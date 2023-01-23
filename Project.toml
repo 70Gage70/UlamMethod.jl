@@ -1,7 +1,19 @@
 name = "UlamMethod"
 uuid = "4cc20838-1966-48f0-823a-5def0ad5c24d"
-authors = ["Gage Bonner"]
+authors = ["Gage Bonner" <gage.bonner@gmail.com>]
 version = "0.1.0"
+
+[deps]
+MAT = "23992714-dd62-5051-b70f-ba57cb901cac"
+HDF5 = "f67ccb44-e63f-5c2f-98bd-6dc0ccc4ba2f"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+Clustering = "aaaa29a8-35af-508c-8bc3-b662a17a0fe5"
+VoronoiCells = "e3e34ffb-84e9-5012-9490-92c94d0c60a4"
+GeometryBasics = "5c1252a2-5f33-56bf-86c9-59e7332b4326"
+LibGEOS = "a90b1aa1-3769-5649-ba7e-abc5a9d163eb"
+GeoInterface = "cf35fbd7-0cd7-5166-be24-54bfbe79505f"
+PolygonInbounds = "e4521ec6-8c1d-418e-9da2-b3bc4ae105d6"
+LazySets = "b4f0291d-fe17-52bc-9479-3d1a343d9043"
 
 [compat]
 julia = "1"

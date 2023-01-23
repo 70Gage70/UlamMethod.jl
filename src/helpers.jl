@@ -5,8 +5,8 @@ General veriables and data for Ulam/TPT computations.
 ####################################################################################################################################
 ####################################################################################################################################
 
-import CSV
-import Tables
+# import CSV
+# import Tables
 import MAT
 import HDF5
 
@@ -43,10 +43,10 @@ import HDF5
 # corners = [-100, 15, -9, 39]
 
 # USEFUL FUNCTIONS
-function csv(name, arr)
-    CSV.write("$name.csv", Tables.table(arr), delim = ',', writeheader = false)
-    return
-end
+# function csv(name, arr)
+#     CSV.write("$name.csv", Tables.table(arr), delim = ',', writeheader = false)
+#     return
+# end
 
 # takes in a vector of vectors and converts it to a matrix
 function vecvec_to_mat(vvec)
@@ -57,7 +57,8 @@ function write_dict_to_h5(fout, group_name, dict)
     g = create_group(fout, group_name)
     for key in collect(keys(dict))
         if dict[key] == []
-            g["key"] = HDF5.EmptyArray{Float64}()
+            # g[key] = HDF5.EmptyArray{Float64}()
+            g[key] = zeros(0)
         else
             g[key] = dict[key]
         end

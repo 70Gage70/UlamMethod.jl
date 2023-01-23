@@ -1,5 +1,3 @@
-using CSV
-using Tables
 using MAT
 using HDF5
 
@@ -70,7 +68,7 @@ function ulamTPT(fname, n_polys, type; h5out = true, extra_suffix = "", rseed = 
 
     if h5out
         # initialize output file 
-        fout_name = "ulamTPT_" * type * extra_suffix * ".h5"
+        fout_name = "ulamTPT_" * type * "_" * string(n_polys) * extra_suffix * ".h5"
         rm(fout_name, force = true) # manually remove old file if it exists
         fout = h5open(fout_name, "w")
 
@@ -85,8 +83,33 @@ function ulamTPT(fname, n_polys, type; h5out = true, extra_suffix = "", rseed = 
     return ulam, tpt
 end
 
-function ulamTPTtest(fname)
-    fid = h5open("ulamTPT_reg_test.h5", "r")
+function ulamTPTtest(fin, n_polys, type, f_standard)
+    ulam, tpt = ulamTPT(fin, n_polys, type, h5out = false)
+    fid = h5open(f_standard, "r")
+
+    # test Ulam's method
+    for key in collect(keys(fid["ulam"]))
+        if !(key in collect(keys(ulam)))
+            return false
+        else
+            if read(fid["ulam"][key]) != ulam[key]
+                return false
+            end
+        end
+    end
+
+    # test TPT
+    for key in collect(keys(fid["tpt"]))
+        if !(key in collect(keys(tpt)))
+            return false
+        else
+            if read(fid["tpt"][key]) != tpt[key]
+                return false
+            end
+        end
+    end
+    
     close(fid)
-    "test"
+
+    return true
 end

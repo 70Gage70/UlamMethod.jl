@@ -72,3 +72,6 @@ Temporary Items
 # HDF5, except tests
 **/src/*.h5
 
+# in prog
+/extras
+

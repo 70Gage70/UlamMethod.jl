@@ -1,5 +1,7 @@
 module UlamMethod
 
-# Write your package code here.
+export ulamTPT
+export ulamTPTtest
+include("main.jl")
 
 end

@@ -65,9 +65,10 @@ Temporary Items
 *.nb
 
 # Matlab, except important
-*.mat
-!x0x5-NA-undrogued.mat
+# *.mat
+# !x0x5-NA-undrogued.mat
+**/src/*.mat
 
 # HDF5
-*.h5
+**/src/*.h5
 

@@ -58,7 +58,7 @@ Temporary Items
 
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
 
-Manifest.toml
+/Manifest.toml
 
 # CSV
 *.csv
@@ -66,11 +66,9 @@ Manifest.toml
 # Mathematica
 *.nb
 
-# Matlab, except important
-# *.mat
-# !x0x5-NA-undrogued.mat
+# Matlab, except tests
 **/src/*.mat
 
-# HDF5
+# HDF5, except tests
 **/src/*.h5
 

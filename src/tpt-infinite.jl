@@ -241,6 +241,8 @@ function tpt_infinite_stats(ALLinds, Ainds, Binds, P, piStat, P_closed = P)
     t_fp = t_first_passage(P_closed, Binds) 
     
     tptDict = begin Dict(
+            "Ainds" => Ainds,
+            "Binds" => Binds,
             "piStat" => piStat, 
             "q+" => qplus, 
             "q-" => qminus, 

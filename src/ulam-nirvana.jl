@@ -82,7 +82,7 @@ polys should be a vector of vectors; that is, poly[i] is a vector whose j'th ent
 polys_centers is also a vector of vectors; polys_centers[i] is equal to [x_center, y_center] 
 """
 
-function ulam_nirvana(x0, y0, xT, yT, polys, polys_centers, A_centers, B_centers)
+function ulam_nirvana(x0, y0, xT, yT, polys, polys_centers)
     ##########################################################################################
     """
     Assign indices to obs/traj data based on given polys.
@@ -153,32 +153,6 @@ function ulam_nirvana(x0, y0, xT, yT, polys, polys_centers, A_centers, B_centers
         end
     end
 
-    ##########################################################################################
-    """
-    Assign A and B regions.
-    """
-    ##########################################################################################
-
-    indsA = zeros(Int64, length(polys))
-    indsB = zeros(Int64, length(polys))
-
-    res_polyA = inpoly2(A_centers, nodes_inpoly, edges_inpoly)
-    res_polyB = inpoly2(B_centers, nodes_inpoly, edges_inpoly)
-
-    for i = 1:length(polys)
-        if (1 in res_polyA[:,1,i]) # the i'th cell contains at least one point from A, therefore this cell belongs to A
-            indsA[i] = 1
-        end
-
-        if (1 in res_polyB[:,1,i])
-            indsB[i] = 1
-        end
-
-    end
-
-    indsA = indsA[contains_data]
-    indsB = indsB[contains_data]
-
     ####################################################################################################################################
     """
     Find the strongest connected component of P_closed.
@@ -194,8 +168,6 @@ function ulam_nirvana(x0, y0, xT, yT, polys, polys_centers, A_centers, B_centers
     P_closed = P_closed[scc_inds, scc_inds]
     polys_clean_scc = splice!(polys_clean, scc_inds[1:end-1]) # don't call at nirvana since that doesn't correspond to a cell, now vt_scc has the connected polygons, vt is the rest
     polys_centers_clean_scc = polys_centers_clean[scc_inds[1:end-1]]
-    indsA = indsA[scc_inds[1:end-1]]
-    indsB = indsB[scc_inds[1:end-1]]
 
     size_change = initial_size - Psize
 
@@ -254,8 +226,6 @@ function ulam_nirvana(x0, y0, xT, yT, polys, polys_centers, A_centers, B_centers
         end
     end
         
-    Ainds = findall(!iszero, indsA)
-    Binds = findall(!iszero, indsB)
     info = clean_info * scc_info
 
     returndict = begin Dict(
@@ -266,12 +236,40 @@ function ulam_nirvana(x0, y0, xT, yT, polys, polys_centers, A_centers, B_centers
         "counts" => final_counts,
         "leaves" => leaves,
         "polys" => vcells,
+        "polys_raw" => polys_clean_scc,
         "polys_centers" => vcenters,
         "polys_dis" => vcells_dis,
-        "Ainds" => Ainds, 
-        "Binds" => Binds, 
         "info" => info)
     end
     
     return returndict 
+end
+
+
+function getABinds(ulam_polys_raw, A_centers, B_centers)
+    res = inpoly_preprocess(ulam_polys_raw)
+    nodes_inpoly = res["nodes"]
+    edges_inpoly = res["edges"]
+
+    indsA = zeros(Int64, length(ulam_polys_raw))
+    indsB = zeros(Int64, length(ulam_polys_raw))
+
+    res_polyA = inpoly2(A_centers, nodes_inpoly, edges_inpoly)
+    res_polyB = inpoly2(B_centers, nodes_inpoly, edges_inpoly)
+
+    for i = 1:length(ulam_polys_raw)
+        if (1 in res_polyA[:,1,i]) # the i'th cell contains at least one point from A, therefore this cell belongs to A
+            indsA[i] = 1
+        end
+
+        if (1 in res_polyB[:,1,i])
+            indsB[i] = 1
+        end
+
+    end
+
+    indsA = findall(!iszero, indsA)
+    indsB = findall(!iszero, indsB)
+    
+    return Dict("indsA" => indsA, "indsB" => indsB)
 end

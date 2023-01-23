@@ -1,6 +1,6 @@
 name = "UlamMethod"
 uuid = "4cc20838-1966-48f0-823a-5def0ad5c24d"
-authors = ["Gage Bonner" <gage.bonner@gmail.com>]
+authors = ["Gage Bonner <gage.bonner@gmail.com>"]
 version = "0.1.0"
 
 [deps]
@@ -14,6 +14,8 @@ LibGEOS = "a90b1aa1-3769-5649-ba7e-abc5a9d163eb"
 GeoInterface = "cf35fbd7-0cd7-5166-be24-54bfbe79505f"
 PolygonInbounds = "e4521ec6-8c1d-418e-9da2-b3bc4ae105d6"
 LazySets = "b4f0291d-fe17-52bc-9479-3d1a343d9043"
+Graphs = "86223c79-3864-5bf0-83f7-82e725a168b6"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [compat]
 julia = "1"

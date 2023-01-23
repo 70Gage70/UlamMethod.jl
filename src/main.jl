@@ -82,34 +82,3 @@ function ulamTPT(fname, n_polys, type; h5out = true, extra_suffix = "", rseed = 
 
     return ulam, tpt
 end
-
-function ulamTPTtest(fin, n_polys, type, f_standard)
-    ulam, tpt = ulamTPT(fin, n_polys, type, h5out = false)
-    fid = h5open(f_standard, "r")
-
-    # test Ulam's method
-    for key in collect(keys(fid["ulam"]))
-        if !(key in collect(keys(ulam)))
-            return false
-        else
-            if read(fid["ulam"][key]) != ulam[key]
-                return false
-            end
-        end
-    end
-
-    # test TPT
-    for key in collect(keys(fid["tpt"]))
-        if !(key in collect(keys(tpt)))
-            return false
-        else
-            if read(fid["tpt"][key]) != tpt[key]
-                return false
-            end
-        end
-    end
-    
-    close(fid)
-
-    return true
-end

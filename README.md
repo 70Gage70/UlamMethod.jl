@@ -17,7 +17,7 @@ This package is an implementation of Ulam's method [[1]](#1), [[2]](#2) (see als
 First, prepare the data into one of two formats: [.mat](https://github.com/JuliaIO/MAT.jl) or [.h5](https://github.com/JuliaIO/HDF5.jl) such that the head of the file contains four variables, `x0`, `xT`, `y0` and `yT`. See `test/x0x5-NA-undrogued.mat` and `test/x0x5-NA-undrogued.h5` for example trajectory data from undrogued drifters in the North Atlantic obtained from the NOAA GDP [[6]](#6). We will use the .mat file for this example
 
 ```julia
-f_in = x0x5-NA-undrogued.mat
+f_in = "x0x5-NA-undrogued.mat"
 ```
 
 Then, select the size of the computational domain, that is, a rectangle of the form `[xmin, xmax, ymin, ymax]`. All data outside this rectangle, if any, will be added to the nirvana state.
@@ -47,6 +47,26 @@ ulam = ulam_method(f_in, n_polys, type, corners)
 The output of Ulam's method is a dictionary. The most relevant keys are `P_closed` which points to the full transition probability matrix with nirvana as the last row/column and `polys` which returns the polygons of the covering as a matrix. This matrix is a list of nodes such that the first column is the index of the node identifying the polyon it belongs to and the second and third columns are the x, y coordinates of that node. 
 
 ### Transition path theory
+
+Currently, infinite-time transition path theory is supported. To compute transition path theory statistics, we first choose the coordinates defining the locations of the source $A$ and the target $B$. These can either be lists of points or a rectangular region using the function `AB_smear`. In this example, we'll set $A$ to be a single point and $B$ to be a region.
+
+```julia
+A_centers = [
+    -18.0 17.0;
+    ]
+    
+B_centers = AB_smear(-98.0, -92.0, 17.7, 32.0, resolution = 0.1)
+```
+
+Then, we compute the statistics as follows
+
+
+```julia
+tpt = tpt_from_ulam(ulam, A_centers, B_centers)
+```
+
+The output of `tpt_from_ulam` is a dictionary with all of the standard transition path theory statistics such as the reactive density `"muAB"`, transition time `"tAB"` and effective flux `"f+"`.
+
 
 ## Binning algorithms
 

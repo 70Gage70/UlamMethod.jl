@@ -238,7 +238,6 @@ function ulam_nirvana(x0, y0, xT, yT, polys, polys_centers)
         "counts" => final_counts,
         "leaves" => leaves,
         "polys" => vcells,
-        "polys_raw" => polys_clean_scc,
         "polys_centers" => vcenters,
         "polys_dis" => vcells_dis,
         "info" => info)
@@ -258,35 +257,45 @@ function inpoly_preprocess_AB(polys)
     i = 1
 
     while i <= size(polys)[1] - 1
-        line = polys[i]
+        line = polys[i,:]
         if polys[i + 2] == poly_index
-            push!(nodes, lin[2:3])
-            push!(edges, [edge_index, edge_index + 1])
+            push!(nodes, line[2:3])
+            push!(edges, [edge_index, edge_index + 1, poly_index])
             edges_this = edges_this + 1
-        else # this is the connecting edge, note we did i + 2 on the last line since polys has the connecting last edge explicitly
-            push!(nodes, lin[2:3])
-            push!(edges, [edge_index, edge_min])
+            i = i + 1
+        elseif (polys[i + 2] != poly_index) || (i == size(polys)[1] - 1) 
+            # this is the connecting edge, note we did i + 2 on the last line since polys has the connecting last edge explicitly
+            push!(nodes, line[2:3])
+            push!(edges, [edge_index, edge_index - edges_this, poly_index])
+            i = i + 2
+            poly_index = poly_index + 1
+            edges_this = 0
         end
 
-
+        edge_index  = edge_index + 1
     end
 
+    nodes = vecvec_to_mat(nodes)
+    edges = vecvec_to_mat(edges)
+    npolys = Integer(polys[end, 1])
 
-    return Dict("nodes" => nodes, "edges" => edges)
+    return Dict("nodes" => nodes, "edges" => edges, "npolys" => npolys)
 end
 
+
 function getABinds(ulam_polys, A_centers, B_centers)
-    res = inpoly_preprocess(ulam_polys)
+    res = inpoly_preprocess_AB(ulam_polys)
     nodes_inpoly = res["nodes"]
     edges_inpoly = res["edges"]
+    npolys = res["npolys"]
 
-    indsA = zeros(Int64, length(ulam_polys))
-    indsB = zeros(Int64, length(ulam_polys))
+    indsA = zeros(Int64, npolys)
+    indsB = zeros(Int64, npolys)
 
     res_polyA = inpoly2(A_centers, nodes_inpoly, edges_inpoly)
     res_polyB = inpoly2(B_centers, nodes_inpoly, edges_inpoly)
 
-    for i = 1:length(ulam_polys)
+    for i = 1:npolys
         if (1 in res_polyA[:,1,i]) # the i'th cell contains at least one point from A, therefore this cell belongs to A
             indsA[i] = 1
         end

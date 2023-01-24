@@ -63,7 +63,7 @@ function tpt_from_ulam(ulam, A_centers, B_centers; h5out = true, extra_suffix = 
 
     if h5out
         # initialize output file 
-        fout_name = "TPT_" * type * "_" * string(n_polys) * extra_suffix * ".h5"
+        fout_name = "TPT" * extra_suffix * ".h5"
         rm(fout_name, force = true) # manually remove old file if it exists
         fout = h5open(fout_name, "w")
         write_dict_to_h5(fout, "tpt", tpt)

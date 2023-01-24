@@ -19,17 +19,12 @@ end
 
 function write_dict_to_h5(fout, group_name, dict)
     g = create_group(fout, group_name)
-    # println(collect(keys(dict)))
     for key in collect(keys(dict))
-        # println(key)
-        # println(dict[key])
-        if key != "polys_raw"
-            if dict[key] == []
-                # g[key] = HDF5.EmptyArray{Float64}()
-                g[key] = zeros(0)
-            else
-                g[key] = dict[key]
-            end
+        if dict[key] == []
+            # g[key] = HDF5.EmptyArray{Float64}()
+            g[key] = zeros(0)
+        else
+            g[key] = dict[key]
         end
     end
 end

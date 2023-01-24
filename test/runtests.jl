@@ -2,14 +2,27 @@ using UlamMethod
 using Test
 using HDF5
 
+include("testdata.jl")
 
-inpath = joinpath(@__DIR__, "x0x5-NA-undrogued")
-regpath = joinpath(@__DIR__, "ulamTPT_reg_500.h5")
-hexpath = joinpath(@__DIR__, "ulamTPT_hex_500.h5")
-vorpath = joinpath(@__DIR__, "ulamTPT_vor_50.h5")
+MATin = joinpath(@__DIR__, "x0x5-NA-undrogued.mat")
+h5in = joinpath(@__DIR__, "x0x5-NA-undrogued.h5")
 
-@testset "UlamMethod.jl" begin
-    @test ulamTPTtest(inpath, 500, "reg", regpath) == true
-    @test ulamTPTtest(inpath, 500, "hex", hexpath) == true
-    @test ulamTPTtest(inpath, 50, "vor", vorpath) == true
+@testset "ulam_tpt_h5" begin
+    for case in test_cases
+        type = case[1]
+        n_polys = case[2]
+        f_ulam = joinpath(@__DIR__, "ulam_" * string(type) * "_" * string(n_polys) * ".h5")
+        f_tpt = joinpath(@__DIR__, "TPT_" * string(type) * "_" * string(n_polys) * ".h5")
+        @test ulam_method_tpt_test(h5in, n_polys, type, corners, A_centers, B_centers, f_ulam, f_tpt)
+    end
+end
+
+@testset "ulam_tpt_MAT" begin
+    for case in test_cases
+        type = case[1]
+        n_polys = case[2]
+        f_ulam = joinpath(@__DIR__, "ulam_" * string(type) * "_" * string(n_polys) * ".h5")
+        f_tpt = joinpath(@__DIR__, "TPT_" * string(type) * "_" * string(n_polys) * ".h5")
+        @test ulam_method_tpt_test(MATin, n_polys, type, corners, A_centers, B_centers, f_ulam, f_tpt)
+    end
 end

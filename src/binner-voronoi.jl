@@ -153,5 +153,3 @@ function voronoi_binner(x0, y0, xT, yT, n_clusters, corners; rseed = 123)
 
     return polys, polys_centers
 end
-
-

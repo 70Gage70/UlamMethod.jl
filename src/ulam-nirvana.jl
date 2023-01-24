@@ -13,6 +13,8 @@ using PolygonInbounds:inpoly2
 using Graphs
 using LinearAlgebra
 
+include("helpers.jl")
+
 ####################################################################################################################################
 ####################################################################################################################################
 ####################################################################################################################################
@@ -246,18 +248,45 @@ function ulam_nirvana(x0, y0, xT, yT, polys, polys_centers)
 end
 
 
-function getABinds(ulam_polys_raw, A_centers, B_centers)
-    res = inpoly_preprocess(ulam_polys_raw)
+function inpoly_preprocess_AB(polys)
+    nodes = []
+    edges = []
+
+    poly_index = 1
+    edge_index = 1
+    edges_this = 0
+    i = 1
+
+    while i <= size(polys)[1] - 1
+        line = polys[i]
+        if polys[i + 2] == poly_index
+            push!(nodes, lin[2:3])
+            push!(edges, [edge_index, edge_index + 1])
+            edges_this = edges_this + 1
+        else # this is the connecting edge, note we did i + 2 on the last line since polys has the connecting last edge explicitly
+            push!(nodes, lin[2:3])
+            push!(edges, [edge_index, edge_min])
+        end
+
+
+    end
+
+
+    return Dict("nodes" => nodes, "edges" => edges)
+end
+
+function getABinds(ulam_polys, A_centers, B_centers)
+    res = inpoly_preprocess(ulam_polys)
     nodes_inpoly = res["nodes"]
     edges_inpoly = res["edges"]
 
-    indsA = zeros(Int64, length(ulam_polys_raw))
-    indsB = zeros(Int64, length(ulam_polys_raw))
+    indsA = zeros(Int64, length(ulam_polys))
+    indsB = zeros(Int64, length(ulam_polys))
 
     res_polyA = inpoly2(A_centers, nodes_inpoly, edges_inpoly)
     res_polyB = inpoly2(B_centers, nodes_inpoly, edges_inpoly)
 
-    for i = 1:length(ulam_polys_raw)
+    for i = 1:length(ulam_polys)
         if (1 in res_polyA[:,1,i]) # the i'th cell contains at least one point from A, therefore this cell belongs to A
             indsA[i] = 1
         end

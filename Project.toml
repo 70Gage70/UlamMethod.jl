@@ -18,6 +18,16 @@ Graphs = "86223c79-3864-5bf0-83f7-82e725a168b6"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [compat]
+MAT = "0.10"
+HDF5 = "0.16"
+Clustering = "0.14"
+VoronoiCells = "0.3"
+GeometryBasics = "0.4"
+LibGEOS = "0.7"
+GeoInterface = "1.2"
+PolygonInbounds = "0.2"
+LazySets = "2.5"
+Graphs = "1.7"
 julia = "1"
 
 [extras]

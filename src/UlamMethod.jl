@@ -1,6 +1,6 @@
 module UlamMethod
 
-export ulamTPT
+export ulam_method, tpt_from_ulam, AB_smear
 include("main.jl")
 
 end

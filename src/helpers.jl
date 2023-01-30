@@ -12,6 +12,10 @@ import HDF5
 ####################################################################################################################################
 ####################################################################################################################################
 
+function corners_mid(corners)
+    return [(corners[1] + corners[2])/2, (corners[3] + corners[4])/2]
+end
+
 # takes in a vector of vectors and converts it to a matrix
 function vecvec_to_mat(vvec)
     return reduce(hcat,vvec)'

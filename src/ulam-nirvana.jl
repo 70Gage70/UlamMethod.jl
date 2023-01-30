@@ -2,6 +2,7 @@
 A generic Ulam method.
 Needs: x0, y0, xT, yT, polys
 Needs: polys: a vector whose i'th entry is a vector of [x, y] coordinates of that polygon WITH CLOSING NODE
+Needs: polys_centers: a vector whose i'th entry is the [x, y] coordinates of the center of the ith polygon. 
 
 Written by Gage Bonner November 2022
 """
@@ -20,7 +21,7 @@ include("helpers.jl")
 ####################################################################################################################################
 
 """
-Generates a list of nodes and edges suitable for use in inpoly2()
+Generates a list of nodes and edges suitable for use in inpoly2(). Here, polys is from the binners.
 """
 
 function inpoly_preprocess(polys)
@@ -78,13 +79,79 @@ end
 
 
 """
+Processes the output of ulam_nirvana ("polys") for use with inpoly2. 
+"""
+
+function inpoly_preprocess_AB(polys)
+    nodes = []
+    edges = []
+
+    poly_index = 1
+    edge_index = 1
+    edges_this = 0
+    i = 1
+
+    while i <= size(polys)[1] - 1
+        line = polys[i,:]
+        if polys[i + 2] == poly_index
+            push!(nodes, line[2:3])
+            push!(edges, [edge_index, edge_index + 1, poly_index])
+            edges_this = edges_this + 1
+            i = i + 1
+        elseif (polys[i + 2] != poly_index) || (i == size(polys)[1] - 1) 
+            # this is the connecting edge, note we did i + 2 on the last line since polys has the connecting last edge explicitly
+            push!(nodes, line[2:3])
+            push!(edges, [edge_index, edge_index - edges_this, poly_index])
+            i = i + 2
+            poly_index = poly_index + 1
+            edges_this = 0
+        end
+
+        edge_index  = edge_index + 1
+    end
+
+    nodes = vecvec_to_mat(nodes)
+    edges = vecvec_to_mat(edges)
+    npolys = Integer(polys[end, 1])
+
+    return Dict("nodes" => nodes, "edges" => edges, "npolys" => npolys)
+end
+
+
+"""
+Finds the indices of ulam_polys which contain the points in centers. For finding the indices of A or B after ulam is already done.
+"""
+
+function getABinds(ulam_polys, centers)
+    res = inpoly_preprocess_AB(ulam_polys)
+    nodes_inpoly = res["nodes"]
+    edges_inpoly = res["edges"]
+    npolys = res["npolys"]
+
+    inds = zeros(Int64, npolys)
+
+    res_poly = inpoly2(centers, nodes_inpoly, edges_inpoly)
+
+    for i = 1:npolys
+        if (1 in res_poly[:,1,i]) # the i'th cell contains at least one point from A, therefore this cell belongs to A
+            inds[i] = 1
+        end
+    end
+
+    inds = findall(!iszero, inds)
+    
+    return inds
+end
+
+
+"""
 The Ulam method. 
 
 polys should be a vector of vectors; that is, poly[i] is a vector whose j'th entry is the jth vertex of that polygon. Must be closed!
 polys_centers is also a vector of vectors; polys_centers[i] is equal to [x_center, y_center] 
 """
 
-function ulam_nirvana(x0, y0, xT, yT, polys, polys_centers)
+function ulam_nirvana(x0, y0, xT, yT, polys, polys_centers; sto_type = "data", source_centers = polys_centers[1])
     ##########################################################################################
     """
     Assign indices to obs/traj data based on given polys.
@@ -140,17 +207,18 @@ function ulam_nirvana(x0, y0, xT, yT, polys, polys_centers)
 
     Psize = npolys + 1 # extra row/col for nirvana
     P_closed = zeros(Psize, Psize)
+    reinjection_counts = zeros(Int64, Psize)
 
     for i = 1:length(inds0)
         ind0 = inds0[i]
         indT = indsT[i]
 
-        if ind0 != 0 && indT != 0
+        if ind0 != 0 && indT != 0 # transitions from interior to interior
             P_closed[ind0, indT] = P_closed[ind0, indT] + 1
-        elseif ind0 == 0 && indT != 0
-            P_closed[Psize, indT] = P_closed[Psize, indT] + 1
-        elseif ind0 != 0 && indT == 0
+        elseif ind0 != 0 && indT == 0 # transitions from interior to nirvana
             P_closed[ind0, Psize] = P_closed[ind0, Psize] + 1
+        elseif ind0 == 0 && indT != 0 # transitions from nirvana to interior
+            reinjection_counts[indT] = reinjection_counts[indT] + 1 # re-inject these later according to the desired type
         # else: transitions from nirvana to self; ignored            
         end
     end
@@ -168,8 +236,9 @@ function ulam_nirvana(x0, y0, xT, yT, polys, polys_centers)
 
     Psize = length(scc_inds)
     P_closed = P_closed[scc_inds, scc_inds]
-    polys_clean_scc = splice!(polys_clean, scc_inds[1:end-1]) # don't call at nirvana since that doesn't correspond to a cell, now vt_scc has the connected polygons, vt is the rest
+    polys_clean_scc = splice!(polys_clean, scc_inds[1:end-1]) # don't call at nirvana since that doesn't correspond to a cell, now polys_clean_scc has the connected polygons, polys_clean is the rest
     polys_centers_clean_scc = polys_centers_clean[scc_inds[1:end-1]]
+    reinjection_counts = reinjection_counts[scc_inds]
 
     size_change = initial_size - Psize
 
@@ -181,24 +250,9 @@ function ulam_nirvana(x0, y0, xT, yT, polys, polys_centers)
 
     ####################################################################################################################################
     """
-    Normalize P and return results.
+    Collect polygons.
     """
     ##########################################################################################
-    # println("Cleaning and returning.")
-
-    final_counts = [sum(P_closed[i,:]) for i = 1:Psize]
-
-    # normalize P
-    for i = 1:Psize
-        if !(i == Psize && final_counts[i] == 0) # there are no transitions to nirvana if this is true. If it is, fine to leave zero row at end.
-            P_closed[i,:] = P_closed[i,:]/final_counts[i]
-        end
-    end
-    
-    pi_closed = abs.(normalize(eigvecs(transpose(P_closed))[:,size(P_closed)[1]], 1))
-    P_open = P_closed[1:end - 1, 1:end - 1]
-    pi_open = pi_closed[1:end - 1]
-    leaves = [(1.0 - P_open[i, i])*final_counts[i] for i = 1:Psize - 1]
 
     # Collect cells into n x 3 array of the form: cell # | x | y
     # Simultaneously, collect polygon centers into n x 2 array of the form: | x | y | 
@@ -227,6 +281,39 @@ function ulam_nirvana(x0, y0, xT, yT, polys, polys_centers)
             end
         end
     end
+
+    ####################################################################################################################################
+    """
+    Reinject trajectories which go from nirvana to the interior and normalize P.
+    """
+    ##########################################################################################
+
+    if sto_type == "data"
+        P_closed[Psize,:] = reinjection_counts
+    elseif sto_type == "source"
+        source_inds = getABinds(vcells, source_centers)
+        P_closed[Psize, source_inds] .= 1
+    end
+
+    final_counts = [sum(P_closed[i,:]) for i = 1:Psize]
+
+    # normalize P
+    for i = 1:Psize
+        if !(i == Psize && final_counts[i] == 0) # there are no transitions from nirvana if this is true. If it is, fine to leave zero row at end.
+            P_closed[i,:] = P_closed[i,:]/final_counts[i]
+        end
+    end
+
+    ####################################################################################################################################
+    """
+    Return results.
+    """
+    ##########################################################################################
+    
+    pi_closed = abs.(normalize(eigvecs(transpose(P_closed))[:,size(P_closed)[1]], 1))
+    P_open = P_closed[1:end - 1, 1:end - 1]
+    pi_open = pi_closed[1:end - 1]
+    leaves = [(1.0 - P_open[i, i])*final_counts[i] for i = 1:Psize - 1]
         
     info = clean_info * scc_info
 
@@ -246,68 +333,3 @@ function ulam_nirvana(x0, y0, xT, yT, polys, polys_centers)
     return returndict 
 end
 
-
-function inpoly_preprocess_AB(polys)
-    nodes = []
-    edges = []
-
-    poly_index = 1
-    edge_index = 1
-    edges_this = 0
-    i = 1
-
-    while i <= size(polys)[1] - 1
-        line = polys[i,:]
-        if polys[i + 2] == poly_index
-            push!(nodes, line[2:3])
-            push!(edges, [edge_index, edge_index + 1, poly_index])
-            edges_this = edges_this + 1
-            i = i + 1
-        elseif (polys[i + 2] != poly_index) || (i == size(polys)[1] - 1) 
-            # this is the connecting edge, note we did i + 2 on the last line since polys has the connecting last edge explicitly
-            push!(nodes, line[2:3])
-            push!(edges, [edge_index, edge_index - edges_this, poly_index])
-            i = i + 2
-            poly_index = poly_index + 1
-            edges_this = 0
-        end
-
-        edge_index  = edge_index + 1
-    end
-
-    nodes = vecvec_to_mat(nodes)
-    edges = vecvec_to_mat(edges)
-    npolys = Integer(polys[end, 1])
-
-    return Dict("nodes" => nodes, "edges" => edges, "npolys" => npolys)
-end
-
-
-function getABinds(ulam_polys, A_centers, B_centers)
-    res = inpoly_preprocess_AB(ulam_polys)
-    nodes_inpoly = res["nodes"]
-    edges_inpoly = res["edges"]
-    npolys = res["npolys"]
-
-    indsA = zeros(Int64, npolys)
-    indsB = zeros(Int64, npolys)
-
-    res_polyA = inpoly2(A_centers, nodes_inpoly, edges_inpoly)
-    res_polyB = inpoly2(B_centers, nodes_inpoly, edges_inpoly)
-
-    for i = 1:npolys
-        if (1 in res_polyA[:,1,i]) # the i'th cell contains at least one point from A, therefore this cell belongs to A
-            indsA[i] = 1
-        end
-
-        if (1 in res_polyB[:,1,i])
-            indsB[i] = 1
-        end
-
-    end
-
-    indsA = findall(!iszero, indsA)
-    indsB = findall(!iszero, indsB)
-    
-    return Dict("indsA" => indsA, "indsB" => indsB)
-end

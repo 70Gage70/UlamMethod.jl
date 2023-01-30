@@ -10,11 +10,26 @@ This package is an implementation of Ulam's method [[1]](#1), [[2]](#2) (see als
 - Bin the data according to the covering to generate a transition probability matrix such that any data outside the computational domain is lumped into a so-called "nirvana" state [[4]](#4).
 - Transition path theory statistics [[5]](#5) are computed on the stationary, time-homogenous Markov chain induced by the transition probability matrix.
 
+## Installation
+
+In the Julia REPL, run the following code and follow the prompts:
+
+```
+using Pkg
+Pkg.add("UlamMethod")
+```
+
+Make the functions in this package available to use in your code by including the following line:
+
+```
+using UlamMethod
+```
+
 ## Usage
 
 ### Ulam's Method
 
-First, prepare the data into one of two formats: [.mat](https://github.com/JuliaIO/MAT.jl) or [.h5](https://github.com/JuliaIO/HDF5.jl) such that the head of the file contains four variables, `x0`, `xT`, `y0` and `yT`. See `test/x0x5-NA-undrogued.mat` and `test/x0x5-NA-undrogued.h5` for example trajectory data from undrogued drifters in the North Atlantic obtained from the NOAA GDP [[6]](#6). We will use the .mat file for this example
+Prepare the data into one of two formats: [.mat](https://github.com/JuliaIO/MAT.jl) or [.h5](https://github.com/JuliaIO/HDF5.jl) such that the head of the file contains four variables, `x0`, `xT`, `y0` and `yT`. See `test/x0x5-NA-undrogued.mat` and `test/x0x5-NA-undrogued.h5` for example trajectory data from undrogued drifters in the North Atlantic obtained from the NOAA GDP [[6]](#6). We will use the .mat file for this example
 
 ```julia
 f_in = "x0x5-NA-undrogued.mat"

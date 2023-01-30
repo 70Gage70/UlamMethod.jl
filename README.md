@@ -14,14 +14,14 @@ This package is an implementation of Ulam's method [[1]](#1), [[2]](#2) (see als
 
 In the Julia REPL, run the following code and follow the prompts:
 
-```
+```julia
 using Pkg
 Pkg.add("UlamMethod")
 ```
 
 Make the functions in this package available to use in your code by including the following line:
 
-```
+```julia
 using UlamMethod
 ```
 

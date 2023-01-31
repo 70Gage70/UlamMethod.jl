@@ -60,8 +60,9 @@ Temporary Items
 
 /Manifest.toml
 
-# CSV
 *.csv
+*.png
+*.pdf
 
 # Mathematica
 *.nb
@@ -69,8 +70,10 @@ Temporary Items
 # Matlab, except tests
 **/src/*.mat
 
-# HDF5, except tests
+# HDF5, except tests and large
 **/src/*.h5
+**/test/ulam_vor_500.h5
+**/test/TPT_vor_500.h5
 
 # in prog
 /extras

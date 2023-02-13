@@ -53,13 +53,13 @@ end
 # GENERATING TEST REFERENCES
 
 # Computational domain
-corners = [-100, 15, -9, 39]
+corners = [-100, 15, -9, 39];
 
 # AB Locations
 A_centers = [
     -18.0 17.0;
-    ]
-B_centers = AB_smear(-98.0, -92.0, 17.7, 32.0, resolution = 0.1)
+    ];
+B_centers = AB_smear(-98.0, -92.0, 17.7, 32.0, resolution = 0.1);
 
 
 test_cases = [["reg", 500], ["hex", 500], ["vor", 50]]

@@ -179,6 +179,52 @@ function t_first_passage(P, Binds)
 end
 
 
+"""
+The probability that state i hits B at B_j in particular (given that it is reactive)
+"""
+
+function B_hitters(ALLinds, Ainds, Binds, P, qplus) 
+    Cinds = mysetdiff(ALLinds, [Ainds ; Binds]) 
+    rij = zeros(length(ALLinds), length(ALLinds)) # jth row is B_j
+
+    for j in Binds
+        M = zeros(length(Cinds), length(Cinds))
+        for i in 1:length(Cinds)
+            for k in 1:length(Cinds)
+                ci = Cinds[i]
+                ck = Cinds[k]
+                M[i, k] = qplus[ck]*P[ci,ck]/qplus[ci]
+            end
+        end
+
+        M = I - M
+        b = [P[i, j]/qplus[i] for i in Cinds]
+        
+        sol = M\b
+
+        for i = 1:length(ALLinds)
+            if i in Cinds
+                solindex = findfirst(isequal(i), Cinds)
+                rij[i,j] = sol[solindex]
+            end
+        end
+    end
+
+    # ri[i] is the index of the B cell that's most likely to be hit.
+    ri = zeros(Int64, length(ALLinds))
+    for i in ALLinds
+        am = argmax(rij[i,:])
+        if am == 1
+            ri[i] = 0
+        else
+            ri[i] = am
+        end
+    end
+
+    return rij, ri
+
+end
+
 
 """
 All the statistics for infinite time tpt, returned as a dict.
@@ -240,6 +286,9 @@ function tpt_infinite_stats(ALLinds, Ainds, Binds, P, piStat, P_closed = P)
     # first passage time
     t_fp = t_first_passage(P_closed, Binds) 
     
+    # B hitters
+    rij, ri = B_hitters(ALLinds, Ainds, Binds, P, qplus) 
+
     tptDict = begin Dict(
             "Ainds" => Ainds,
             "Binds" => Binds,
@@ -255,7 +304,9 @@ function tpt_infinite_stats(ALLinds, Ainds, Binds, P, piStat, P_closed = P)
             "tAB" => tAB,
             "tAB_rem" => tAB_rem,
             "t_rem" => t_rem,
-            "t_fp" => t_fp) 
+            "t_fp" => t_fp,
+            "rij" => rij,
+            "ri" => ri) 
     end
     
     return tptDict

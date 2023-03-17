@@ -183,28 +183,35 @@ end
 The probability that state i hits B at B_j in particular (given that it is reactive)
 """
 
-function B_hitters(ALLinds, Ainds, Binds, P, qplus) 
-    Cinds = mysetdiff(ALLinds, [Ainds ; Binds]) 
+function B_hitters(ALLinds, Ainds, Binds, P, qplus)
+    Cplus = []
+    outsideBinds = mysetdiff(ALLinds, Binds)
+    for i in outsideBinds
+        if qplus[i] > 0.0
+            push!(Cplus, i)
+        end
+    end
+
     rij = zeros(length(ALLinds), length(ALLinds)) # jth row is B_j
 
     for j in Binds
-        M = zeros(length(Cinds), length(Cinds))
-        for i in 1:length(Cinds)
-            for k in 1:length(Cinds)
-                ci = Cinds[i]
-                ck = Cinds[k]
+        M = zeros(length(Cplus), length(Cplus))
+        for i in 1:length(Cplus)
+            for k in 1:length(Cplus)
+                ci = Cplus[i]
+                ck = Cplus[k]
                 M[i, k] = qplus[ck]*P[ci,ck]/qplus[ci]
             end
         end
 
         M = I - M
-        b = [P[i, j]/qplus[i] for i in Cinds]
+        b = [P[i, j]/qplus[i] for i in Cplus]
         
         sol = M\b
 
         for i = 1:length(ALLinds)
-            if i in Cinds
-                solindex = findfirst(isequal(i), Cinds)
+            if i in Cplus
+                solindex = findfirst(isequal(i), Cplus)
                 rij[i,j] = sol[solindex]
             end
         end

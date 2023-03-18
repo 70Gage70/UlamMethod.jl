@@ -49,11 +49,27 @@ function AB_smear(xmin, xmax, ymin, ymax; resolution = 0.1)
 end
 
 
-function tpt_from_ulam(ulam, A_centers, B_centers; h5out = true, extra_suffix = "")
+function tpt_from_ulam(ulam, A_centers, B_centers; h5out = true, extra_suffix = "", avoid = false)
     P_closed = ulam["P_closed"]
     P_open = ulam["P_open"]
     pi_open = ulam["pi_open"]
     ALL_inds = 1:length(P_open[:,1])
+
+    if avoid != false
+        avoid_verts = avoid["verts"]
+        avoid_edges = avoid["edges"]
+        xmin = minimum(avoid_verts[:, 1])
+        xmax = maximum(avoid_verts[:, 1])
+        ymin = minimum(avoid_verts[:, 2])
+        ymax = maximum(avoid_verts[:, 2])
+        avoid_points = AB_smear(xmin, xmax, ymin, ymax, resolution = minimum([ymax - ymin, xmax - xmin]./200))
+
+        res = inpoly2(avoid_points, avoid_verts, avoid_edges)[:,1]
+        avoid_points = avoid_points[res, :]
+    
+        A_centers = [A_centers ; avoid_points]
+        B_centers = [B_centers ; avoid_points]
+    end
 
     A_inds = getABinds(ulam["polys"], A_centers)
     B_inds = getABinds(ulam["polys"], B_centers)

@@ -204,7 +204,14 @@ function B_hitters(ALLinds, Ainds, Binds, P, qplus)
 
     rij = zeros(length(ALLinds), length(ALLinds)) # jth row is B_j
 
-    for j in Binds
+    ABint = intersect(Ainds, Binds)
+    trueB = mysetdiff(Binds, ABint)
+
+    if length(trueB) == 0
+        error("B is a subset of A")
+    end
+
+    for j in trueB
         M = zeros(length(Cplus), length(Cplus))
         for i in 1:length(Cplus)
             for k in 1:length(Cplus)

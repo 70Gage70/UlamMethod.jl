@@ -12,15 +12,17 @@ using LinearAlgebra
 
 
 """
-Subtracts x from y, setwise. 
+Calculates y - x, setwise. 
 e.g.  mysetdiff([1,2,3,4,5], [1,2,3]) = [4,5]
+e.g.  mysetdiff([1,2,3,4,5], [1,2,2,3]) = [4,5]
 """
 
 function mysetdiff(y, x)
-    res = Vector{eltype(y)}(undef, length(y) - length(x))
+    xu = unique(x)
+    res = Vector{eltype(y)}(undef, length(y) - length(xu))
     i = 1
     @inbounds for el in y
-        el ∈ x && continue
+        el ∈ xu && continue
         res[i] = el
         i += 1
     end
@@ -114,13 +116,21 @@ The remaining time of a reactive trajectory (second formulation). Satisfies a li
 
 function t_remaining(ALLinds, Ainds, Binds, P, qplus) 
     Cplus = []
-    outsideBinds = mysetdiff(ALLinds, Binds)
+
+    # if A and B intersect, we can't calculate t_rem where they intersect
+    ABint = intersect(Ainds, Binds)
+    trueB = mysetdiff(Binds, ABint)
+
+    if length(trueB) == 0
+        error("B is a subset of A")
+    end
+
+    outsideBinds = mysetdiff(ALLinds, trueB)
     for i in outsideBinds
         if sum(P[i, k]*qplus[k] for k in ALLinds) > 0.0
             push!(Cplus, i)
         end
     end
-
 
     M = zeros(length(Cplus), length(Cplus))
     for i in 1:length(Cplus)
@@ -185,8 +195,8 @@ The probability that state i hits B at B_j in particular (given that it is react
 
 function B_hitters(ALLinds, Ainds, Binds, P, qplus)
     Cplus = []
-    outsideBinds = mysetdiff(ALLinds, Binds)
-    for i in outsideBinds
+    Cinds = mysetdiff(ALLinds, [Ainds ; Binds])
+    for i in Cinds
         if qplus[i] > 0.0
             push!(Cplus, i)
         end

@@ -60,11 +60,20 @@ Forward committor. Essentially have linear matrix equation q = P q + b, where P 
 and where b_i = sum P_{i, k} for k in B. Hence, construct M = I - P and so q = M\b
 """
 
+# Subtle issue with the committor that's relevant for the case where A and B contain intersections.
+#We want the intersection to have 0 forward and backward committors, therefore we check the one
+# that gives 0 first in the if statements.
+
 function qforward(ALLinds, Ainds, Binds, P)
+
     Cinds = mysetdiff(ALLinds, [Ainds ; Binds])
+
+    ABint = intersect(Ainds, Binds)
+    trueB = mysetdiff(Binds, ABint)
+
     Pc = P[Cinds, Cinds] # P restricted to C subspace
     M = I - Pc # "I" just works in Julia as an identity matrix object in LinearAlgebra
-    b = [sum(P[i, k] for k in Binds) for i in Cinds]
+    b = [sum(P[i, k] for k in trueB) for i in Cinds]
     
     sol = M\b
     
@@ -80,6 +89,8 @@ function qforward(ALLinds, Ainds, Binds, P)
         end
     end
     
+    qplus[abs.(qplus) .< 1e-16] .= 0.0
+
     return qplus           
 end
 
@@ -89,25 +100,31 @@ Backward committor. Same idea as forward committor except we use Pminus instead 
 
 function qbackward(ALLinds, Ainds, Binds, Pminus)
     Cinds = mysetdiff(ALLinds, [Ainds ; Binds]) 
+
+    ABint = intersect(Ainds, Binds)
+    trueA = mysetdiff(Ainds, ABint)
+
     Pc = Pminus[Cinds, Cinds] # P restricted to C subspace
     M = I - Pc # "I" just works in Julia as an identity matrix object in LinearAlgebra
-    b = [sum(Pminus[i, k] for k in Ainds) for i in Cinds]
+    b = [sum(Pminus[i, k] for k in trueA) for i in Cinds]
     
     sol = M\b
     
-    qplus = zeros(length(ALLinds))
+    qback = zeros(length(ALLinds))
     for i = 1:length(ALLinds)
-        if i in Ainds
-            qplus[i] = 1.0
-        elseif i in Binds
-            qplus[i] = 0.0
+        if i in Binds
+            qback[i] = 0.0
+        elseif i in Ainds
+            qback[i] = 1.0
         else
             solindex = findfirst(isequal(i), Cinds)
-            qplus[i] = sol[solindex]
+            qback[i] = sol[solindex]
         end
     end
     
-    return qplus           
+    qback[abs.(qback) .< 1e-16] .= 0.0
+
+    return qback           
 end
 
 """
@@ -125,7 +142,7 @@ function t_remaining(ALLinds, Ainds, Binds, P, qplus)
         error("B is a subset of A")
     end
 
-    outsideBinds = mysetdiff(ALLinds, trueB)
+    outsideBinds = mysetdiff(ALLinds, Binds)
     for i in outsideBinds
         if sum(P[i, k]*qplus[k] for k in ALLinds) > 0.0
             push!(Cplus, i)

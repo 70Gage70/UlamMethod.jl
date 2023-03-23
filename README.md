@@ -26,9 +26,7 @@ Make the functions in this package available to use in your code by including th
 using UlamMethod
 ```
 
-## Usage
-
-### Ulam's Method
+## Usage: Ulam's Method
 
 Prepare the data into one of two formats: [.mat](https://github.com/JuliaIO/MAT.jl) or [.h5](https://github.com/JuliaIO/HDF5.jl) such that the head of the file contains four variables, `x0`, `xT`, `y0` and `yT`. See `test/x0x5-NA-undrogued.mat` and `test/x0x5-NA-undrogued.h5` for example trajectory data from undrogued drifters in the North Atlantic obtained from the NOAA GDP [[6]](#6). We will use the .mat file for this example
 
@@ -77,7 +75,7 @@ The output of Ulam's method is a dictionary. The most relevant keys are `P_close
 ulam = ulam_method(f_in, n_polys, type, corners, sto_type = "source", source_centers = A_centers)
 ```
 
-### Transition path theory
+## Usage: Transition path theory
 
 Currently, infinite-time transition path theory is supported. To compute transition path theory statistics, we first choose the coordinates defining the locations of the source $\mathbb{A}$ and the target $\mathbb{B}$. These can either be lists of points or a rectangular region using the function `AB_smear`. In this example, we'll set $\mathbb{A}$ to be a single point and $\mathbb{B}$ to be a region.
 
@@ -98,7 +96,7 @@ tpt = tpt_from_ulam(ulam, A_centers, B_centers)
 
 The output of `tpt_from_ulam` is a dictionary with all of the standard transition path theory statistics such as the reactive density `"muAB"`, transition time `"tAB"` and effective flux `"f+"`. The data are written to a [.h5](https://github.com/JuliaIO/HDF5.jl) file by default. Suppress this output with the kwarg `h5out = false`. 
 
-## Avoiding sets
+### Avoiding sets
 
 In TPT, one can force trajectories to ignore a given region $\mathbb{C}$ via the replacements $\mathbb{A} \to \mathbb{A} \cup \mathbb{C}$ and $\mathbb{B} \to \mathbb{B} \cup \mathbb{C}$. The user should provide a dictionary defining the vertices and edges of the polygon which encloses $\mathbb{C}$ and then apply the kwarg `avoid`. Some examples of polygons are provided in `earth-polygons.jl`. Here we show how the Gulf of Guinea can be avoided.
 

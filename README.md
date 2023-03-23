@@ -69,9 +69,13 @@ The output of Ulam's method is a dictionary. The most relevant keys are `P_close
 ### Reinjection algorithms
 
 - `"data"` Data are reinjected into the domain according to trajectories pointing from nirvana to the interior. This is the default algorithm.
-- `"source"` Data are reinjected into the domain at a given location, typically the source $A$ in transiiton path theory. To use this algorithm, apply the kwargs `sto_stype = "source"` and `source_centers = A_centers`. Note that `A_centers` can actually be any points in the domain. 
+- `"source"` Data are reinjected into the domain at a given location, typically the source $\mathbb{A}$ in transiiton path theory. To use this algorithm, apply the kwargs `sto_stype = "source"` and `source_centers = A_centers`. Note that `A_centers` can actually be any points in the domain. 
 
 ```julia
+A_centers = [
+    -18.0 17.0;
+    ]
+
 ulam = ulam_method(f_in, n_polys, type, corners, sto_type = "source", source_centers = A_centers)
 ```
 

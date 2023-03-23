@@ -100,7 +100,7 @@ The output of `tpt_from_ulam` is a dictionary with all of the standard transitio
 
 ## Avoiding sets
 
-In TPT, one can force trajectories to ignore a given region $\mathbb{C}$ via the replacements $\mathb{A} \to \mathbb{A} \cup \mathbb{C}$ and $\mathb{B} \to \mathbb{B} \cup \mathbb{C}$. The user should provide a dictionary defining the vertices and edges of the polygon which encloses $\mathbb{C}$ and then apply the kwarg `avoid`. Some examples of polygons are provided in `earth-polygons.jl`. Here we show how the Gulf of Guinea can be avoided.
+In TPT, one can force trajectories to ignore a given region $\mathbb{C}$ via the replacements $\mathbb{A} \to \mathbb{A} \cup \mathbb{C}$ and $\mathbb{B} \to \mathbb{B} \cup \mathbb{C}$. The user should provide a dictionary defining the vertices and edges of the polygon which encloses $\mathbb{C}$ and then apply the kwarg `avoid`. Some examples of polygons are provided in `earth-polygons.jl`. Here we show how the Gulf of Guinea can be avoided.
 
 ```julia
 GoG = Dict(

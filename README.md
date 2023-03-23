@@ -62,9 +62,24 @@ ulam = ulam_method(f_in, n_polys, type, corners)
 
 The output of Ulam's method is a dictionary. The most relevant keys are `P_closed` which points to the full transition probability matrix with nirvana as the last row/column and `polys` which returns the polygons of the covering as a matrix. This matrix is a list of nodes such that the first column is the index of the node identifying the polyon it belongs to and the second and third columns are the x, y coordinates of that node. 
 
+### Binning algorithms
+
+- `"reg"` A covering of the domain by a grid of squares. This algorithm is suggested for generic data that is not too sparse.
+- `"hex"` A covering of the domain by a grid of hexagons.
+- `"vor"` A covering of the domain by a [Voronoi tesselation](https://en.wikipedia.org/wiki/Voronoi_diagram) based on clustering the observational data using [k-means](https://en.wikipedia.org/wiki/K-means_clustering). Since the data are clustered, this algorithm is significantly slower than the regular coverings. This algorithm is suggested for sparse data.
+
+### Reinjection algorithms
+
+- `"data"` Data are reinjected into the domain according to trajectories pointing from nirvana to the interior. This is the default algorithm.
+- `"source"` Data are reinjected into the domain at a given location, typically the source $A$ in transiiton path theory. To use this algorithm, apply the kwargs `sto_stype = "source"` and `source_centers = A_centers`. Note that `A_centers` can actually be any points in the domain. 
+
+```julia
+ulam = ulam_method(f_in, n_polys, type, corners, sto_type = "source", source_centers = A_centers)
+```
+
 ### Transition path theory
 
-Currently, infinite-time transition path theory is supported. To compute transition path theory statistics, we first choose the coordinates defining the locations of the source $A$ and the target $B$. These can either be lists of points or a rectangular region using the function `AB_smear`. In this example, we'll set $A$ to be a single point and $B$ to be a region.
+Currently, infinite-time transition path theory is supported. To compute transition path theory statistics, we first choose the coordinates defining the locations of the source $\mathbb{A}$ and the target $\mathbb{B}$. These can either be lists of points or a rectangular region using the function `AB_smear`. In this example, we'll set $\mathbb{A}$ to be a single point and $\mathbb{B}$ to be a region.
 
 ```julia
 A_centers = [
@@ -83,20 +98,22 @@ tpt = tpt_from_ulam(ulam, A_centers, B_centers)
 
 The output of `tpt_from_ulam` is a dictionary with all of the standard transition path theory statistics such as the reactive density `"muAB"`, transition time `"tAB"` and effective flux `"f+"`. The data are written to a [.h5](https://github.com/JuliaIO/HDF5.jl) file by default. Suppress this output with the kwarg `h5out = false`. 
 
+## Avoiding sets
 
-## Binning algorithms
-
-- `"reg"` A covering of the domain by a grid of squares. This algorithm is suggested for generic data that is not too sparse.
-- `"hex"` A covering of the domain by a grid of hexagons.
-- `"vor"` A covering of the domain by a [Voronoi tesselation](https://en.wikipedia.org/wiki/Voronoi_diagram) based on clustering the observational data using [k-means](https://en.wikipedia.org/wiki/K-means_clustering). Since the data are clustered, this algorithm is significantly slower than the regular coverings. This algorithm is suggested for sparse data.
-
-## Reinjection algorithms
-
-- `"data"` Data are reinjected into the domain according to trajectories pointing from nirvana to the interior. This is the default algorithm.
-- `"source"` Data are reinjected into the domain at a given location, typically the source $A$ in transiiton path theory. To use this algorithm, apply the kwargs `sto_stype = "source"` and `source_centers = A_centers`. Note that `A_centers` can actually be any points in the domain. 
+In TPT, one can force trajectories to ignore a given region $\mathbb{C}$ via the replacements $\mathb{A} \to \mathbb{A} \cup \mathbb{C}$ and $\mathb{B} \to \mathbb{B} \cup \mathbb{C}$. The user should provide a dictionary defining the vertices and edges of the polygon which encloses $\mathbb{C}$ and then apply the kwarg `avoid`. Some examples of polygons are provided in `earth-polygons.jl`. Here we show how the Gulf of Guinea can be avoided.
 
 ```julia
-ulam = ulam_method(f_in, n_polys, type, corners, sto_type = "source", source_centers = A_centers)
+GoG = Dict(
+    "verts" => [
+        -2.79 8.66; 
+        11.6 8.76; 
+        10.9 -1.62;
+        -2.77 -1.02;
+    ],
+    "edges" => [1 2 ; 2 3 ; 3 4 ; 4 1]
+)
+
+tpt_no_GoG = tpt_from_ulam(ulam, A_centers, B_centers, avoid = GoG)
 ```
 
 ## References

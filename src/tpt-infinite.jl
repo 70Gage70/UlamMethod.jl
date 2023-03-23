@@ -134,14 +134,6 @@ The remaining time of a reactive trajectory (second formulation). Satisfies a li
 function t_remaining(ALLinds, Ainds, Binds, P, qplus) 
     Cplus = []
 
-    # if A and B intersect, we can't calculate t_rem where they intersect
-    ABint = intersect(Ainds, Binds)
-    trueB = mysetdiff(Binds, ABint)
-
-    if length(trueB) == 0
-        error("B is a subset of A")
-    end
-
     outsideBinds = mysetdiff(ALLinds, Binds)
     for i in outsideBinds
         if sum(P[i, k]*qplus[k] for k in ALLinds) > 0.0
@@ -205,6 +197,72 @@ function t_first_passage(P, Binds)
     return t_fp           
 end
 
+function tAB_dist(ALLinds, Ainds, Binds, P, piStat, qplus, cutoff = 0.99)
+    Cplus = []
+    n_inds = length(ALLinds)
+    
+    ABint = intersect(Ainds, Binds)
+    trueB = mysetdiff(Binds, ABint)
+    trueA = mysetdiff(Ainds, ABint)
+    
+    Cinds = mysetdiff(ALLinds, [Ainds ; Binds])
+    for i in Cinds
+        if qplus[i] > 0.0
+            push!(Cplus, i)
+        end
+    end
+    
+    M = zeros(n_inds, n_inds)
+    for i in Cplus
+        for j in Cplus
+            M[i, j] = qplus[j]*P[i,j]/qplus[i]
+        end
+    end
+    
+    v = zeros(n_inds)
+    for i in Cplus
+        v[i] = sum(P[i, j]*qplus[j]/qplus[i] for j in Binds)
+    end
+    
+    Nbar = zeros(n_inds, n_inds)
+    for i in trueA
+        for j in Binds
+            denom = sum(P[i, k]*qplus[k] for k in Cplus)
+            if denom > 0.0
+                Nbar[i, j] = qplus[j]*P[i,j]/denom
+            end
+        end
+    end
+    
+    N = zeros(n_inds, n_inds)
+    for i in trueA
+        for j in Cplus
+            denom = sum(P[i, k]*qplus[k] for k in Cplus)
+            if denom > 0.0
+                N[i, j] = qplus[j]*P[i,j]/denom
+            end
+        end
+    end
+    
+    u = zeros(n_inds)
+    for i in trueA
+        u[i] = piStat[i]*sum(P[i, l]*qplus[l] for l in Cplus)/sum(piStat[k]*sum(P[k, l]*qplus[l] for l in Cplus) for k in trueA)
+    end
+    
+    n_powers = Integer(ceil(log(1 - cutoff)/log(abs(eigvals(M)[end]))))
+    
+    dist = zeros(n_powers)
+    
+    dist[1] = u' * Nbar * [1 for i = 1:n_inds]
+    
+    Mpow = M
+    for i = 2:length(dist)
+        Mpow = Mpow * M
+        dist[i] = u' * N * Mpow * v
+    end
+    
+    return dist
+end
 
 """
 The probability that state i hits B at B_j in particular (given that it is reactive)
@@ -281,14 +339,24 @@ All the statistics for infinite time tpt, returned as a dict.
     "tAB" => reactive time [scalar]
     "t_rem" => remaining time [states] 
     "t_fp" => first passage time [states]
+    "tABdist" => distribution of reactive hitting times of B from A [states]
 """
 
 function tpt_infinite_stats(ALLinds, Ainds, Binds, P, piStat, P_closed = P)
+    ABint = intersect(Ainds, Binds)
+    trueA = mysetdiff(Ainds, ABint)
+    trueB = mysetdiff(Binds, ABint)
+
+    if length(trueA) == 0
+        error("A is a subset of B.")
+    elseif length(trueB) == 0
+        error("B is a subset of A.")
+    end
+
 #     piStat = Ppi(P)
     Pmin = Pminus(P, piStat)
     qplus = qforward(ALLinds, Ainds, Binds, P)
     qminus = qbackward(ALLinds, Ainds, Binds, Pmin)
-    
     
     # reactive density
     muAB = [qminus[i]*piStat[i]*qplus[i] for i = 1:length(piStat)]
@@ -327,6 +395,9 @@ function tpt_infinite_stats(ALLinds, Ainds, Binds, P, piStat, P_closed = P)
     # first passage time
     t_fp = t_first_passage(P_closed, Binds) 
     
+    # tAB hitting distribution
+    tAB_distribution = tAB_dist(ALLinds, Ainds, Binds, P, piStat, qplus)
+
     # B hitters
     rij, ri = B_hitters(ALLinds, Ainds, Binds, P, qplus) 
 
@@ -346,6 +417,7 @@ function tpt_infinite_stats(ALLinds, Ainds, Binds, P, piStat, P_closed = P)
             "tAB_rem" => tAB_rem,
             "t_rem" => t_rem,
             "t_fp" => t_fp,
+            "tAB_dist" => tAB_distribution,
             "rij" => rij,
             "ri" => ri) 
     end

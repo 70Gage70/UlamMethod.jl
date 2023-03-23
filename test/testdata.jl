@@ -4,8 +4,8 @@ function ulam_method_tpt_test(f_in, n_polys, type, corners, A_centers, B_centers
     ulam = ulam_method(f_in, n_polys, type, corners, h5out = false)
     fid = h5open(f_ulam, "r")
 
-    for key in collect(keys(fid["ulam"]))
-        if !(key in collect(keys(ulam)))
+    for key in collect(keys(ulam))
+        if !(key in collect(keys(fid["ulam"])))
             return "No ulam key: " * string(key)
         else
             expected = read(fid["ulam"][key])
@@ -27,8 +27,8 @@ function ulam_method_tpt_test(f_in, n_polys, type, corners, A_centers, B_centers
     tpt = tpt_from_ulam(ulam, A_centers, B_centers, h5out = false)
     fid = h5open(f_tpt, "r")
 
-    for key in collect(keys(fid["tpt"]))
-        if !(key in collect(keys(tpt)))
+    for key in collect(keys(tpt))
+        if !(key in collect(keys(fid["tpt"])))
             return "No tpt key: " * string(key)
         else
             expected = read(fid["tpt"][key])

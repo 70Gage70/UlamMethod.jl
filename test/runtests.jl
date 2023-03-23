@@ -1,4 +1,4 @@
-using UlamMethod
+# using UlamMethod
 using Test
 using HDF5
 

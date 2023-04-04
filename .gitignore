@@ -75,6 +75,9 @@ Temporary Items
 **/test/ulam_vor_500.h5
 **/test/TPT_vor_500.h5
 
+# Test
+*.txt
+
 # in prog
 /extras
 

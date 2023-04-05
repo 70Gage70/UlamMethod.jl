@@ -1,16 +1,16 @@
 const global_bin_types = ["reg", "hex", "vor"]
 const global_poly_types = ["reg", "hex", "vor", "unk"]
 
-# abstract type AbstractUlamPolygon end
+abstract type AbstractInPolygonCompatible end
 
-struct UlamPolygon
+struct UlamPolygon <: AbstractInPolygonCompatible
     nodes::Matrix{Float64} 
     edges::Matrix{Int64} 
     center::Matrix{Float64} 
     polys_type::String
 
-    function UlamPolygon(;
-        nodes::Matrix{Float64}, 
+    function UlamPolygon(
+        nodes::Matrix{Float64};
         edges::Union{Matrix{Int64}, Nothing} = nothing, 
         center::Union{Matrix{Float64}, Nothing} = nothing, 
         polys_type::String = "unk")
@@ -25,32 +25,97 @@ struct UlamPolygon
             edges = [1:n_nodes;; [2:n_nodes; 1]]
         end
 
-        @assert size(edges) === size(nodes)
+        @assert size(edges) == size(nodes)
 
         if center === nothing
             center = [sum(nodes[:,1]) sum(nodes[:,2])]/n_nodes
         end
 
-        @assert size(center) === (1, 2)
+        @assert size(center) == (1, 2)
 
         new(nodes, edges, center, polys_type)
     end
 end
 
+
+struct PolyTable <: AbstractInPolygonCompatible
+    nodes::Matrix{Float64}
+    edges::Matrix{Int64}
+
+    function PolyTable(UPpolys::Vector{UlamPolygon})
+        @assert length(UPpolys) > 0
+
+        n_nodes = sum(size(UPpolys[i].nodes, 1) for i = 1:length(UPpolys))
+
+        nodes = Matrix{Float64}(undef, n_nodes, 2)
+        edges = Matrix{Int64}(undef, n_nodes, 3)
+
+        counter_edge = 1
+        counter_bot = 1
+        counter_top = counter_bot + size(poly.nodes, 1) - 1
+        offset = size(UPpolys[1].nodes, 1)
+        counter_top = counter_bot + offset - 1
+
+        for i = 1:length(UPpolys)
+            nodes[counter_bot:counter_top, :] = poly.nodes
+            edges[counter_bot:counter_top, 1:2] = poly.edges .+ counter_top .- offset
+            edges[counter_bot:counter_top, 3] .= counter_edge
+
+            counter_bot = counter_top + 1
+            counter_edge = counter_edge + 1
+        end
+
+        new(nodes, edges)
+    end
+end
+
+
 struct UlamCovering
     polys::Vector{UlamPolygon}
-    n_polys::Int64
-
     contains_data::Vector{Bool}
     contains_scc::Vector{Bool}
     contains_A::Vector{Bool}
     contains_B::Vector{Bool}
 
-    # function UlamPolygons(;)
-    #     d
-    # end
+
+    function UlamCovering(
+        polys::Vector{UlamPolygon};
+        contains_data::Union{Vector{Bool}, Nothing} = nothing,
+        contains_scc::Union{Vector{Bool}, Nothing} = nothing,
+        contains_A::Union{Vector{Bool}, Nothing} = nothing,
+        contains_B::Union{Vector{Bool}, Nothing}= nothing)
+
+        @assert length(polys) > 0 
+
+        if contains_data === nothing
+            contains_data = fill(true, length(polys))
+        end
+
+        if contains_scc === nothing
+            contains_scc = fill(true, length(polys))
+        end
+
+        if contains_A === nothing
+            contains_A = fill(false, length(polys))
+        end
+
+        if contains_B === nothing
+            contains_B = fill(false, length(polys))
+        end
+
+        new(polys, contains_data, contains_scc, contains_A, contains_B)
+    end
+
 end
 
+include("binner-square.jl")
+n_polys_test = 100
+polys_test, polys_centers_test = square_binner(n_polys_test, [0, 1, 0, 1])
+include("ulam-nirvana.jl")
+iptest = inpoly_preprocess(polys_test)
+uptest = [UlamPolygon(iptest["nodes"][i:i+3,:]) for i=1:4:4*n_polys_test]
+uctest = UlamCovering(uptest)
+pttest = PolyTable(uctest.polys)
 
 
 ##############################################################################################################################

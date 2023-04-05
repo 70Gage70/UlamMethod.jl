@@ -1,4 +1,4 @@
-# using Parameters # for kwarg
+# using Parameters # for kwargs
 
 abstract type AbstractUlamCorners end
 abstract type AbstractTrajectoryData end

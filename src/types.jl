@@ -52,13 +52,12 @@ struct PolyTable <: AbstractInPolygonCompatible
 
         counter_edge = 1
         counter_bot = 1
-        counter_top = counter_bot + size(poly.nodes, 1) - 1
-        offset = size(UPpolys[1].nodes, 1)
-        counter_top = counter_bot + offset - 1
 
-        for i = 1:length(UPpolys)
+        for poly in UPpolys
+            counter_top = counter_bot + size(poly.nodes, 1) - 1
+
             nodes[counter_bot:counter_top, :] = poly.nodes
-            edges[counter_bot:counter_top, 1:2] = poly.edges .+ counter_top .- offset
+            edges[counter_bot:counter_top, 1:2] = poly.edges .+ counter_bot .- 1
             edges[counter_bot:counter_top, 3] .= counter_edge
 
             counter_bot = counter_top + 1

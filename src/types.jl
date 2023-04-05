@@ -101,6 +101,38 @@ struct UlamCovering
 
 end
 
+struct UlamTrajectories 
+    x0::Vector{Float64}
+    xT::Vector{Float64}
+    y0::Vector{Float64}
+    yT::Vector{Float64}
+
+    function UlamTrajectories(;x0::Vector{R1}, y0::Vector{R2}, xT::Vector{R3}, yT::Vector{R4}) where {R1 <: Real, R2 <: Real, R3 <: Real, R4 <: Real}
+        @assert length(x0) == length(y0) == length(xT) == length(yT) > 0
+        new(x0, xT, y0, yT)
+    end
+
+    function UlamTrajectories(infile::String)
+        extension = infile[findlast(==('.'), infile)+1:end]
+        if extension == "mat"
+            data_T = MAT.matopen(infile)
+            x0, xT, y0, yT = read(data_T, "x0", "xT", "y0", "yT")
+            close(data_T)
+        elseif extension == "h5"
+            data_T = HDF5.h5open(infile)
+            x0, xT, y0, yT = read(data_T, "x0", "xT", "y0", "yT")
+            close(data_T)
+        else
+            error("File type not supported.") 
+        end
+    
+        x0 = vec(x0)
+        y0 = vec(y0)
+        xT = vec(xT)
+        yT = vec(yT)
+    end
+end  
+
 struct UlamProblem
     xmin::Float64
     xmax::Float64

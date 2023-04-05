@@ -12,13 +12,12 @@ struct UlamCorners <: AbstractUlamCorners
     ymin::Float64
     ymax::Float64
 
-    function UlamCorners(;xmin::Real, xmax::Real, ymin::Real, ymax::Real)
+    function UlamCorners(;xmin::R1, xmax::R2, ymin::R3, ymax::R4) where {R1 <: Real, R2 <: Real, R3 <: Real, R4 <: Real}
         @assert xmin < xmax
         @assert ymin < ymax
         new(xmin, xmax, ymin, ymax)
     end
 end  
-
 
 struct UlamTrajectories <: AbstractTrajectoryData
     x0::Vector{Float64}
@@ -26,7 +25,7 @@ struct UlamTrajectories <: AbstractTrajectoryData
     y0::Vector{Float64}
     yT::Vector{Float64}
 
-    function UlamTrajectories(;x0::Vector{Real}, y0::Vector{Real}, xT::Vector{Real}, yT::Vector{Real})
+    function UlamTrajectories(;x0::Vector{R1}, y0::Vector{R2}, xT::Vector{R3}, yT::Vector{R4}) where {R1 <: Real, R2 <: Real, R3 <: Real, R4 <: Real}
         @assert length(x0) == length(y0) == length(xT) == length(yT) > 0
         new(x0, xT, y0, yT)
     end

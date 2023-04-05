@@ -16,7 +16,7 @@ import PolygonInbounds
 ####################################################################################################################################
 
 
-function inpoly(data::Matrix{Float64}, poly_struct::AbstractInPolygonCompatible)
+function inpoly(data::Matrix{Float64}, poly_struct::AbstractInPolygonCompatible)::AbstractArray{Bool}
     @assert size(data, 1) > 0
     @assert size(data, 2) == 2
 

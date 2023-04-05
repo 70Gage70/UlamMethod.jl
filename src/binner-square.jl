@@ -1,11 +1,8 @@
 """
-Bin the data based a covering of the computational domain by squares.
+    square_binner(ulam_problem)
 
-Written by Gage Bonner November 2022
+Cover the computational domain in `ulam_problem` by a uniform grid of squares and return an [`UlamCovering`](@ref).
 """
-####################################################################################################################################
-####################################################################################################################################
-
 function square_binner(n_polys, corners)
     xmin, xmax, ymin, ymax = corners
     w = xmax - xmin

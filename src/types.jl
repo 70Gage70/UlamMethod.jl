@@ -79,16 +79,12 @@ struct UlamCovering
     polys::Vector{UlamPolygon}
     contains_data::Vector{Bool}
     contains_scc::Vector{Bool}
-    contains_A::Vector{Bool}
-    contains_B::Vector{Bool}
 
 
     function UlamCovering(
         polys::Vector{UlamPolygon};
         contains_data::Union{Vector{Bool}, Nothing} = nothing,
-        contains_scc::Union{Vector{Bool}, Nothing} = nothing,
-        contains_A::Union{Vector{Bool}, Nothing} = nothing,
-        contains_B::Union{Vector{Bool}, Nothing}= nothing)
+        contains_scc::Union{Vector{Bool}, Nothing} = nothing)
 
         @assert length(polys) > 0 
 
@@ -100,16 +96,24 @@ struct UlamCovering
             contains_scc = fill(true, length(polys))
         end
 
-        if contains_A === nothing
-            contains_A = fill(false, length(polys))
-        end
-
-        if contains_B === nothing
-            contains_B = fill(false, length(polys))
-        end
-
-        new(polys, contains_data, contains_scc, contains_A, contains_B)
+        new(polys, contains_data, contains_scc)
     end
+
+end
+
+struct UlamProblem
+    xmin::Float64
+    xmax::Float64
+    ymin::Float64
+    ymax::Float64
+    x0::Vector{Float64}
+    y0::Vector{Float64}
+    xT::Vector{Float64}
+    yT::Vector{Float64}
+    bin_type::String
+    bin_number::Int64
+    stoc_type::String
+    stoc_polygon::UlamPolygon
 
 end
 

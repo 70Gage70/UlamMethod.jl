@@ -17,22 +17,32 @@ import PolygonInbounds
 
 
 
-function inpoly(data::Matrix{Float64}, polys::PolyTable)::Vector{Int64}
+function inpoly(data::Matrix{Float64}, polys::PolyTable)::InpolyResult
     @assert size(data, 1) > 0
     @assert size(data, 2) == 2
 
     ip2res = PolygonInbounds.inpoly2(data, polys.nodes, polys.edges)
     inds = zeros(Int64, size(data, 1))
+    contains = Dict{Int64, Int64}()
 
+    j = 1
     for i = 1:size(ip2res, 3)
-        inds[findall(x->x==true, ip2res[:,1,i])] .= i
+        fa = findall(x->x==true, ip2res[:,1,i])
+        if length(fa) > 0
+            contains[i] = j
+            j = j + 1
+            inds[fa] .= i
+        end
     end
 
     # ip2res is a BitArray with dimensions size(data, 1) x 2 x size(polys.nodes, 1).
     # ip2res[:,1,i] is a BitVector such that ip2res[:,1,i][k] == true if the k'th data point is in polygon i
-    # findall(x->x==true, ip2res[:,1,i]) therfore finds the indices of all data points in polygon i    
+    # findall(x->x==true, ip2res[:,1,i]) therfore finds the indices of all data points in polygon i
+    # contains is a lookup table for polygons that contain data, 
+    # e.g. contains[6] = 3 means that the 6th polygon is the 3rd polygon in the list that contains data
+    # note that [i for i in keys(contains)] is a list of indices of polygons that contain data
 
-    return inds
+    return InpolyResult(inds, contains)
 end
 
 

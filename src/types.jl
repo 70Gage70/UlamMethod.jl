@@ -6,11 +6,12 @@ import LinearAlgebra
 
 export 
     UlamPolygon,
-    PolyTable,
     # UlamCovering,
     UlamTrajectories,
     UlamDomain,
-    UlamProblem
+    UlamProblem,
+    PolyTable,
+    InpolyResult
 
 const global_poly_types::Vector{String} = ["sqr", "hex", "vor"]
 const global_stoc_types::Vector{String} = ["data", "source"]
@@ -49,37 +50,6 @@ struct UlamPolygon
         @assert size(center) == (1, 2)
 
         new(nodes, edges, center, poly_type)
-    end
-end
-
-
-struct PolyTable
-    nodes::Matrix{Float64}
-    edges::Matrix{Int64}
-
-    function PolyTable(UPpolys::Vector{UlamPolygon})
-        @assert length(UPpolys) > 0
-
-        n_nodes = sum(size(UPpolys[i].nodes, 1) for i = 1:length(UPpolys))
-
-        nodes = Matrix{Float64}(undef, n_nodes, 2)
-        edges = Matrix{Int64}(undef, n_nodes, 3)
-
-        counter_edge = 1
-        counter_bot = 1
-
-        for poly in UPpolys
-            counter_top = counter_bot + size(poly.nodes, 1) - 1
-
-            nodes[counter_bot:counter_top, :] = poly.nodes
-            edges[counter_bot:counter_top, 1:2] = poly.edges .+ counter_bot .- 1
-            edges[counter_bot:counter_top, 3] .= counter_edge
-
-            counter_bot = counter_top + 1
-            counter_edge = counter_edge + 1
-        end
-
-        new(nodes, edges)
     end
 end
 
@@ -212,6 +182,43 @@ struct UlamResult
 
         new(covering, P_closed, P_open, pi_closed, pi_open, info)
     end
+end
+
+struct PolyTable
+    nodes::Matrix{Float64}
+    edges::Matrix{Int64}
+    n_polys::Int64
+
+    function PolyTable(UPpolys::Vector{UlamPolygon})
+        n_polys = length(UPpolys)
+        @assert n_polys > 0
+
+        n_nodes = sum(size(UPpolys[i].nodes, 1) for i = 1:n_polys)
+
+        nodes = Matrix{Float64}(undef, n_nodes, 2)
+        edges = Matrix{Int64}(undef, n_nodes, 3)
+
+        counter_edge = 1
+        counter_bot = 1
+
+        for poly in UPpolys
+            counter_top = counter_bot + size(poly.nodes, 1) - 1
+
+            nodes[counter_bot:counter_top, :] = poly.nodes
+            edges[counter_bot:counter_top, 1:2] = poly.edges .+ counter_bot .- 1
+            edges[counter_bot:counter_top, 3] .= counter_edge
+
+            counter_bot = counter_top + 1
+            counter_edge = counter_edge + 1
+        end
+
+        new(nodes, edges, n_polys)
+    end
+end
+
+struct InpolyResult
+    inds::Vector{Int64}
+    contains::Dict{Int64, Int64}
 end
 
 end # module

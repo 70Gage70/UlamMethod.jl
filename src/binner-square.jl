@@ -1,9 +1,9 @@
 """
     square_binner(traj, domain)
 
-Cover the computational domain in `ulam_problem` by a uniform grid of squares and return an [`UlamCovering`](@ref).
+Cover the computational domain in `domain` by a uniform grid of squares and return an vector of type [`UlamPolygon`](@ref).
 """
-function square_binner(traj::UlamTrajectories, domain::UlamDomain)::UlamCovering
+function square_binner(traj::UlamTrajectories, domain::UlamDomain)::Vector{UlamPolygon}
     n_polys = domain.bin_number
     xmin, xmax, ymin, ymax = domain.corners
     w = xmax - xmin
@@ -40,5 +40,5 @@ function square_binner(traj::UlamTrajectories, domain::UlamDomain)::UlamCovering
         y_top = y_top - s
     end
 
-    return UlamCovering(polys)
+    return polys
 end

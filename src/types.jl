@@ -2,20 +2,20 @@ module UlamTypes
 
 import MAT
 import HDF5
+import LinearAlgebra
 
 export 
     UlamPolygon,
     PolyTable,
-    UlamCovering,
+    # UlamCovering,
     UlamTrajectories,
     UlamDomain,
     UlamProblem
 
-const global_bin_types::Vector{String} = ["reg", "hex", "vor"]
-const global_poly_types::Vector{String} = ["reg", "hex", "vor", "unk"]
+const global_poly_types::Vector{String} = ["reg", "hex", "vor"]
 const global_stoc_types::Vector{String} = ["data", "source"]
 const global_traj_file_types::Vector{String} = ["mat", "h5"]
-const global_bin_number_default::Int64 = 100
+const global_poly_number_default::Int64 = 100
 
 
 struct UlamPolygon 
@@ -32,7 +32,7 @@ struct UlamPolygon
 
         @assert size(nodes, 1) > 0 
         @assert size(nodes, 2) == 2 
-        @assert polys_type in global_poly_types
+        @assert (polys_type in global_poly_types) || (polys_types == "unk")
 
         n_nodes = size(nodes, 1)
 
@@ -84,25 +84,6 @@ struct PolyTable
 end
 
 
-struct UlamCovering
-    polys::Vector{UlamPolygon}
-    contains_data::Vector{Bool}
-    contains_scc::Vector{Bool}
-
-
-    function UlamCovering(
-        polys::Vector{UlamPolygon};
-        contains_data::Vector{Bool} = fill(true, length(polys)),
-        contains_scc::Vector{Bool} = fill(true, length(polys)))
-
-        @assert length(polys) > 0 
-
-        new(polys, contains_data, contains_scc)
-    end
-
-end
-
-
 struct UlamTrajectories 
     x0::Vector{Float64}
     y0::Vector{Float64}
@@ -144,8 +125,8 @@ end
 struct UlamDomain
     domain::UlamPolygon
     corners::Vector{Float64}
-    bin_type::String
-    bin_number::Int64
+    poly_type::String
+    poly_number::Int64
     stoc_type::String
     stoc_polygon::Union{UlamPolygon,Nothing}
 
@@ -155,8 +136,8 @@ struct UlamDomain
         ymin::Real,
         ymax::Real;
         domain::Union{UlamPolygon, Nothing} = nothing,
-        bin_type::String = global_bin_types[1],
-        bin_number::Int64 = global_bin_number_default,
+        poly_type::String = global_poly_types[1],
+        poly_number::Int64 = global_poly_number_default,
         stoc_type::String = global_stoc_types[1],
         stoc_polygon::Union{UlamPolygon, Nothing} = nothing)
 
@@ -169,25 +150,68 @@ struct UlamDomain
             domain = UlamPolygon([xmin ymin; xmin ymax; xmax ymax; xmin ymax])
         end
 
-        @assert bin_type in global_bin_types
-        @assert bin_number > 1
+        @assert poly_type in global_poly_types
+        @assert poly_number > 1
         @assert stoc_type in global_stoc_types
 
-        new(domain, corners, bin_type, bin_number, stoc_type, stoc_polygon)
+        new(domain, corners, poly_type, poly_number, stoc_type, stoc_polygon)
     end
 end
 
-struct UlamProblem
-    xmin::Float64
-    xmax::Float64
-    ymin::Float64
-    ymax::Float64
-    traj::UlamTrajectories
-    bin_type::String
-    bin_number::Int64
-    stoc_type::String
-    stoc_polygon::UlamPolygon
+# returndict = begin Dict(
+#     "P_closed" => P_closed, 
+#     "P_open" => P_open,
+#     "pi_closed" => pi_closed,
+#     "pi_open" => pi_open,
+#     "counts" => final_counts,
+#     "leaves" => leaves,
+#     "polys" => vcells,
+#     "polys_centers" => vcenters,
+#     "polys_dis" => vcells_dis,
+#     "info" => info)
+# end
 
+struct UlamCovering
+    polys::Vector{UlamPolygon}
+    counts::Vector{Int64}
+    contains_scc::Vector{Bool}
+
+
+    function UlamCovering(
+        polys::Vector{UlamPolygon};
+        counts::Vector{Int64} = fill(0, length(polys)),
+        contains_scc::Vector{Bool} = fill(true, length(polys)))
+
+        @assert length(polys) > 0 
+
+        new(polys, counts, contains_scc)
+    end
+
+end
+
+struct UlamResult
+    covering::UlamCovering
+    P_closed::Matrix{Float64}
+    P_open::SubArray{Float64, 2, Matrix{Float64}, Tuple{UnitRange{Int64}, UnitRange{Int64}}, false}
+    pi_closed::Vector{Float64}
+    pi_open::SubArray{Float64, 1, Vector{Float64}, Tuple{UnitRange{Int64}}, true}
+    info::String
+
+    function UlamResult(
+        covering::UlamCovering,
+        P_closed::Matrix{Float64},
+        info::String)
+
+        @assert size(P_closed, 1) == size(P_closed, 2)
+        @assert size(P_closed, 1) > 0
+        
+        pi_closed = abs.(normalize(LinearAlgebra.eigvecs(transpose(P_closed))[:,size(P_closed)[1]], 1))
+
+        P_open = view(P_closed, 1:size(P_closed, 1) - 1, 1:size(P_closed, 1) - 1)
+        pi_open = view(pi_open, 1:size(pi_open) - 1, 1)
+
+        new(covering, P_closed, P_open, pi_closed, pi_open, info)
+    end
 end
 
 end # module

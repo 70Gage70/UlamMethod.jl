@@ -151,7 +151,9 @@ polys should be a vector of vectors; that is, poly[i] is a vector whose j'th ent
 polys_centers is also a vector of vectors; polys_centers[i] is equal to [x_center, y_center] 
 """
 
-function ulam_nirvana(x0, y0, xT, yT, polys, polys_centers; sto_type = "data", source_centers = polys_centers[1])
+# ulam_nirvana(x0, y0, xT, yT, polys, polys_centers; sto_type = "data", source_centers = polys_centers[1])
+
+function ulam_nirvana(traj::UlamTrajectories, domain::UlamDomain, polys::Vector{UlamPolygon})::UlamResult
     ##########################################################################################
     """
     Assign indices to obs/traj data based on given polys.
@@ -160,34 +162,11 @@ function ulam_nirvana(x0, y0, xT, yT, polys, polys_centers; sto_type = "data", s
     ##########################################################################################
     # println("Assigning indices.")
 
-    npolys = length(polys)
-    data0 = [x0 ;; y0]
-    dataT = [xT ;; yT]
-    res = inpoly_preprocess(polys)
-    nodes_inpoly = res["nodes"]
-    edges_inpoly = res["edges"]
+    inds0 = inpoly([traj.x0 ;; traj.y0], polys)
+    indsT = inpoly([traj.xT ;; traj.yT], polys)
+    contains_data = []
+    new_polys_count = 1
 
-    inds0 = zeros(Int64, length(x0))
-    indsT = zeros(Int64, length(x0))
-    contains_data = [] # incides of polygons that actually contain data
-
-    res_poly0 = inpoly2(data0, nodes_inpoly, edges_inpoly)
-    res_polyT = inpoly2(dataT, nodes_inpoly, edges_inpoly)
-
-    new_poly_count = 1 # keeping track of how many boxes actually contain data
-
-    for i = 1:npolys
-        these_indsT = range(1, length(x0))[res_polyT[:,1,i]]
-        indsT[these_indsT] .= new_poly_count
-
-        res0i = res_poly0[:,1,i]
-        if 1 in res0i # if there's at least one data point in this box
-            push!(contains_data, i)
-            these_inds0 = range(1, length(x0))[res0i]
-            inds0[these_inds0] .= new_poly_count
-            new_poly_count = new_poly_count + 1
-        end
-    end
 
     polys_clean = polys[contains_data] # only keep the polygons that actually have data in them
     polys_centers_clean = polys_centers[contains_data]

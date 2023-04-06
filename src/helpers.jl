@@ -17,20 +17,24 @@ import PolygonInbounds
 
 
 
-function inpoly(data::Matrix{Float64}, poly_struct::PolyTable)::Vector{Int64}
+function inpoly(data::Matrix{Float64}, polys::Union{Vector{UlamPolygon}, PolyTable})::Vector{Int64}
     @assert size(data, 1) > 0
     @assert size(data, 2) == 2
 
-    ip2res = PolygonInbounds.inpoly2(data, poly_struct.nodes, poly_struct.edges)
+    if typeof(polys) == Vector{UlamPolygon}
+        polys = PolyTable(polys)
+    end
 
-    # ip2res is a BitArray with dimensions
-
-
+    ip2res = PolygonInbounds.inpoly2(data, polys.nodes, polys.edges)
     inds = zeros(Int64, size(data, 1))
 
     for i = 1:size(ip2res, 3)
         inds[findall(x->x==true, ip2res[:,1,i])] .= i
     end
+
+    # ip2res is a BitArray with dimensions size(data, 1) x 2 x size(polys.nodes, 1).
+    # ip2res[:,1,i] is a BitVector such that ip2res[:,1,i][k] == true if the k'th data point is in polygon i
+    # findall(x->x==true, ip2res[:,1,i]) therfore finds the indices of all data points in polygon i    
 
     return inds
 end

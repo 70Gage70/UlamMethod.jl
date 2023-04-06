@@ -16,13 +16,19 @@ import PolygonInbounds
 ####################################################################################################################################
 
 
-"""""""""""SHOULD MODIFY THIS TO JUST TELL YOU THE INDICES"""""""""
 
-function inpoly(data::Matrix{Float64}, poly_struct::AbstractInPolygonCompatible)::AbstractArray{Bool}
+function inpoly(data::Matrix{Float64}, poly_struct::AbstractInPolygonCompatible)::Vector{Int64}
     @assert size(data, 1) > 0
     @assert size(data, 2) == 2
 
-    return PolygonInbounds.inpoly2(data, poly_struct.nodes, poly_struct.edges)
+    ip2res = PolygonInbounds.inpoly2(data, poly_struct.nodes, poly_struct.edges)
+    inds = zeros(Int64, size(data, 1))
+
+    for i = 1:size(ipres, 3)
+        inds[findall(x->x==true, ipres[:,1,i])] .= i
+    end
+
+    return inds
 end
 
 

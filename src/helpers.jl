@@ -22,10 +22,14 @@ function inpoly(data::Matrix{Float64}, poly_struct::AbstractInPolygonCompatible)
     @assert size(data, 2) == 2
 
     ip2res = PolygonInbounds.inpoly2(data, poly_struct.nodes, poly_struct.edges)
+
+    # ip2res is a BitArray with dimensions
+
+
     inds = zeros(Int64, size(data, 1))
 
-    for i = 1:size(ipres, 3)
-        inds[findall(x->x==true, ipres[:,1,i])] .= i
+    for i = 1:size(ip2res, 3)
+        inds[findall(x->x==true, ip2res[:,1,i])] .= i
     end
 
     return inds

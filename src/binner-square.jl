@@ -1,5 +1,5 @@
 """
-    square_binner(ulam_problem)
+    square_binner(traj, domain)
 
 Cover the computational domain in `ulam_problem` by a uniform grid of squares and return an [`UlamCovering`](@ref).
 """

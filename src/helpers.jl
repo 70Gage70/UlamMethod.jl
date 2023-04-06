@@ -17,7 +17,7 @@ import PolygonInbounds
 
 
 
-function inpoly(data::Matrix{Float64}, poly_struct::AbstractInPolygonCompatible)::Vector{Int64}
+function inpoly(data::Matrix{Float64}, poly_struct::PolyTable)::Vector{Int64}
     @assert size(data, 1) > 0
     @assert size(data, 2) == 2
 

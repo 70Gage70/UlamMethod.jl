@@ -4,15 +4,12 @@ import MAT
 import HDF5
 
 export 
-    AbstractInPolygonCompatible,
     UlamPolygon,
     PolyTable,
     UlamCovering,
     UlamTrajectories,
     UlamDomain,
     UlamProblem
-
-abstract type AbstractInPolygonCompatible end
 
 const global_bin_types::Vector{String} = ["reg", "hex", "vor"]
 const global_poly_types::Vector{String} = ["reg", "hex", "vor", "unk"]
@@ -21,7 +18,7 @@ const global_traj_file_types::Vector{String} = ["mat", "h5"]
 const global_bin_number_default::Int64 = 100
 
 
-struct UlamPolygon <: AbstractInPolygonCompatible
+struct UlamPolygon 
     nodes::Matrix{Float64} 
     edges::Matrix{Int64} 
     center::Matrix{Float64} 
@@ -56,7 +53,7 @@ struct UlamPolygon <: AbstractInPolygonCompatible
 end
 
 
-struct PolyTable <: AbstractInPolygonCompatible
+struct PolyTable
     nodes::Matrix{Float64}
     edges::Matrix{Int64}
 

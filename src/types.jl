@@ -1,13 +1,25 @@
 module UlamTypes
 
+import MAT
+import HDF5
+
 export 
     AbstractInPolygonCompatible,
     UlamPolygon,
     PolyTable,
-    UlamCovering
-
+    UlamCovering,
+    UlamTrajectories,
+    UlamDomain,
+    UlamProblem
 
 abstract type AbstractInPolygonCompatible end
+
+const global_bin_types::Vector{String} = ["reg", "hex", "vor"]
+const global_poly_types::Vector{String} = ["reg", "hex", "vor", "unk"]
+const global_sto_types::Vector{String} = ["data", "source"]
+const global_traj_file_types::Vector{String} = ["mat", "h5"]
+const global_bin_number_default::Int64 = 100
+
 
 struct UlamPolygon <: AbstractInPolygonCompatible
     nodes::Matrix{Float64} 
@@ -16,14 +28,14 @@ struct UlamPolygon <: AbstractInPolygonCompatible
     polys_type::String
 
     function UlamPolygon(
-        nodes::Matrix{Float64};
-        edges::Union{Matrix{Int64}, Nothing} = nothing, 
-        center::Union{Matrix{Float64}, Nothing} = nothing, 
+        nodes::Matrix{<:Real};
+        edges::Union{Matrix{<:Integer}, Nothing} = nothing, 
+        center::Union{Matrix{<:Real}, Nothing} = nothing, 
         polys_type::String = "unk")
 
         @assert size(nodes, 1) > 0 
         @assert size(nodes, 2) == 2 
-        @assert polys_type in ["reg", "hex", "vor", "unk"]
+        @assert polys_type in global_poly_types
 
         n_nodes = size(nodes, 1)
 
@@ -83,65 +95,94 @@ struct UlamCovering
 
     function UlamCovering(
         polys::Vector{UlamPolygon};
-        contains_data::Union{Vector{Bool}, Nothing} = nothing,
-        contains_scc::Union{Vector{Bool}, Nothing} = nothing)
+        contains_data::Vector{Bool} = fill(true, length(polys)),
+        contains_scc::Vector{Bool} = fill(true, length(polys)))
 
         @assert length(polys) > 0 
-
-        if contains_data === nothing
-            contains_data = fill(true, length(polys))
-        end
-
-        if contains_scc === nothing
-            contains_scc = fill(true, length(polys))
-        end
 
         new(polys, contains_data, contains_scc)
     end
 
 end
 
+
 struct UlamTrajectories 
     x0::Vector{Float64}
-    xT::Vector{Float64}
     y0::Vector{Float64}
+    xT::Vector{Float64}
     yT::Vector{Float64}
 
-    function UlamTrajectories(;x0::Vector{R1}, y0::Vector{R2}, xT::Vector{R3}, yT::Vector{R4}) where {R1 <: Real, R2 <: Real, R3 <: Real, R4 <: Real}
+    function UlamTrajectories(
+        ;
+        x0::Vector{<:Real},
+        y0::Vector{<:Real}, 
+        xT::Vector{<:Real}, 
+        yT::Vector{<:Real})
+        
         @assert length(x0) == length(y0) == length(xT) == length(yT) > 0
-        new(x0, xT, y0, yT)
+        new(x0, y0, xT, yT)
     end
 
     function UlamTrajectories(infile::String)
         extension = infile[findlast(==('.'), infile)+1:end]
+
+        @assert extension in global_traj_file_types
+
         if extension == "mat"
             data_T = MAT.matopen(infile)
-            x0, xT, y0, yT = read(data_T, "x0", "xT", "y0", "yT")
-            close(data_T)
         elseif extension == "h5"
             data_T = HDF5.h5open(infile)
-            x0, xT, y0, yT = read(data_T, "x0", "xT", "y0", "yT")
-            close(data_T)
-        else
-            error("File type not supported.") 
         end
-    
-        x0 = vec(x0)
-        y0 = vec(y0)
-        xT = vec(xT)
-        yT = vec(yT)
+
+        x0, y0, xT, yT = map(vec, read(data_T, "x0", "y0", "xT", "yT"))
+        close(data_T)
+
+        @assert length(x0) == length(y0) == length(xT) == length(yT) > 0
+
+        new(x0, y0, xT, yT)
     end
 end  
+
+struct UlamDomain
+    domain::UlamPolygon
+    corners::Vector{Float64}
+    bin_type::String
+    bin_number::Int64
+    stoc_type::String
+    stoc_polygon::Union{UlamPolygon,Nothing}
+
+    function UlamDomain(
+        xmin::Real,
+        xmax::Real,
+        ymin::Real,
+        ymax::Real;
+        domain::Union{UlamPolygon,Nothing} = nothing,
+        bin_type::String = global_bin_types[1],
+        bin_number::Int64 = global_bin_number_default,
+        stoc_type::String = global_sto_types[1],
+        stoc_polygon::Union{UlamPolygon,Nothing} = nothing)
+
+        @assert xmax > xmin
+        @assert ymax > ymin
+
+        corners::Vector{Float64} = [xmin, xmax, ymin, ymax]
+
+        if domain === nothing
+
+        end
+
+
+
+        new(x0, y0, xT, yT)
+    end
+end
 
 struct UlamProblem
     xmin::Float64
     xmax::Float64
     ymin::Float64
     ymax::Float64
-    x0::Vector{Float64}
-    y0::Vector{Float64}
-    xT::Vector{Float64}
-    yT::Vector{Float64}
+    traj::UlamTrajectories
     bin_type::String
     bin_number::Int64
     stoc_type::String

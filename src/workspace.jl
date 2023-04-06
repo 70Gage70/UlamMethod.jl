@@ -26,7 +26,7 @@ n_polys = length(polys)
 
 P_closed = zeros(n_polys + 1, n_polys + 1) # one extra for nirvana
 
-for i = 1:length(inds0)
+for i = 1:length(ip0.inds)
     i0 = ip0.inds[i]
     iT = ipT.inds[i]
 
@@ -57,6 +57,10 @@ scc = sort(strongly_connected_components(SimpleDiGraph(Padj)), by = length)[end]
 
 # In general, scc itself is not sorted, so we sort one my time and put nirvana back at the end to get the largest scc of P_closed
 largest_component = [sort(scc); n_polys + 1]
+
+
+
+
 P_closed = P_closed[largest_component, largest_component]
 
 P_sto = [P_closed[i, j]/sum(P_closed[i,:]) for i in 1:n_polys, j in 1:n_polys];

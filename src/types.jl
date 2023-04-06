@@ -18,6 +18,7 @@ const global_stoc_types::Vector{String} = ["data", "source"]
 const global_traj_file_types::Vector{String} = ["mat", "h5"]
 const global_poly_number_default::Int64 = 100
 
+# sort edges if they aren't already
 
 struct UlamPolygon 
     nodes::Matrix{Float64} 
@@ -38,6 +39,15 @@ struct UlamPolygon
         n_nodes = size(nodes, 1)
 
         if edges === nothing
+            edges = [1:n_nodes;; [2:n_nodes; 1]] # assume provided nodes are sorted
+        elseif edges != [1:n_nodes;; [2:n_nodes; 1]] # user provided unsorted nodes; sort them
+            ss = sortslices(edges, dims = 1)
+            order = [1]
+            for i = 2:size(ss, 1)
+                push!(order, ss[order[i - 1], 2])
+            end
+
+            nodes = nodes[order, :]
             edges = [1:n_nodes;; [2:n_nodes; 1]]
         end
 
@@ -160,7 +170,8 @@ struct UlamCovering
 end
 
 struct UlamResult
-    covering::UlamCovering
+    polys::Vector{UlamPolygon}
+    polys_dis::Vector{UlamPolygon}
     P_closed::Matrix{Float64}
     P_open::SubArray{Float64, 2, Matrix{Float64}, Tuple{UnitRange{Int64}, UnitRange{Int64}}, false}
     pi_closed::Vector{Float64}

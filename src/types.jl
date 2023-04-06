@@ -16,7 +16,7 @@ abstract type AbstractInPolygonCompatible end
 
 const global_bin_types::Vector{String} = ["reg", "hex", "vor"]
 const global_poly_types::Vector{String} = ["reg", "hex", "vor", "unk"]
-const global_sto_types::Vector{String} = ["data", "source"]
+const global_stoc_types::Vector{String} = ["data", "source"]
 const global_traj_file_types::Vector{String} = ["mat", "h5"]
 const global_bin_number_default::Int64 = 100
 
@@ -118,7 +118,7 @@ struct UlamTrajectories
         y0::Vector{<:Real}, 
         xT::Vector{<:Real}, 
         yT::Vector{<:Real})
-        
+
         @assert length(x0) == length(y0) == length(xT) == length(yT) > 0
         new(x0, y0, xT, yT)
     end
@@ -143,6 +143,7 @@ struct UlamTrajectories
     end
 end  
 
+
 struct UlamDomain
     domain::UlamPolygon
     corners::Vector{Float64}
@@ -156,11 +157,11 @@ struct UlamDomain
         xmax::Real,
         ymin::Real,
         ymax::Real;
-        domain::Union{UlamPolygon,Nothing} = nothing,
+        domain::Union{UlamPolygon, Nothing} = nothing,
         bin_type::String = global_bin_types[1],
         bin_number::Int64 = global_bin_number_default,
-        stoc_type::String = global_sto_types[1],
-        stoc_polygon::Union{UlamPolygon,Nothing} = nothing)
+        stoc_type::String = global_stoc_types[1],
+        stoc_polygon::Union{UlamPolygon, Nothing} = nothing)
 
         @assert xmax > xmin
         @assert ymax > ymin
@@ -168,12 +169,14 @@ struct UlamDomain
         corners::Vector{Float64} = [xmin, xmax, ymin, ymax]
 
         if domain === nothing
-
+            domain = UlamPolygon([xmin ymin; xmin ymax; xmax ymax; xmin ymax])
         end
 
+        @assert bin_type in global_bin_types
+        @assert bin_number > 1
+        @assert stoc_type in global_stoc_types
 
-
-        new(x0, y0, xT, yT)
+        new(domain, corners, bin_type, bin_number, stoc_type, stoc_polygon)
     end
 end
 

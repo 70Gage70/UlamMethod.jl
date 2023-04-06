@@ -1,5 +1,5 @@
 using .UlamTypes
-import Graphs
+using Graphs:SimpleDiGraph,  strongly_connected_components
 
 include("ulam-binners.jl")
 include("helpers.jl")
@@ -8,30 +8,34 @@ traj = UlamTrajectories("x0x5-NA-undrogued.mat");
 domain = UlamDomain(-100, 15, -9, 39, poly_number = 500);
 polys = square_binner(traj, domain);
 
-
-function get_scc_inds(P_closed::Matrix{Float64})::Vector{Int64}
-    Psize = length(P_closed[1,:])
-    P_open_size = Psize - 1 # exclude nirvana when calculating scc, assumes one nirvana state in last entry
+# function get_scc_inds_old(P_closed)
+#     Psize = length(P_closed[1,:])
+#     P_open_size = Psize - 1 # exclude nirvana when calculating scc, assumes one nirvana state in last entry
     
-    Padj = Matrix{Int64}(undef, P_open_size, P_open_size) # the adjacency matrix defined by P
-    for i = 1:P_open_size
-        for j = 1:P_open_size
-            if P_closed[i, j] == 0.0
-                Padj[i,j] = 0 
-            else
-                Padj[i,j] = 1
-            end
-        end
-    end
+#     Padj = Matrix{Int64}(undef, P_open_size, P_open_size) # the adjacency matrix defined by P
+#     for i = 1:P_open_size
+#         for j = 1:P_open_size
+#             if P_closed[i, j] == 0.0
+#                 Padj[i,j] = 0 
+#             else
+#                 Padj[i,j] = 1
+#             end
+#         end
+#     end
     
-    Pgraph = SimpleDiGraph(Padj)
-    scc = sort(strongly_connected_components(Pgraph), by = length) 
-    largest_component = sort(scc[end])
-    push!(largest_component, Psize) # put nirvana back at the end, should stay sorted
+#     Pgraph = SimpleDiGraph(Padj)
+#     scc = sort(strongly_connected_components(Pgraph), by = length) 
+#     largest_component = sort(scc[end])
+#     push!(largest_component, Psize) # put nirvana back at the end, should stay sorted
 
-    return largest_component
-end
+#     return largest_component
+# end
 
+#########################################################################################################
+#########################################################################################################
+#########################################################################################################
+
+### Assign polygon indices to trajectory points
 
 # find the polygon indices of initial trajectory points 
 ip0 = inpoly([traj.x0 ;; traj.y0], PolyTable(polys));
@@ -44,7 +48,8 @@ n_polys = length(polys)
 # find the polygon indices of final trajectory points
 ipT = inpoly([traj.xT ;; traj.yT], PolyTable(polys));
 
-# construct P_closed
+### Construct P_closed
+
 P_closed = zeros(n_polys + 1, n_polys + 1) # one extra for nirvana
 
 for i = 1:length(ip0.inds)
@@ -65,3 +70,16 @@ for i = 1:length(ip0.inds)
     end
 end
 
+### Find the largest strongly connected component
+
+# create the adjacency matrix of P_closed; note that nirvana is excluded since we assume it's always connected
+Padj::Matrix{Int64} = [P_closed[i,j] != 0.0 ? 1 : 0 for i in 1:n_polys, j in 1:n_polys]
+
+# Construct the directed graph with adjacency matrix Padj and find its sccs; sort to get the largest scc.
+res = strongly_connected_components(SimpleDiGraph(Padj))
+scc = sort(strongly_connected_components(SimpleDiGraph(Padj)), by = length)[end]
+
+# In general, scc itself is not sorted, so we sort one my time and put nirvana back at the end to get the largest scc of P_closed
+largest_component = [sort(scc); n_polys + 1]
+
+P_sto = [P_closed[i, j]/sum(P_closed[i,:]) for i in 1:n_polys + 1, j in 1:n_polys+1];

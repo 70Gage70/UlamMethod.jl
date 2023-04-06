@@ -55,7 +55,7 @@ Padj::Matrix{Int64} = [P_closed[i,j] != 0.0 ? 1 : 0 for i in 1:n_polys, j in 1:n
 # Construct the directed graph with adjacency matrix Padj and find its sccs; sort to get the largest scc.
 scc = sort(strongly_connected_components(SimpleDiGraph(Padj)), by = length)[end]
 
-# In general, scc itself is not sorted, so we sort one my time and put nirvana back at the end to get the largest scc of P_closed
+# In general, scc itself is not sorted, so we sort one more time and put nirvana back at the end to get the largest scc of P_closed
 largest_component = [sort(scc); n_polys + 1]
 
 

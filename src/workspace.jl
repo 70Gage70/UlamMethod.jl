@@ -1,7 +1,8 @@
 using .UlamTypes
 
 include("ulam-binners.jl")
+include("helpers.jl")
 
-Ut = UlamTrajectories("x0x5-NA-undrogued.mat");
-Ud = UlamDomain(-100, 15, -9, 39, bin_number = 500);
-polys = square_binner(Ut, Ud);
+traj = UlamTrajectories("x0x5-NA-undrogued.mat");
+domain = UlamDomain(-100, 15, -9, 39, poly_number = 500);
+polys = square_binner(traj, domain);

@@ -17,13 +17,9 @@ import PolygonInbounds
 
 
 
-function inpoly(data::Matrix{Float64}, polys::Union{Vector{UlamPolygon}, PolyTable})::Vector{Int64}
+function inpoly(data::Matrix{Float64}, polys::PolyTable)::Vector{Int64}
     @assert size(data, 1) > 0
     @assert size(data, 2) == 2
-
-    if typeof(polys) == Vector{UlamPolygon}
-        polys = PolyTable(polys)
-    end
 
     ip2res = PolygonInbounds.inpoly2(data, polys.nodes, polys.edges)
     inds = zeros(Int64, size(data, 1))

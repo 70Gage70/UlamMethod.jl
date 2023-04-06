@@ -162,8 +162,8 @@ function ulam_nirvana(traj::UlamTrajectories, domain::UlamDomain, polys::Vector{
     ##########################################################################################
     # println("Assigning indices.")
 
-    inds0 = inpoly([traj.x0 ;; traj.y0], polys)
-    indsT = inpoly([traj.xT ;; traj.yT], polys)
+    inds0 = inpoly([traj.x0 ;; traj.y0], PolyTable(polys))
+    indsT = inpoly([traj.xT ;; traj.yT], PolyTable(polys))
     contains_data = []
     new_polys_count = 1
 

@@ -12,7 +12,7 @@ export
     UlamDomain,
     UlamProblem
 
-const global_poly_types::Vector{String} = ["reg", "hex", "vor"]
+const global_poly_types::Vector{String} = ["sqr", "hex", "vor"]
 const global_stoc_types::Vector{String} = ["data", "source"]
 const global_traj_file_types::Vector{String} = ["mat", "h5"]
 const global_poly_number_default::Int64 = 100
@@ -22,17 +22,17 @@ struct UlamPolygon
     nodes::Matrix{Float64} 
     edges::Matrix{Int64} 
     center::Matrix{Float64} 
-    polys_type::String
+    poly_type::String
 
     function UlamPolygon(
         nodes::Matrix{<:Real};
         edges::Union{Matrix{<:Integer}, Nothing} = nothing, 
         center::Union{Matrix{<:Real}, Nothing} = nothing, 
-        polys_type::String = "unk")
+        poly_type::String = "unk")
 
         @assert size(nodes, 1) > 0 
         @assert size(nodes, 2) == 2 
-        @assert (polys_type in global_poly_types) || (polys_types == "unk")
+        @assert (poly_type in global_poly_types) || (poly_type == "unk")
 
         n_nodes = size(nodes, 1)
 
@@ -48,7 +48,7 @@ struct UlamPolygon
 
         @assert size(center) == (1, 2)
 
-        new(nodes, edges, center, polys_type)
+        new(nodes, edges, center, poly_type)
     end
 end
 

@@ -9,6 +9,7 @@ export
     UlamTrajectories,
     UlamDomain,
     UlamProblem,
+    UlamInfo,
     UlamResult,
     PolyTable,
     InpolyResult
@@ -143,18 +144,14 @@ struct UlamDomain
     end
 end
 
-# returndict = begin Dict(
-#     "P_closed" => P_closed, 
-#     "P_open" => P_open,
-#     "pi_closed" => pi_closed,
-#     "pi_open" => pi_open,
-#     "counts" => final_counts,
-#     "leaves" => leaves,
-#     "polys" => vcells,
-#     "polys_centers" => vcenters,
-#     "polys_dis" => vcells_dis,
-#     "info" => info)
-# end
+
+struct UlamInfo
+    n_polys_requested::Int64
+    n_polys_removed::Int64
+    n_polys_dis::Int64
+    n_counts_total::Int64
+    n_counts_removed_scc::Int64
+end
 
 
 struct UlamResult
@@ -164,26 +161,27 @@ struct UlamResult
     pi_open::SubArray{Float64, 1, Vector{Float64}, Tuple{UnitRange{Int64}}, true}
     polys::Vector{UlamPolygon}
     polys_dis::Vector{UlamPolygon}
-    info::String
+    counts::Vector{Int64}
+    info::UlamInfo
 
     function UlamResult(
         P_closed::Matrix{Float64},
         polys::Vector{UlamPolygon},
         polys_dis::Vector{UlamPolygon},
         counts::Vector{Int64},
-        info::String)
+        info::UlamInfo)
 
         @assert size(P_closed, 1) == size(P_closed, 2)
         @assert size(P_closed, 1) > 0
 
         @assert length(polys) > 0
         
-        pi_closed = abs.(normalize(LinearAlgebra.eigvecs(transpose(P_closed))[:,size(P_closed)[1]], 1))
+        pi_closed = abs.(LinearAlgebra.normalize(LinearAlgebra.eigvecs(transpose(P_closed))[:,size(P_closed)[1]], 1))
 
         P_open = view(P_closed, 1:size(P_closed, 1) - 1, 1:size(P_closed, 1) - 1)
-        pi_open = view(pi_open, 1:size(pi_open) - 1, 1)
+        pi_open = view(pi_closed, 1:size(pi_closed, 1) - 1)
 
-        new(covering, P_closed, P_open, pi_closed, pi_open, info)
+        new(P_closed, P_open, pi_closed, pi_open, polys, polys_dis, counts, info)
     end
 end
 

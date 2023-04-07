@@ -19,13 +19,17 @@ function binner_hexagon(domain::UlamDomain)::Vector{UlamPolygon}
     n_x = Int64(ceil((rect_width - w/2)/w) + 1)
     n_y = Int64(ceil((rect_height - hex_size)/((3/2)*hex_size)) + 1)
 
-    if (n_x - 1)*w > rect_width # need to trim every second row to avoid overlap
+    # trim_x takes into account whether there will be one too many hexagons outside the given 
+    # rectangle, which happens exactly when (n_x - 1)*w > rect_width
+    # in this case, we trim every second row (we don't have to trim every row since they are offset)
+    # and this has to be taken into account for the entire calculation
+    if (n_x - 1)*w > rect_width
         trim_x = true
     else
         trim_x = false
     end
 
-    # extra width and height to fix overlap
+    # delta_x and delta_y ensure the covering is tight
     if trim_x
         delta_x = (n_x - 1)*w - rect_width
     else
@@ -33,21 +37,22 @@ function binner_hexagon(domain::UlamDomain)::Vector{UlamPolygon}
     end
 
     delta_y = (n_y - 1)*((3/2)*hex_size) + 2*hex_size - rect_height
+
+    # we build up the covering in rows from left to right starting from the top
     xleft = xmin - delta_x/2
     ytop = ymax - hex_size + delta_y/2
 
     delta_trim = 0
-
     if trim_x
         delta_trim = Int64(floor(n_y/2))
     end
 
     nodes = zeros(6*(n_x*n_y - delta_trim), 2) # x | y
-    edges = zeros(Int64, 6*(n_x*n_y - delta_trim), 3) # x | y | cell index
-    centers = []
     hex_i = 1
-    edge_n = 1
+
     for i = 1:n_y
+        # first we calculate the center of the leftmost hexagon we're creating
+
         trim_n = 0
 
         if isodd(i)
@@ -61,26 +66,22 @@ function binner_hexagon(domain::UlamDomain)::Vector{UlamPolygon}
 
         center_y = ytop - (3/2)*hex_size*(i - 1)
 
+        # now we look across the rows; note the one less hexagon when a trim is required
         for j = 1:(n_x - trim_n)
             center_x = center_x + w
-
-            push!(centers, [center_x, center_y])
             
+            # we construct the vertices of the current hexagon
+            # vertices of a hexagon are 60 degrees apart with respect to their center
             for k = 0:5
                 nodes[hex_i + k, :] = [center_x + hex_size*sin((pi/180)*60*k), center_y + hex_size*cos((pi/180)*60*k)]
-
-                if k < 5
-                    edges[hex_i + k, :] = [hex_i + k, hex_i + k + 1, edge_n]
-                else
-                    edges[hex_i + k, :] = [hex_i + k, hex_i, edge_n]
-                end
             end
 
             hex_i = hex_i + 6
-            edge_n = edge_n + 1
         end
     end
 
-    return Dict("nodes" => nodes, "edges" => edges, "centers" => centers, "nhex" => edge_n - 1)
+    polys = [UlamPolygon(nodes[i:i+5,:]) for i = 1:6:size(nodes, 1)]
+
+    return polys
 end
 

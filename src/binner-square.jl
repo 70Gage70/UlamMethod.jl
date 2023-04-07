@@ -1,9 +1,9 @@
 """
-    square_binner(traj, domain)
+    binner_square(domain)
 
-Cover the computational domain in `domain` by a uniform grid of squares and return an vector of type [`UlamPolygon`](@ref).
+Cover the computational domain in `domain` by a uniform grid of squares and return a vector of type [`UlamPolygon`](@ref).
 """
-function square_binner(traj::UlamTrajectories, domain::UlamDomain)::Vector{UlamPolygon}
+function binner_square(domain::UlamDomain)::Vector{UlamPolygon}
     n_polys = domain.poly_number
     xmin, xmax, ymin, ymax = domain.corners
     w = xmax - xmin

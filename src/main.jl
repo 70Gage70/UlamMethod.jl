@@ -1,13 +1,11 @@
 using HDF5
 
-include("binner-voronoi.jl")
-include("binner-hexbin.jl")
-include("binner-square.jl")
 
 include("ulam-nirvana.jl")
+include("ulam-binner.jl")
+
 include("tpt-infinite.jl")
 
-include("helpers.jl")
 include("earth-polygons.jl")
 include("process_infile.jl")
 

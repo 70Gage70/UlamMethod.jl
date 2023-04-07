@@ -1,34 +1,31 @@
 """
-Bin the data based a covering of the computational domain by hexagons.
+    binner_hexagon(domain)
 
-Written by Gage Bonner November 2022
-"""
-####################################################################################################################################
-####################################################################################################################################
-
-"""
-Using "odd-r" pointy configuration (top of hexagon is a vertex and every second row is pushed right.) 
-Data should be in a rectangle of defined by corners = [xmin, xmax, ymin, ymax].
-hex_size is the distance between the center of the hexagon and any of its vertices.
-Return dictionary of "nodes" and "edges"
+Cover the computational domain in `domain` by a uniform grid of hexagons and return a vector of type [`UlamPolygon`](@ref).
 """
 
-function generate_hexagons(corners, hex_size)
-    xmin, xmax, ymin, ymax = corners
+function binner_hexagon(domain::UlamDomain)::Vector{UlamPolygon}
+    xmin, xmax, ymin, ymax = domain.corners
+    n_polys = domain.poly_number
+
+    # The user requests a number of hexagons, we have to then calculate the approximate size by ratios of areas
     rect_width = xmax - xmin
     rect_height = ymax - ymin
-    w = sqrt(3)*hex_size
+    rect_A = rect_width*rect_height
+    hex_size = sqrt(2*rect_A/(3*sqrt(3)*n_polys))
 
+    # w is the width of a hexagon, n_x and n_y are the numbers of hexagons in each direction
+    w = sqrt(3)*hex_size
     n_x = Int64(ceil((rect_width - w/2)/w) + 1)
     n_y = Int64(ceil((rect_height - hex_size)/((3/2)*hex_size)) + 1)
 
-    if (n_x - 1)*w > rect_width # need to trim every second row
+    if (n_x - 1)*w > rect_width # need to trim every second row to avoid overlap
         trim_x = true
     else
         trim_x = false
     end
 
-    # extra width and height
+    # extra width and height to fix overlap
     if trim_x
         delta_x = (n_x - 1)*w - rect_width
     else
@@ -64,7 +61,6 @@ function generate_hexagons(corners, hex_size)
 
         center_y = ytop - (3/2)*hex_size*(i - 1)
 
-
         for j = 1:(n_x - trim_n)
             center_x = center_x + w
 
@@ -88,31 +84,3 @@ function generate_hexagons(corners, hex_size)
     return Dict("nodes" => nodes, "edges" => edges, "centers" => centers, "nhex" => edge_n - 1)
 end
 
-
-"""
-Clean up for Ulam.
-"""
-
-function hexbin_binner(n_polys, corners)
-    xmin, xmax, ymin, ymax = corners
-    rect_width = xmax - xmin
-    rect_height = ymax - ymin
-    rect_A = rect_width*rect_height
-    hex_size = sqrt(2*rect_A/(3*sqrt(3)*n_polys))
-
-    hexes = generate_hexagons(corners, hex_size)
-    polys = []
-    nodes = hexes["nodes"]
-
-    for i = 1:6:6*hexes["nhex"]
-        this_hex = []
-        for k = i:i+5
-            push!(this_hex, nodes[k,:])
-        end
-
-        push!(this_hex, nodes[i,:]) # close polygon
-        push!(polys, this_hex)
-    end
-
-    return polys, hexes["centers"]
-end

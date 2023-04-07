@@ -7,7 +7,6 @@ General helper functions.
 
 using .UlamTypes
 
-import Luxor
 import MAT
 import HDF5
 import PolygonInbounds
@@ -55,13 +54,8 @@ which requires a convex clipping polygon. `UlamPolygon` objects returned by squa
 
 #REWRITE WITH LIBGEOS
 
-function ulamclip(source::UlamPolygon, clip::UlamPolygon)
-    p_source = [Luxor.Point(source.nodes[i,:]...) for i = 1:size(source.nodes, 1)]
-    p_clip = [Luxor.Point(clip.nodes[i,:]...) for i = 1:size(clip.nodes, 1)]
-
-    return p_source, p_clip
-
-    return Luxor.polyclip(p_source, p_clip)
+function ulamclip()
+    return 1
 end
 
 

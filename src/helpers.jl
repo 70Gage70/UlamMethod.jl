@@ -46,16 +46,44 @@ function inpoly(data::Matrix{Float64}, polys::PolyTable)::InpolyResult
 end
 
 """
-    ulamclip(source, clip)
+    ulam_intersect(verts1, verts2)
 
-Check if `source` polygon is clipped by `clip` polygon. The underlying calculations are performed by Luxor.polyclip,
-which requires a convex clipping polygon. `UlamPolygon` objects returned by squares, hexagon and Voronoi algorithms are convex.
+Compute the intersection of two `UlamPolygons` objects.
 """
 
-#REWRITE WITH LIBGEOS
+function ulam_intersect(verts1::Matrix{<:Real}, verts2::Matrix{<:Real})
+    if typeof(verts1) != Matrix{Float64}
+        verts1 = convert(Matrix{Float64}, verts1)
+    end
 
-function ulamclip()
-    return 1
+    if typeof(verts2) != Matrix{Float64}
+        verts2 = convert(Matrix{Float64}, verts2)
+    end
+
+    if verts1[end, :] != verts1[1, :]
+        verts1 = vcat(verts1, verts1[1,:]')
+    end
+
+    if verts2[end, :] != verts2[1, :]
+        verts2 = vcat(verts2, verts2[1,:]')
+    end    
+
+    verts2 = convert(Matrix{Float64}, verts2)
+    p1 = LibGEOS.Polygon([[verts1[i,:] for i = 1:size(verts1, 1)]])
+    p2 = LibGEOS.Polygon([[verts2[i,:] for i = 1:size(verts2, 1)]])
+    pint = GeoInterface.coordinates(LibGEOS.intersection(p1, p2))
+
+    if length(pint[1]) == 0
+        return false
+    end
+
+    res = Vector{Matrix{Float64}}()
+    
+    for p in pint
+        push!(res, reduce(hcat, p[1])')
+    end
+
+    return res    
 end
 
 

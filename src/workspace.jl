@@ -55,12 +55,39 @@ Padj::Matrix{Int64} = [P_closed[i,j] != 0.0 ? 1 : 0 for i in 1:n_polys, j in 1:n
 # Construct the directed graph with adjacency matrix Padj and find its sccs; sort to get the largest scc.
 scc = sort(strongly_connected_components(SimpleDiGraph(Padj)), by = length)[end]
 
-# In general, scc itself is not sorted, so we sort one more time and put nirvana back at the end to get the largest scc of P_closed
+# In general, scc itself is not sorted
+# we sort one more time and put nirvana back at the end to get the largest scc of P_closed
 largest_component = [sort(scc); n_polys + 1]
-
-
-
-
 P_closed = P_closed[largest_component, largest_component]
 
-P_sto = [P_closed[i, j]/sum(P_closed[i,:]) for i in 1:n_polys, j in 1:n_polys];
+### stochasticizing/reinjection
+
+# the "data" algorithm is applied by default and needs no further calculations
+
+# now we handle the reinjection if the user requested source
+if domain.stoc_type == "source" && sum(P_closed[n_polys + 1, :]) > 0.0
+    # findind the polygons that intersect with the given sto_polygon
+    in_source = [ulam_intersects(domain.sto_polygon, polys[i]) for i in largest_component]
+
+    # all the reinjection counts are redistributed evenly at those locations
+    total_counts = sum(P_closed[n_polys + 1, :])
+    P_closed[n_polys + 1, :] = zeros(n_polys + 1)
+    P_closed[n_polys + 1, :][in_source] .= total_counts/length(in_source)
+end
+
+# stochasticizing P_closed
+for i = 1:n_polys
+    P_closed[i, :] = P_closed[i, :]/sum(P_closed[i, :])
+end
+
+# reinjection trajectories
+if sum(P_closed[n_polys + 1, :]) > 0.0  
+    P_closed[n_polys + 1, :] = P_closed[n_polys + 1, :]/sum(P_closed[n_polys + 1, :])
+else
+    @warn "There are no trajectories from nirvana to the interior. No reinjection was performed."
+end
+
+if sum(P_closed[:, n_polys + 1]) == 0.0
+    @warn "There are no trajectories from the interior to nirvana."
+end
+

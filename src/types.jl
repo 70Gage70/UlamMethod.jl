@@ -6,10 +6,10 @@ import LinearAlgebra
 
 export 
     UlamPolygon,
-    # UlamCovering,
     UlamTrajectories,
     UlamDomain,
     UlamProblem,
+    UlamResult,
     PolyTable,
     InpolyResult
 
@@ -134,6 +134,11 @@ struct UlamDomain
         @assert poly_number > 1
         @assert stoc_type in global_stoc_types
 
+        if stoc_polygon != nothing && stoc_type != "source"
+            # assume the user wants to use the source algorithm if they provide a stoc_polygon
+            stoc_type = "source"
+        end
+
         new(domain, corners, poly_type, poly_number, stoc_type, stoc_polygon)
     end
 end
@@ -151,40 +156,27 @@ end
 #     "info" => info)
 # end
 
-struct UlamCovering
-    polys::Vector{UlamPolygon}
-    counts::Vector{Int64}
-    contains_scc::Vector{Bool}
-
-
-    function UlamCovering(
-        polys::Vector{UlamPolygon};
-        counts::Vector{Int64} = fill(0, length(polys)),
-        contains_scc::Vector{Bool} = fill(true, length(polys)))
-
-        @assert length(polys) > 0 
-
-        new(polys, counts, contains_scc)
-    end
-
-end
 
 struct UlamResult
-    polys::Vector{UlamPolygon}
-    polys_dis::Vector{UlamPolygon}
     P_closed::Matrix{Float64}
     P_open::SubArray{Float64, 2, Matrix{Float64}, Tuple{UnitRange{Int64}, UnitRange{Int64}}, false}
     pi_closed::Vector{Float64}
     pi_open::SubArray{Float64, 1, Vector{Float64}, Tuple{UnitRange{Int64}}, true}
+    polys::Vector{UlamPolygon}
+    polys_dis::Vector{UlamPolygon}
     info::String
 
     function UlamResult(
-        covering::UlamCovering,
         P_closed::Matrix{Float64},
+        polys::Vector{UlamPolygon},
+        polys_dis::Vector{UlamPolygon},
+        counts::Vector{Int64},
         info::String)
 
         @assert size(P_closed, 1) == size(P_closed, 2)
         @assert size(P_closed, 1) > 0
+
+        @assert length(polys) > 0
         
         pi_closed = abs.(normalize(LinearAlgebra.eigvecs(transpose(P_closed))[:,size(P_closed)[1]], 1))
 

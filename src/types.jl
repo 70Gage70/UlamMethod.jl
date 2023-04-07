@@ -12,7 +12,8 @@ export
     UlamInfo,
     UlamResult,
     PolyTable,
-    InpolyResult
+    InpolyResult,
+    show
 
 const global_poly_types::Vector{String} = ["sqr", "hex", "vor"]
 const global_stoc_types::Vector{String} = ["data", "source"]
@@ -64,6 +65,19 @@ struct UlamPolygon
     end
 end
 
+function Base.show(io::IO, x::UlamPolygon)
+    print(io, "UlamPolygon[")
+    show(io, size(x.edges, 1))
+    print("]")
+end
+
+function Base.show(io::IO, ::MIME"text/plain", x::Vector{UlamPolygon})
+    print(io, "Vector{UlamPolygon}[")
+    show(io, length(x))
+    print("]")
+end
+
+
 
 struct UlamTrajectories 
     x0::Vector{Float64}
@@ -103,8 +117,15 @@ struct UlamTrajectories
 end  
 
 
+function Base.show(io::IO, x::UlamTrajectories)
+    print(io, "UlamTrajectories[")
+    show(io, length(x.x0))
+    print("]")
+end
+
+
 struct UlamDomain
-    domain::UlamPolygon
+    domain::Union{UlamPolygon, Nothing}
     corners::Vector{Float64}
     poly_type::String
     poly_number::Int64
@@ -127,9 +148,10 @@ struct UlamDomain
 
         corners::Vector{Float64} = [xmin, xmax, ymin, ymax]
 
-        if domain === nothing
-            domain = UlamPolygon([xmin ymin; xmin ymax; xmax ymax; xmin ymax])
-        end
+        # if corners is ever replaced by a generic domain
+        # if domain === nothing
+        #     domain = UlamPolygon([xmin ymin; xmin ymax; xmax ymax; xmin ymax])
+        # end
 
         @assert poly_type in global_poly_types
         @assert poly_number > 1
@@ -144,13 +166,27 @@ struct UlamDomain
     end
 end
 
+function Base.show(io::IO, x::UlamDomain)
+    print(io, "UlamDomain[")
+    show(io, x.corners)
+    print(io, ", ")
+    show(io, x.poly_number)
+    print(io, "@")
+    show(io, x.poly_type)
+    if x.domain != nothing
+        print(io, " w/ domain")
+    end
+    print("]")
+end
+
 
 struct UlamInfo
     n_polys_requested::Int64
-    n_polys_removed::Int64
+    n_polys_no_data::Int64
     n_polys_dis::Int64
     n_counts_total::Int64
     n_counts_removed_scc::Int64
+    poly_type::String
 end
 
 
@@ -185,6 +221,24 @@ struct UlamResult
     end
 end
 
+
+function Base.show(io::IO, x::UlamResult)
+    print(io, " UlamResult")
+    println(io)
+    print("  Polys requested: ")
+    show(io, x.info.n_polys_requested)
+    println(io)
+    print("  Polys type: ")
+    show(io, x.info.poly_type)
+    println(io)
+    print("  Polys obtained: ")
+    show(io, length(x.polys))
+    println(io)
+    print("  Polys disconnected: ")
+    show(io, length(x.polys_dis))
+end
+
+
 struct PolyTable
     nodes::Matrix{Float64}
     edges::Matrix{Int64}
@@ -217,6 +271,12 @@ struct PolyTable
     end
 end
 
+function Base.show(io::IO, x::PolyTable)
+    print(io, "PolyTable[")
+    show(io, x.n_polys)
+    print("]")
+end
+
 struct InpolyResult
     inds::Vector{Int64}
     contains::Dict{Int64, Int64}
@@ -224,77 +284,3 @@ end
 
 end # module
 
-# include("binner-square.jl")
-# n_polys_test = 100
-# polys_test, polys_centers_test = square_binner(n_polys_test, [0, 1, 0, 1])
-# include("ulam-nirvana.jl")
-# iptest = inpoly_preprocess(polys_test)
-# uptest = [UlamPolygon(iptest["nodes"][i:i+3,:]) for i=1:4:4*n_polys_test]
-# uctest = UlamCovering(uptest)
-# pttest = PolyTable(uctest.polys)
-
-
-##############################################################################################################################
-
-# To define an Ulam method, need corners, x0y0xTyT data, binning type and number, stochasticization type 
-
-# struct UlamBoundary 
-#     xmin::Float64
-#     xmax::Float64
-#     ymin::Float64
-#     ymax::Float64
-
-#     function UlamBoundary(;xmin::R1, xmax::R2, ymin::R3, ymax::R4) where {R1 <: Real, R2 <: Real, R3 <: Real, R4 <: Real}
-#         @assert xmin < xmax
-#         @assert ymin < ymax
-#         new(xmin, xmax, ymin, ymax)
-#     end
-# end  
-
-# struct UlamTrajectories 
-#     x0::Vector{Float64}
-#     xT::Vector{Float64}
-#     y0::Vector{Float64}
-#     yT::Vector{Float64}
-
-#     function UlamTrajectories(;x0::Vector{R1}, y0::Vector{R2}, xT::Vector{R3}, yT::Vector{R4}) where {R1 <: Real, R2 <: Real, R3 <: Real, R4 <: Real}
-#         @assert length(x0) == length(y0) == length(xT) == length(yT) > 0
-#         new(x0, xT, y0, yT)
-#     end
-# end  
-
-# struct UlamBins 
-#     bin_type::String
-#     bin_number::Integer
-
-#     function UlamBins(;bin_type::String, bin_number::Integer)
-#         @assert bin_type in ["reg", "hex", "vor"]
-#         @assert bin_number > 0
-#         new(bin_type, bin_number)
-#     end
-# end  
-
-# struct UlamStocData
-#     stoc_type::String
-#     bin_number::Integer
-
-#     function UlamBins(;bin_type::String, bin_number::Integer)
-#         @assert bin_type in ["reg", "hex", "vor"]
-#         @assert bin_number > 0
-#         new(bin_type, bin_number)
-#     end
-# end  
-
-
-
-# struct UlamProblem
-#     corners::Vector{T} where {T<:Real}
-
-#     function UlamProblem(corners::Vector{T}) where {T<:Real}
-#         if length(corners) != 4
-#             throw(ArgumentError("Vector must have length 4"))
-#         else
-#             new(corners)
-#         end
-#     end
-# end

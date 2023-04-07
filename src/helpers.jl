@@ -7,16 +7,20 @@ General helper functions.
 
 using .UlamTypes
 
-import MAT
-import HDF5
+import MAT, HDF5
 import PolygonInbounds
+import LibGEOS, GeoInterface
 
 ####################################################################################################################################
 ####################################################################################################################################
 ####################################################################################################################################
 
 
+"""
+    ulam_intersection(poly1, poly2)
 
+Compute the intersection of two `UlamPolygons` objects. Returns false if they do not intersect.
+"""
 function inpoly(data::Matrix{Float64}, polys::PolyTable)::InpolyResult
     @assert size(data, 1) > 0
     @assert size(data, 2) == 2
@@ -46,45 +50,65 @@ function inpoly(data::Matrix{Float64}, polys::PolyTable)::InpolyResult
 end
 
 """
-    ulam_intersect(verts1, verts2)
+    ulam_intersection(poly1, poly2)
 
-Compute the intersection of two `UlamPolygons` objects.
+Compute the intersection of two `UlamPolygons` objects. Returns false if they do not intersect.
 """
+function ulam_intersection(poly1::UlamPolygon, poly2::UlamPolygon)::Union{Bool,UlamPolygon}
+    # UlamPolygons are not closed, so we have to close them for LibGEOS.
+    nodes1 = poly1.nodes
+    nodes2 = poly2.nodes
+    nodes1 = vcat(nodes1, nodes1[1,:]')
+    nodes2 = vcat(nodes2, nodes2[1,:]')
 
-function ulam_intersect(verts1::Matrix{<:Real}, verts2::Matrix{<:Real})
-    if typeof(verts1) != Matrix{Float64}
-        verts1 = convert(Matrix{Float64}, verts1)
+    # Construct LibGEOS-formatted polygons
+    p1 = LibGEOS.Polygon([[nodes1[i,:] for i = 1:size(nodes1, 1)]])
+    p2 = LibGEOS.Polygon([[nodes2[i,:] for i = 1:size(nodes2, 1)]])
+
+    # Compute the intersection
+    pint = LibGEOS.intersection(p1, p2)
+
+    # Ensure that the result is a polygon
+    if GeoInterface.geomtrait(pint) == GeoInterface.PolygonTrait()
+        pint = GeoInterface.coordinates(pint)
+
+        if length(pint[1]) == 0
+            return false # no intersection
+        else
+            pmat = reduce(hcat, pint[1])'
+            pmat = pmat[1:end-1,:]
+
+            return UlamPolygon(pmat)
+        end
+    elseif GeoInterface.geomtrait(pint) == GeoInterface.MultiPolygonTrait()
+        @error "The intersection of these polygons is a multipolygon, this shouldn't happen." poly1 poly2
+    else
+        @error "The intersection of these polygons is bad, this REALLY shouldn't happen." poly1 poly2
     end
-
-    if typeof(verts2) != Matrix{Float64}
-        verts2 = convert(Matrix{Float64}, verts2)
-    end
-
-    if verts1[end, :] != verts1[1, :]
-        verts1 = vcat(verts1, verts1[1,:]')
-    end
-
-    if verts2[end, :] != verts2[1, :]
-        verts2 = vcat(verts2, verts2[1,:]')
-    end    
-
-    verts2 = convert(Matrix{Float64}, verts2)
-    p1 = LibGEOS.Polygon([[verts1[i,:] for i = 1:size(verts1, 1)]])
-    p2 = LibGEOS.Polygon([[verts2[i,:] for i = 1:size(verts2, 1)]])
-    pint = GeoInterface.coordinates(LibGEOS.intersection(p1, p2))
-
-    if length(pint[1]) == 0
-        return false
-    end
-
-    res = Vector{Matrix{Float64}}()
-    
-    for p in pint
-        push!(res, reduce(hcat, p[1])')
-    end
-
-    return res    
 end
+
+"""
+    ulam_intersects(poly1, poly2)
+
+Return truw or false accoring to whether two `UlamPolygons` objects intersect. Can be faster
+than `ulam_intersection` if the shape of the intersection is not needed.
+"""
+function ulam_intersects(poly1::UlamPolygon, poly2::UlamPolygon)::Bool
+    # UlamPolygons are not closed, so we have to close them for LibGEOS.
+    nodes1 = poly1.nodes
+    nodes2 = poly2.nodes
+    nodes1 = vcat(nodes1, nodes1[1,:]')
+    nodes2 = vcat(nodes2, nodes2[1,:]')
+
+    # Construct LibGEOS-formatted polygons
+    p1 = LibGEOS.Polygon([[nodes1[i,:] for i = 1:size(nodes1, 1)]])
+    p2 = LibGEOS.Polygon([[nodes2[i,:] for i = 1:size(nodes2, 1)]])
+
+    # Compute the intersection
+    return LibGEOS.intersects(p1, p2)
+end
+
+
 
 
 

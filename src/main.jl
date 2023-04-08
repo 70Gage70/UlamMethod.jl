@@ -5,8 +5,6 @@ include("helpers.jl")
 include("ulam-nirvana.jl")
 include("ulam-binner.jl")
 
-include("tpt-infinite.jl")
-
 include("earth-polygons.jl")
 
 #########################################################################################################

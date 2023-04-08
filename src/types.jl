@@ -8,7 +8,6 @@ export
     UlamPolygon,
     UlamTrajectories,
     UlamDomain,
-    UlamProblem,
     UlamInfo,
     UlamResult,
     PolyTable,
@@ -125,8 +124,8 @@ end
 
 
 struct UlamDomain
-    domain::Union{UlamPolygon, Nothing}
     corners::Vector{Float64}
+    domain::Union{UlamPolygon, Nothing}
     poly_type::String
     poly_number::Int64
     stoc_type::String
@@ -164,7 +163,67 @@ struct UlamDomain
             stoc_type = "source"
         end
 
-        new(domain, corners, poly_type, poly_number, stoc_type, stoc_polygon), rseed
+        new(corners, domain, poly_type, poly_number, stoc_type, stoc_polygon, rseed)
+    end
+
+    function UlamDomain(infile::String)
+        extension = infile[findlast(==('.'), infile)+1:end]
+
+        @assert extension in global_traj_file_types
+
+        if extension == "mat"
+            data = MAT.matopen(infile)
+        elseif extension == "h5"
+            data = HDF5.h5open(infile)
+        end
+
+        @assert "xmin" in keys(data)
+        @assert "xmax" in keys(data)
+        @assert "ymin" in keys(data)
+        @assert "ymax" in keys(data)
+
+        xmin, xmax, ymin, ymax = map(vec, read(data, "xmin", "xmax", "ymin", "ymax"))
+        corners = [xmin, xmax, ymin, ymax]
+
+        if "domain" in keys(data)
+            domain = read(data, "domain")
+        else
+            domain = nothing
+        end
+
+        if "poly_type" in keys(data)
+            poly_type = read(data, "poly_type")
+        else
+            poly_type = global_poly_types[1]
+        end
+
+        if "poly_number" in keys(data)
+            poly_number = read(data, "poly_number")
+        else
+            poly_number = global_poly_number_default[1]
+        end        
+
+        if "stoc_type" in keys(data)
+            stoc_type = read(data, "stoc_type")
+        else
+            stoc_type = global_stoc_types[1]
+        end
+        
+        if "stoc_polygon" in keys(data)
+            stoc_polygon = read(data, "stoc_polygon")
+        else
+            stoc_polygon = nothing
+        end      
+
+        if "rseed" in keys(data)
+            rseed = read(data, "rseed")
+        else
+            rseed = 123
+        end    
+
+        close(data)
+
+        new(corners, domain, poly_type, poly_number, stoc_type, stoc_polygon, rseed)
     end
 end
 

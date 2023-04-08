@@ -1,7 +1,5 @@
 using Graphs:SimpleDiGraph,  strongly_connected_components
 
-include("helpers.jl")
-
 """
     ulam_nirvana(traj, domain, polys)
 

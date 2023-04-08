@@ -41,7 +41,7 @@ function inpoly(data::Matrix{Float64}, polys::PolyTable)::InpolyResult
 
     # ip2res is a BitArray with dimensions size(data, 1) x 2 x size(polys.nodes, 1).
     # ip2res[:,1,i] is a BitVector such that ip2res[:,1,i][k] == true if the k'th data point is in polygon i
-    # findall(x->x==true, ip2res[:,1,i]) therfore finds the indices of all data points in polygon i
+    # fa = findall(x->x==true, ip2res[:,1,i]) therefore finds the indices of all data points in polygon i
     # contains is a lookup table for polygons that contain data, 
     # e.g. contains[6] = 3 means that the 6th polygon is the 3rd polygon in the list that contains data
     # note that [i for i in keys(contains)] is a list of indices of polygons that contain data
@@ -128,31 +128,28 @@ function ulam_intersects(poly1::UlamPolygon, poly2::UlamPolygon)::Bool
 end
 
 
+# function help_smear(xmin, xmax, ymin, ymax; resolution = 0.1)
+#     centers = collect.(Iterators.product(xmin:resolution:xmax, ymin:resolution:ymax))
+#     centers = reshape(centers, (length(centers),1))
+#     centers = transpose(reduce(hcat, centers))
+#     return centers
+# end
 
 
+# function ABcorner_standard()
+#     corners = [-100, 15, -9, 39]
 
-function help_smear(xmin, xmax, ymin, ymax; resolution = 0.1)
-    centers = collect.(Iterators.product(xmin:resolution:xmax, ymin:resolution:ymax))
-    centers = reshape(centers, (length(centers),1))
-    centers = transpose(reduce(hcat, centers))
-    return centers
-end
+#     A_centers = [
+#         -18.0 17.0;
+#         ]
+#     B_centers = help_smear(-98.0, -92.0, 17.7, 32.0, resolution = 0.1)
 
+#     return corners, A_centers, B_centers
+# end
 
-function ABcorner_standard()
-    corners = [-100, 15, -9, 39]
-
-    A_centers = [
-        -18.0 17.0;
-        ]
-    B_centers = help_smear(-98.0, -92.0, 17.7, 32.0, resolution = 0.1)
-
-    return corners, A_centers, B_centers
-end
-
-function corners_mid(corners)
-    return [(corners[1] + corners[2])/2, (corners[3] + corners[4])/2]
-end
+# function corners_mid(corners)
+#     return [(corners[1] + corners[2])/2, (corners[3] + corners[4])/2]
+# end
 
 # takes in a vector of vectors and converts it to a matrix
 function vecvec_to_mat(vvec)

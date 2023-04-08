@@ -17,9 +17,9 @@ import LibGEOS, GeoInterface
 
 
 """
-    ulam_intersection(poly1, poly2)
+    inpoly(data::Matrix{Float64}, polys::PolyTable)
 
-Compute the intersection of two `UlamPolygons` objects. Returns false if they do not intersect.
+Determines which polygon of `polys` contains the data points in `data`. Returns an `InpolyResult`[@ref].
 """
 function inpoly(data::Matrix{Float64}, polys::PolyTable)::InpolyResult
     @assert size(data, 1) > 0
@@ -48,6 +48,25 @@ function inpoly(data::Matrix{Float64}, polys::PolyTable)::InpolyResult
 
     return InpolyResult(inds, contains)
 end
+
+"""
+    inpoly(traj::UlamTrajectories, domain::UlamDomain)
+
+Determines the indices of points that are inside the domain (i.e. not nirvana.)
+"""
+function inpoly(traj::UlamTrajectories, domain::UlamDomain)::InpolyResult
+    data = [traj.x0 ;; traj.y0]
+
+    if domain.domain === nothing # the domain is a square
+        xmin, xmax, ymin, ymax = domain.corners
+        polys = PolyTable([UlamPolygon([xmin ymin; xmin ymax; xmax ymax; xmax ymin])])
+    else
+        polys = PolyTable([domain.domain])
+    end
+
+    return inpoly(data, polys)
+end
+
 
 """
     ulam_intersection(poly1, poly2)

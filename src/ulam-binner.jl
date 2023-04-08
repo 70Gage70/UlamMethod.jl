@@ -4,20 +4,20 @@ include("binner-hexagon.jl")
 include("binner-square.jl")
 
 """
-    All binners.
+    ulam_binner(traj, domain)
+
+Selects and executes the appropriate binning algorithm for the given trajectories and domain.
+Intersects the resulting polygons with the domain so that the returned polygons are clipped to it.
 """
-
 function ulam_binner(traj::UlamTrajectories, domain::UlamDomain)::Vector{UlamPolygon}
-    bin_type = domain.bin_type
+    poly_type = domain.poly_type
 
-    if bin_type == "reg"
+    if poly_type == "reg"
         res = binner_square(domain)
-    elseif bin_type == "hex"
-        # res = binner_hexagon(domain)
-        error("Not ready yet.") 
-    elseif bin_type == "vor"        
-        # res = voronoi_binner(n_polys, corners)
-        error("Not ready yet.") 
+    elseif poly_type == "hex"
+        res = binner_hexagon(domain)
+    elseif poly_type == "vor"        
+        res = binner_voronoi(traj, domain)
     end
 
     # intersect the binned polygons with the given domain if one exists

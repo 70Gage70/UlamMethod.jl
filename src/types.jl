@@ -131,6 +131,7 @@ struct UlamDomain
     poly_number::Int64
     stoc_type::String
     stoc_polygon::Union{UlamPolygon,Nothing}
+    rseed::Int64
 
     function UlamDomain(
         xmin::Real,
@@ -141,7 +142,8 @@ struct UlamDomain
         poly_type::String = global_poly_types[1],
         poly_number::Int64 = global_poly_number_default,
         stoc_type::String = global_stoc_types[1],
-        stoc_polygon::Union{UlamPolygon, Nothing} = nothing)
+        stoc_polygon::Union{UlamPolygon, Nothing} = nothing,
+        rseed::Int64 = 123)
 
         @assert xmax > xmin
         @assert ymax > ymin
@@ -162,7 +164,7 @@ struct UlamDomain
             stoc_type = "source"
         end
 
-        new(domain, corners, poly_type, poly_number, stoc_type, stoc_polygon)
+        new(domain, corners, poly_type, poly_number, stoc_type, stoc_polygon), rseed
     end
 end
 

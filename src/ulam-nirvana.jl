@@ -58,7 +58,7 @@ function ulam_nirvana(traj::UlamTrajectories, domain::UlamDomain, polys::Vector{
     largest_component = sort(scc)
     P_closed = P_closed[[largest_component; n_polys + 1], [largest_component; n_polys + 1]]
     n_polys = length(largest_component)
-    polys_dis = [polys[i] for i=1:n_polys if !(i in largest_component)]
+    polys_dis::Vector{eltype(polys)} = [polys[i] for i=1:n_polys if !(i in largest_component)]
     polys = polys[largest_component]
 
     ############ stochasticizing/reinjection

@@ -17,7 +17,7 @@ export
 const global_poly_types::Vector{String} = ["sqr", "hex", "vor"]
 const global_stoc_types::Vector{String} = ["data", "source"]
 const global_traj_file_types::Vector{String} = ["mat", "h5"]
-const global_poly_number_default::Int64 = 100
+const global_poly_number_default::Dict = Dict("sqr" => 500, "hex" => 500, "vor" => 100)
 
 
 
@@ -144,7 +144,7 @@ function UlamDomain(
     ymax::T;
     domain::Union{UlamPolygon{T}, Nothing} = nothing,
     poly_type::S = global_poly_types[1],
-    poly_number::U = global_poly_number_default,
+    poly_number::U = global_poly_number_default[poly_type],
     stoc_type::S = global_stoc_types[1],
     stoc_polygon::Union{UlamPolygon{T}, Nothing} = nothing,
     rseed::U = 123) where {S<:AbstractString, T<:Real, U<:Integer}

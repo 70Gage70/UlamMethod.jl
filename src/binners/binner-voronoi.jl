@@ -2,6 +2,7 @@ using Random
 using Clustering: kmeans
 using VoronoiCells: voronoicells, Rectangle
 using GeometryBasics: Point2
+using Dates
 
 """
     binner_voronoi(traj, domain; rseed)
@@ -17,10 +18,11 @@ function binner_voronoi(traj::UlamTrajectories, domain::UlamDomain)
     data0 = transpose([traj.x0[inds_in] ;; traj.y0[inds_in]])  # kmeans takes a 2 x n matrix; have to transpose
 
     # cluster the data
-    @info "kmeans: start"
+    tstart = Dates.format(now(), "HH:MM")
+    @info "Starting kmeans with $(domain.poly_number) clusters at $(tstart)."
     Random.seed!(domain.rseed) # random seed for kmeans algo; makes results reproducible
     centers = @time kmeans(data0, domain.poly_number).centers
-    @info "kmeans: end"
+    @info "Done kmeans."
 
     # create tiling
     # The Voronoi cells algorithm takes in an n-vector of Point2(x, y) 

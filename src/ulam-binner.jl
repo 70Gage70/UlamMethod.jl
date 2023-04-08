@@ -13,7 +13,7 @@ Returns Vector{UlamPolygon{Float64}}.
 function ulam_binner(traj::UlamTrajectories, domain::UlamDomain)
     poly_type = domain.poly_type
 
-    if poly_type == "reg"
+    if poly_type == "sqr"
         res = binner_square(domain)
     elseif poly_type == "hex"
         res = binner_hexagon(domain)

@@ -3,14 +3,19 @@ using BenchmarkTools
 
 include("main.jl")
 
-traj = UlamTrajectories("x0x5-NA-undrogued.mat");
-domain = UlamDomain(-100, 15, -9, 39, poly_number = 100, poly_type = "hex");
+fin = "x0x5-NA-undrogued.mat"
+corners = [-100, 15, -9, 39]
+poly_number = 500
+poly_type = "hex"
+traj = UlamTrajectories(fin);
+# domain = UlamDomain(corners..., poly_number = poly_number, poly_type = poly_type);
+domain = UlamDomain(corners..., poly_type = "vor")
 ulam = ulam_method(traj, domain)
 
 
 function utest()
-    traj = UlamTrajectories("x0x5-NA-undrogued.mat");
-    domain = UlamDomain(-100, 15, -9, 39, poly_number = 100, poly_type = "hex");
+    traj = UlamTrajectories(fin);
+    domain = UlamDomain(corners..., poly_number = poly_number, poly_type = poly_type);
     ulam = ulam_method(traj, domain)
 
     return ulam

@@ -26,42 +26,43 @@ struct UlamPolygon
     edges::Matrix{Int64} 
     center::Matrix{Float64} 
     poly_type::String
+end
 
-    function UlamPolygon(
-        nodes::Matrix{<:Real};
-        edges::Union{Matrix{<:Integer}, Nothing} = nothing, 
-        center::Union{Matrix{<:Real}, Nothing} = nothing, 
-        poly_type::String = "unk")
 
-        @assert size(nodes, 1) > 0 
-        @assert size(nodes, 2) == 2 
-        @assert (poly_type in global_poly_types) || (poly_type == "unk")
+function UlamPolygon(
+    nodes::Matrix{<:Real};
+    edges::Union{Matrix{<:Integer}, Nothing} = nothing, 
+    center::Union{Matrix{<:Real}, Nothing} = nothing, 
+    poly_type::String = "unk")
 
-        n_nodes = size(nodes, 1)
+    @assert size(nodes, 1) > 0 
+    @assert size(nodes, 2) == 2 
+    @assert (poly_type in global_poly_types) || (poly_type == "unk")
 
-        if edges === nothing
-            edges = [1:n_nodes;; [2:n_nodes; 1]] # assume provided nodes are sorted
-        elseif edges != [1:n_nodes;; [2:n_nodes; 1]] # user provided unsorted nodes; sort them
-            ss = sortslices(edges, dims = 1)
-            order = [1]
-            for i = 2:size(ss, 1)
-                push!(order, ss[order[i - 1], 2])
-            end
+    n_nodes = size(nodes, 1)
 
-            nodes = nodes[order, :]
-            edges = [1:n_nodes;; [2:n_nodes; 1]]
+    if edges === nothing
+        edges = [1:n_nodes;; [2:n_nodes; 1]] # assume provided nodes are sorted
+    elseif edges != [1:n_nodes;; [2:n_nodes; 1]] # user provided unsorted nodes; sort them
+        ss = sortslices(edges, dims = 1)
+        order = [1]
+        for i = 2:size(ss, 1)
+            push!(order, ss[order[i - 1], 2])
         end
 
-        @assert size(edges) == size(nodes)
-
-        if center === nothing
-            center = [sum(nodes[:,1]) sum(nodes[:,2])]/n_nodes
-        end
-
-        @assert size(center) == (1, 2)
-
-        new(nodes, edges, center, poly_type)
+        nodes = nodes[order, :]
+        edges = [1:n_nodes;; [2:n_nodes; 1]]
     end
+
+    @assert size(edges) == size(nodes)
+
+    if center === nothing
+        center = [sum(nodes[:,1]) sum(nodes[:,2])]/n_nodes
+    end
+
+    @assert size(center) == (1, 2)
+
+    return UlamPolygon(nodes, edges, center, poly_type)
 end
 
 function Base.show(io::IO, x::UlamPolygon)

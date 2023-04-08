@@ -1,7 +1,7 @@
 
-include("binner-voronoi.jl")
-include("binner-hexagon.jl")
-include("binner-square.jl")
+include("binners/binner-voronoi.jl")
+include("binners/binner-hexagon.jl")
+include("binners/binner-square.jl")
 
 """
     ulam_binner(traj, domain)

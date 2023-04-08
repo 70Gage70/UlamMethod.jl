@@ -8,8 +8,9 @@ include("binners/binner-square.jl")
 
 Selects and executes the appropriate binning algorithm for the given trajectories and domain.
 Intersects the resulting polygons with the domain so that the returned polygons are clipped to it.
+Returns Vector{UlamPolygon{Float64}}.
 """
-function ulam_binner(traj::UlamTrajectories, domain::UlamDomain)::Vector{UlamPolygon}
+function ulam_binner(traj::UlamTrajectories, domain::UlamDomain)
     poly_type = domain.poly_type
 
     if poly_type == "reg"
@@ -22,7 +23,7 @@ function ulam_binner(traj::UlamTrajectories, domain::UlamDomain)::Vector{UlamPol
 
     # intersect the binned polygons with the given domain if one exists
     if domain.domain != nothing
-        intersected = Vector{UlamPolygon}()
+        intersected = Vector{UlamPolygon{Float64}}()
         for poly in res
             int = ulam_intersection(domain, poly)
             if int != false

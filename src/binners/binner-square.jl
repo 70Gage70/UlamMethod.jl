@@ -1,9 +1,10 @@
 """
     binner_square(domain)
 
-Cover the computational domain in `domain` by a uniform grid of squares and return a vector of type [`UlamPolygon`](@ref).
+Cover the computational domain in `domain` by a uniform grid of squares.
+Returns Vector{UlamPolygon{Float64}}.
 """
-function binner_square(domain::UlamDomain)::Vector{UlamPolygon}
+function binner_square(domain::UlamDomain)
     n_polys = domain.poly_number
     xmin, xmax, ymin, ymax = domain.corners
     w = xmax - xmin
@@ -19,7 +20,7 @@ function binner_square(domain::UlamDomain)::Vector{UlamPolygon}
     y_top = ymax + delta_y/2
     x_left = xmin - delta_x/2
 
-    polys = Vector{UlamPolygon}()
+    polys = Vector{UlamPolygon{Float64}}()
 
     for i = 1:n_y
         x_left = xmin - delta_x/2
@@ -32,7 +33,7 @@ function binner_square(domain::UlamDomain)::Vector{UlamPolygon}
                 x_left + s y_top - s
                 ]
 
-            push!(polys, UlamPolygon(poly, poly_type = "sqr"))
+            push!(polys, UlamPolygon(poly))
 
             x_left = x_left + s
         end

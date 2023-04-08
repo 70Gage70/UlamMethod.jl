@@ -15,18 +15,18 @@ include("earth-polygons.jl")
 
 The high-level Ulam method; cover the domain by polygons and then construct the transition probability matrix.
 """
-function ulam_method(traj::UlamTrajectories, domain::UlamDomain)::UlamResult
+function ulam_method(traj::UlamTrajectories, domain::UlamDomain)
     polys = ulam_binner(traj, domain)
     ulam = ulam_nirvana(traj, domain, polys)
 
     return ulam
 end
 
-function ulam_method(fulam::String)::UlamResult
-    traj = UlamTrajectories(fulam)
-    domain = UlamDomain(fulam)
-    return ulam_method(traj, domain)
-end
+# function ulam_method(fulam::String)::UlamResult
+#     traj = UlamTrajectories(fulam)
+#     domain = UlamDomain(fulam)
+#     return ulam_method(traj, domain)
+# end
 
 # need to write a function which writes an UlamResult to a file
 

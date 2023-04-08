@@ -1,10 +1,11 @@
 """
     binner_hexagon(domain)
 
-Cover the computational domain in `domain` by a uniform grid of hexagons and return a vector of type [`UlamPolygon`](@ref).
+Cover the computational domain in `domain` by a uniform grid of hexagons.
+Returns Vector{UlamPolygon{Float64}}.
 """
 
-function binner_hexagon(domain::UlamDomain)::Vector{UlamPolygon}
+function binner_hexagon(domain::UlamDomain)
     xmin, xmax, ymin, ymax = domain.corners
     n_polys = domain.poly_number
 

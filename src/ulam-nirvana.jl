@@ -85,11 +85,11 @@ function ulam_nirvana(traj::UlamTrajectories, domain::UlamDomain, polys::Vector{
     if sum(P_closed[n_polys + 1, :]) > 0.0  
         P_closed[n_polys + 1, :] = P_closed[n_polys + 1, :]/sum(P_closed[n_polys + 1, :])
     else
-        @warn "There are no trajectories from nirvana to the interior. No reinjection was performed."
+        @info "There are no trajectories from nirvana to the interior."
     end
 
     if sum(P_closed[:, n_polys + 1]) == 0.0
-        @warn "There are no trajectories from the interior to nirvana."
+        @info "There are no trajectories from the interior to nirvana."
     end
 
     ############ collect results and info, and return

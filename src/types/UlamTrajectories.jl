@@ -22,10 +22,16 @@ function UlamTrajectories(
 end
 
 
-function UlamTrajectories(infile::String)
+function UlamTrajectories(
+    infile::String; 
+    x0_alias::String = "x0",
+    y0_alias::String = "y0",
+    xT_alias::String = "xT",
+    yT_alias::String = "yT")
+
     extension = infile[findlast(==('.'), infile)+1:end]
 
-    @assert extension in global_traj_file_types
+    @assert extension in global_traj_file_types "Require a .mat or .h5 file."
 
     if extension == "mat"
         data_T = MAT.matopen(infile)
@@ -33,7 +39,12 @@ function UlamTrajectories(infile::String)
         data_T = HDF5.h5open(infile)
     end
 
-    x0, y0, xT, yT = map(vec, read(data_T, "x0", "y0", "xT", "yT"))
+    @assert x0_alias in collect(keys(data_T)) "$(x0_alias) not in $(infile)"
+    @assert y0_alias in collect(keys(data_T)) "$(y0_alias) not in $(infile)"
+    @assert xT_alias in collect(keys(data_T)) "$(xT_alias) not in $(infile)"
+    @assert yT_alias in collect(keys(data_T)) "$(yT_alias) not in $(infile)"
+
+    x0, y0, xT, yT = map(vec, read(data_T, x0_alias, y0_alias, xT_alias, yT_alias))
     close(data_T)
 
     @assert eltype(x0) <: Real 

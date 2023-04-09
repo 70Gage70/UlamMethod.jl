@@ -23,3 +23,23 @@ struct UlamInfo{S<:AbstractString, U<:Integer}
         poly_type)
     end
 end
+
+function Base.show(io::IO, x::UlamInfo)
+    print(io, " UlamInfo")
+    println(io)
+    print("  Polys requested: ")
+    show(io, x.n_polys_requested)
+    print("@" * x.poly_type)
+    println(io)
+    print("  Polys with no data: ")
+    show(io, x.n_polys_no_data)
+    println(io)
+    print("  Polys disconnected: ")
+    show(io, x.n_polys_dis)
+    println(io)
+    print("  Counts total: ")
+    show(io, x.n_counts_total)
+    println(io)
+    print("  Counts removed by scc: ")
+    show(io, x.n_counts_removed_scc)    
+end

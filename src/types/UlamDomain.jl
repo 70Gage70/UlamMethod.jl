@@ -18,7 +18,7 @@ function UlamDomain(
     poly_number::U = global_poly_number_default[poly_type],
     stoc_type::S = global_stoc_types[1],
     stoc_polygon::Union{UlamPolygon{T}, Nothing} = nothing,
-    rseed::U = 123) where {S<:AbstractString, T<:Real, U<:Integer}
+    rseed::U = global_rseed_default) where {S<:AbstractString, T<:Real, U<:Integer}
 
     @assert xmax > xmin
     @assert ymax > ymin
@@ -38,6 +38,11 @@ function UlamDomain(
         # assume the user wants to use the source algorithm if they provide a stoc_polygon even if they
         # didn't specify "source"
         stoc_type = "source"
+    elseif stoc_polygon === nothing && stoc_type == "source"
+        @warn "The `source`` reinjection algorithm was requested, but `stoc_polygon` was not provided. The 
+        `stoc_polygon`` will be set to a rectangle with edges defined by `corners`. This is equivalent to
+        reinjecting data uniformly across all boxes."
+        stoc_polygon = UlamPolygon([xmin ymin; xmin ymax; xmax ymax; xmin ymax])
     end
 
     return UlamDomain{String, Float64, Int64}(

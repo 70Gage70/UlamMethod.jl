@@ -18,6 +18,7 @@ const global_poly_types::Vector{String} = ["sqr", "hex", "vor"]
 const global_stoc_types::Vector{String} = ["data", "source"]
 const global_traj_file_types::Vector{String} = ["mat", "h5"]
 const global_poly_number_default::Dict = Dict("sqr" => 500, "hex" => 500, "vor" => 100)
+const global_rseed_default::Int64 = 123
 
 include("types/UlamPolygon.jl")
 include("types/UlamTrajectories.jl")

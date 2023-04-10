@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - struct_refactor_outers
     tags: '*'
   pull_request:
 jobs:

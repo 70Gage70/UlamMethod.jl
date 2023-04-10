@@ -8,5 +8,5 @@ makedocs(
 )
 
 deploydocs(;
-    repo = "github.com/70Gage70/UlamMethod.jl"
+    repo = "github.com/70Gage70/UlamMethod.jl.git"
 )

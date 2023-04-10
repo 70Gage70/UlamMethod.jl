@@ -72,8 +72,6 @@ Temporary Items
 
 # HDF5, except tests and large
 **/src/*.h5
-**/test/ulam_vor_500.h5
-**/test/TPT_vor_500.h5
 
 # Test
 *.txt

@@ -18,12 +18,14 @@ function ulam_test(ftest::String, ulam_result::UlamResult)
     test = read(testf["ulam/polys"])[:,1:2]
     if !all(ulam .≈ test) @error("polys mismatch") end    
 
-    #JUST MAKE POLYTABLE WORK WITH NO NODES.
-
     # polys_dis
-    ulam = PolyTable(ulam_result.polys_dis).nodes
-    test = read(testf["ulam/polys_dis"])[:,1:2]
-    if !all(ulam .≈ test) @error("polys_dis mismatch") end  
+    if ulam_result.info.n_polys_dis == 0
+        return length(ulam_result.polys_dis) == 0 && length(read(testf["ulam/polys_dis"])) == 0
+    else
+        ulam = PolyTable(ulam_result.polys_dis).nodes
+        test = read(testf["ulam/polys_dis"])[:,1:2]
+        if !all(ulam .≈ test) @error("polys_dis mismatch") end
+    end  
 
     close(testf)
 
@@ -31,15 +33,7 @@ function ulam_test(ftest::String, ulam_result::UlamResult)
 end
 
 
-function generate_tests(test_cases::Vector)
-    for t in test_cases
-        traj, domain, fout = t
-        res = ulam_method(traj, domain)
-        ulam_write(fout, res)
-    end
 
-    return
-end
 
 
 

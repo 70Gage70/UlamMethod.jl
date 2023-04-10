@@ -23,3 +23,15 @@ test_cases = [
     t2,
     t3
 ]
+
+function generate_tests(test_cases::Vector)
+    for t in test_cases
+        traj, domain, fout = t
+        res = ulam_method(traj, domain)
+        ulam_write(fout, res)
+    end
+
+    return
+end
+
+# generate_tests(test_cases) # generates a new test set in the test directory

@@ -3,7 +3,7 @@ using BenchmarkTools
 
 include("main.jl")
 
-fin = "data/x0x5-NA-undrogued.mat"
+fin = "../test/x0x5-NA-undrogued.h5"
 corners = [-100, 15, -9, 39]
 poly_number = 50
 poly_type = "vor"

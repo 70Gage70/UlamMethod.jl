@@ -6,7 +6,9 @@ end
 
 function PolyTable(UPpolys::Vector{UlamPolygon{T}}) where {T<:Real}
     n_polys = length(UPpolys)
-    @assert n_polys > 0
+    if n_polys == 0 
+        return PolyTable{T, Int64}(Matrix{T}(undef, 0, 2), Matrix{Int64}(undef, 0, 3), n_polys) 
+    end
 
     n_nodes = sum(size(UPpolys[i].nodes, 1) for i = 1:n_polys)
 

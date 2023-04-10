@@ -9,7 +9,7 @@ function UlamPolygon(
     center::Union{Matrix{<:Real}, Nothing} = nothing, 
     edges::Union{Matrix{<:Integer}, Nothing} = nothing)
 
-    @assert size(nodes, 1) > 0 
+    @assert size(nodes, 1) > 2 "A polygon must have at least three nodes." 
     @assert size(nodes, 2) == 2 
 
     n_nodes = size(nodes, 1)

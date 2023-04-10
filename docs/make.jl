@@ -9,4 +9,4 @@ makedocs(
 
 deploydocs(;
     repo = "github.com/70Gage70/UlamMethod.jl"
-)=
+)

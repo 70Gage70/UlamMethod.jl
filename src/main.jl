@@ -36,8 +36,10 @@ function ulam_write(outfile::String, ulam_result::UlamResult; P_out::Bool = true
     # the (x, y) nodes and the third column is the index of the polygon that node belongs to.
     g["polys"] = [PolyTable(ulam_result.polys).nodes ;; PolyTable(ulam_result.polys).edges[:,3]]
 
-    polys_dis_out = [PolyTable(ulam_result.polys_dis).nodes ;; PolyTable(ulam_result.polys_dis).edges[:,3]]
-    g["polys_dis"] = ulam_result.info.n_polys_dis == 0 ? zeros(0) : polys_dis_out
+    # Similarly for disconnected polygons, but we explicitly write an empty array if there are no
+    # disconnected polygons.
+    g["polys_dis"] = ulam_result.info.n_polys_dis == 0 ? zeros(0) : 
+    [PolyTable(ulam_result.polys_dis).nodes ;; PolyTable(ulam_result.polys_dis).edges[:,3]]
 
     if P_out g["P_closed"] = ulam_result.P_closed end
 
@@ -47,8 +49,3 @@ function ulam_write(outfile::String, ulam_result::UlamResult; P_out::Bool = true
 
     return
 end
-
-
-
-
-

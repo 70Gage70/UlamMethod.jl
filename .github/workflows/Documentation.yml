@@ -2,7 +2,7 @@ name: Documentationon:
   push:
     branches:
       - master
-      -struc_refactor_outers
+      - struc_refactor_outers
     tags: '*'
   pull_request:jobs:
   build:

@@ -61,17 +61,18 @@ Temporary Items
 /Manifest.toml
 
 *.csv
-*.png
+*.pngs
 *.pdf
 
 # Mathematica
 *.nb
 
-# Matlab, except tests
+# Matlab, HDF5
 **/src/*.mat
-
-# HDF5, except tests and large
 **/src/*.h5
+
+# workspace
+/src/workspaces.jl
 
 # Test
 *.txt

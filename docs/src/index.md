@@ -1,6 +1,6 @@
 # UlamMethod.jl
 
-Documentation for UlamMethod.jl
+Documentation for UlamMethod.jl (test!)
 
 ```@autodocs
 Modules = [UlamMethod]

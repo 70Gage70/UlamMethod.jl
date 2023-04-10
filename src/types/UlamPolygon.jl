@@ -1,12 +1,25 @@
+"""
+    UlamPolygon{T}
 
+A polygon defined by a series of `nodes` and carrying a `center`.
+"""
 struct UlamPolygon{T<:Real} 
     nodes::Matrix{T} 
     center::Matrix{T} 
 end
 
+"""
+    UlamPolygon(nodes; edges = nothing)
+
+Construct an `UlamPolygon` based on a `nodes` matrix with `n` rows and `2` columns.
+
+The edges of the polygon defined by `nodes` are connected in order.
+
+### Optional Arguments
+- `edges::Matrix{<:Integer}`: an `n` by `2` matrix which specifies the edge connections betwen `nodes`. Used if nodes are not already sorted.
+"""
 function UlamPolygon(
     nodes::Matrix{<:Real};
-    center::Union{Matrix{<:Real}, Nothing} = nothing, 
     edges::Union{Matrix{<:Integer}, Nothing} = nothing)
 
     @assert size(nodes, 1) > 2 "A polygon must have at least three nodes." 
@@ -26,14 +39,8 @@ function UlamPolygon(
         nodes = nodes[order, :]
     end
 
-    if center === nothing
-        center = [sum(nodes[:,1]) sum(nodes[:,2])]/n_nodes
-    end
-
-    @assert size(center) == (1, 2)
-
     nodes = convert(Matrix{Float64}, nodes)
-    nodes, center = promote(nodes, center)
+    center = [sum(nodes[:,1]) sum(nodes[:,2])]/n_nodes
 
     return UlamPolygon{Float64}(nodes, center)
 end

@@ -1,10 +1,18 @@
 using Documenter
 using UlamMethod
 
+push!(LOAD_PATH,"../src/")
+
 makedocs(
-    sitename = "UlamMethod",
+    sitename = "UlamMethod.jl",
+    authors = "Gage Bonner",
     format = Documenter.HTML(),
-    modules = [UlamMethod]
+    modules = [UlamMethod],
+    pages = [
+        "Home" => "index.md",
+        "Advanced Usage" => "advanced.md",
+        "API" => "api.md"
+    ]
 )
 
 deploydocs(;

@@ -1,5 +1,3 @@
-include(joinpath(@__DIR__, "..", "src/main.jl"))
-
 function ulam_test(ftest::String, ulam_result::UlamResult)
     testf = h5open(ftest)
 

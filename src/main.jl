@@ -1,4 +1,5 @@
 using HDF5
+using .UlamTypes
 
 include("helpers.jl")
 

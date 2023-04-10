@@ -1,16 +1,26 @@
+"""
+    Polytable{T, U}
+
+Tables, in matrix form of nodes and edges making up a set of polygons.
+"""
 struct PolyTable{T<:Real, U<:Integer}
     nodes::Matrix{T}
     edges::Matrix{U}
     n_polys::U
 end
 
-function PolyTable(UPpolys::Vector{UlamPolygon{T}}) where {T<:Real}
-    n_polys = length(UPpolys)
+"""
+    Polytable(ulam_polys)
+
+Construct a table of matrices and nodes of a vector of UlamPolygons.
+"""
+function PolyTable(ulam_polys::Vector{UlamPolygon{T}}) where {T<:Real}
+    n_polys = length(ulam_polys)
     if n_polys == 0 
         return PolyTable{T, Int64}(Matrix{T}(undef, 0, 2), Matrix{Int64}(undef, 0, 3), n_polys) 
     end
 
-    n_nodes = sum(size(UPpolys[i].nodes, 1) for i = 1:n_polys)
+    n_nodes = sum(size(ulam_polys[i].nodes, 1) for i = 1:n_polys)
 
     nodes = Matrix{T}(undef, n_nodes, 2)
     edges = Matrix{Int64}(undef, n_nodes, 3)
@@ -18,7 +28,7 @@ function PolyTable(UPpolys::Vector{UlamPolygon{T}}) where {T<:Real}
     counter_edge = 1
     counter_bot = 1
 
-    for poly in UPpolys
+    for poly in ulam_polys
         counter_top = counter_bot + size(poly.nodes, 1) - 1
 
         # The edges of an UlamPolygon are always sorted, so we know that the table of edges

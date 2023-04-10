@@ -1,8 +1,7 @@
 """
-    binner_hexagon(domain)
+    binner_square(domain)
 
-Cover the computational domain in `domain` by a uniform grid of hexagons.
-Returns Vector{UlamPolygon{Float64}}.
+Cover `domain` by a tight uniform grid of hexagons.
 """
 
 function binner_hexagon(domain::UlamDomain)

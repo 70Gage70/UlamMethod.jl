@@ -1,3 +1,8 @@
+"""
+    UlamResult{S, T, U}
+
+A container for the output of [`ulam_method`](@ref).
+"""
 struct UlamResult{S<:AbstractString, T<:Real, U<:Integer}
     P_closed::Matrix{T}
     P_open::SubArray{T, 2, Matrix{T}, Tuple{UnitRange{U}, UnitRange{U}}, false}
@@ -9,7 +14,18 @@ struct UlamResult{S<:AbstractString, T<:Real, U<:Integer}
     info::UlamInfo{S, U}
 end
 
+"""
+    UlamResult(P_closed, polys, polys_dis, counts, info)
+    
+Construct a container for the output of [`ulam_method`](@ref).
 
+### Arguments
+- `P_closed`: the transition probability matrix obtained by Ulam's method.
+- `polys`: the vector of `UlamPolygon`s constituting the covering of the domain.
+- `polys_dis`: the vector of `UlamPolygon`s which contained data but were in disconnected components.
+- `counts`: the number of observation data points in the `i`th polygon.
+- `info`: additional info from [`UlamInfo`](@ref).
+"""
 function UlamResult(
     P_closed::Matrix{T},
     polys::Vector{UlamPolygon{T}},

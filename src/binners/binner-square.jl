@@ -1,8 +1,7 @@
 """
     binner_square(domain)
 
-Cover the computational domain in `domain` by a uniform grid of squares.
-Returns Vector{UlamPolygon{Float64}}.
+Cover `domain` by a tight uniform grid of squares.
 """
 function binner_square(domain::UlamDomain)
     n_polys = domain.poly_number

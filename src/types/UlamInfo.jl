@@ -1,3 +1,8 @@
+"""
+    UlamInfo{S, U}
+
+A contained for some of the results of [`ulam_method`](@ref).
+"""
 struct UlamInfo{S<:AbstractString, U<:Integer}
     n_polys_requested::U
     n_polys_no_data::U

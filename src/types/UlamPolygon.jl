@@ -16,7 +16,7 @@ Construct an `UlamPolygon` based on a `nodes` matrix with `n` rows and `2` colum
 The edges of the polygon defined by `nodes` are connected in order.
 
 ### Optional Arguments
-- `edges::Matrix{<:Integer}`: an `n` by `2` matrix which specifies the edge connections betwen `nodes`. Used if nodes are not already sorted.
+- `edges`: an `n` by `2` matrix which specifies the edge connections betwen `nodes`. Used if nodes are not already sorted.
 """
 function UlamPolygon(
     nodes::Matrix{<:Real};

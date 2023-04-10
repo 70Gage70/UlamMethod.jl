@@ -1,3 +1,8 @@
+"""
+    UlamTrajectories{T}
+
+A container for trajectory data.
+"""
 struct UlamTrajectories{T<:Real}
     x0::Vector{T}
     y0::Vector{T}
@@ -5,7 +10,11 @@ struct UlamTrajectories{T<:Real}
     yT::Vector{T}
 end  
 
+"""
+    UlamTrajectories(;x0, y0, xT, yT)
 
+Construct a container for trajectory data.
+"""
 function UlamTrajectories(
     ;
     x0::Vector{<:Real},
@@ -21,7 +30,18 @@ function UlamTrajectories(
     return UlamTrajectories{Float64}(x0, y0, xT, yT)
 end
 
+"""
+    UlamTrajectories(infile, [...])
 
+Construct a container for trajectory data, loading it from `infile`, which should be a `.h5` or `.mat` file.
+
+    ### Optional Arguments
+    These are used if trajectory data in `infile` are named something other than `"x0"`, `"y0"`, `"xT"`, `"yT"`.
+    - `x0_alias`
+    - `y0_alias`
+    - `xT_alias`
+    - `yT_alias`
+"""
 function UlamTrajectories(
     infile::String; 
     x0_alias::String = "x0",

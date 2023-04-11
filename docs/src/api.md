@@ -1,10 +1,10 @@
-# Reference
+# Core API
 
-UlamMethod.jl includes the following methods and types.
+These are the core methods and types used by UlamMethod.jl.
 
 ## Index
 ```@index
-Pages = ["api.md]
+Pages = ["api.md"]
 ```
 
 ## Functions

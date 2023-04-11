@@ -12,7 +12,8 @@ makedocs(
         "Home" => "index.md",
         "Advanced Usage" => "advanced.md",
         "Theory and Implementation" => "theory.md",
-        "API" => "api.md"
+        "Core API" => "api.md",
+        "Full Reference" => "ref.md"
     ]
 )
 

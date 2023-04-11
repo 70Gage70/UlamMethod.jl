@@ -4,12 +4,11 @@ This is a full reference for UlamMethod.jl.
 
 ## Index
 ```@index
-Pages = ["api.md"]
+Pages = ["ref.md"]
 ```
 
 ## Items
 ```@autodocs
 Modules = [UlamMethod]
 Order = [:function, :type]
-Private = true
 ``` 

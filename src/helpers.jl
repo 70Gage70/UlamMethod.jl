@@ -1,25 +1,10 @@
-"""
-General helper functions.
-"""
-####################################################################################################################################
-####################################################################################################################################
-####################################################################################################################################
-
-using .UlamTypes
-
-import MAT, HDF5
 import PolygonInbounds
 import LibGEOS, GeoInterface
-
-####################################################################################################################################
-####################################################################################################################################
-####################################################################################################################################
-
 
 """
     inpoly(data::Matrix{Float64}, polys::PolyTable)
 
-Determines which polygon of `polys` contains the data points in `data`. Returns an `InpolyResult`[@ref].
+Determine which polygon of `polys` contains the data points in `data`. Return an `InpolyResult`[@ref].
 """
 function inpoly(data::Matrix{Float64}, polys::PolyTable)::InpolyResult
     @assert size(data, 1) > 0
@@ -52,9 +37,9 @@ end
 """
     inpoly(traj::UlamTrajectories, domain::UlamDomain)
 
-Determines the indices of points that are inside the domain (i.e. not nirvana.)
+Determine the indices of points that are inside the `domain`'s rectangle, but outside `domain.domain`. Return an `InpolyResult`[@ref].
 """
-function inpoly(traj::UlamTrajectories, domain::UlamDomain)::InpolyResult
+function inpoly(traj::UlamTrajectories, domain::UlamDomain)
     data = [traj.x0 ;; traj.y0]
 
     if domain.domain === nothing # the domain is a square
@@ -71,9 +56,9 @@ end
 """
     ulam_intersection(poly1, poly2)
 
-Compute the intersection of two `UlamPolygons` objects. Returns false if they do not intersect.
+Compute the intersection of two [`UlamPolygon`](@ref) objects. Return `false`` if they do not intersect.
 """
-function ulam_intersection(poly1::UlamPolygon, poly2::UlamPolygon)::Union{Bool,UlamPolygon}
+function ulam_intersection(poly1::UlamPolygon, poly2::UlamPolygon)
     # UlamPolygons are not closed, so we have to close them for LibGEOS.
     nodes1 = poly1.nodes
     nodes2 = poly2.nodes
@@ -109,10 +94,10 @@ end
 """
     ulam_intersects(poly1, poly2)
 
-Return truw or false accoring to whether two `UlamPolygons` objects intersect. Can be faster
-than `ulam_intersection` if the shape of the intersection is not needed.
+Return `true` or `false accoring to whether two [`UlamPolygon`](@ref) objects intersect. Can be faster
+than [`ulam_intersection`](@ref) if the shape of the intersection is not needed.
 """
-function ulam_intersects(poly1::UlamPolygon, poly2::UlamPolygon)::Bool
+function ulam_intersects(poly1::UlamPolygon, poly2::UlamPolygon)
     # UlamPolygons are not closed, so we have to close them for LibGEOS.
     nodes1 = poly1.nodes
     nodes2 = poly2.nodes

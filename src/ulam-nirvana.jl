@@ -3,8 +3,7 @@ using Graphs:SimpleDiGraph,  strongly_connected_components
 """
     ulam_nirvana(traj, domain, polys)
 
-This is the implementation of Ulam's method with a nirvana state. Returns an `UlamResult` object.
-Returns an UlamResult
+Execute the core algorithm of Ulam's method with a nirvana state. Return an [`UlamResult`](@ref).
 """
 function ulam_nirvana(traj::UlamTrajectories, domain::UlamDomain, polys::Vector{UlamPolygon{T}}) where {T<:Real}
     ############ Assign polygon indices to trajectory points

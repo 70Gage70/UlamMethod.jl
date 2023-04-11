@@ -14,7 +14,11 @@ include("earth-polygons.jl")
 """
     ulam_method(traj, domain)
 
-The high-level Ulam method; cover the domain by polygons and then construct the transition probability matrix.
+Run the high-level Ulam method and return an [`UlamResult`](@ref).
+
+### Arguments
+- `traj`: An [`UlamTrajectories`](@ref); contains the trajectory data.
+- `domain`: An [`UlamDomain`](@ref); contains the domain specification.
 """
 function ulam_method(traj::UlamTrajectories, domain::UlamDomain)
     polys = ulam_binner(traj, domain)
@@ -23,6 +27,14 @@ function ulam_method(traj::UlamTrajectories, domain::UlamDomain)
     return ulam
 end
 
+"""
+    ulam_write(outfile, ulam_result; P_out)
+
+Write `ulam_result` to the file `outfile`, which must be in the `.h5` format. 
+
+### Optional Arguments
+- `P_out`: If false, `P_closed`` is not written to file since it can sometimes be very large. Default true.
+"""
 function ulam_write(outfile::String, ulam_result::UlamResult; P_out::Bool = true)
     @assert outfile[end-2:end] == ".h5" "The output file must be of the form filename.h5"
 

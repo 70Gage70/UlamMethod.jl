@@ -22,8 +22,8 @@ Construct an `UlamDomain` defined by the rectangle with bottom left corner (`xmi
 ### Optional Arguments
 - `domain`: Points inside the rectangle, but outside the outside `domain` will be considered in nirvana. This can be used to refine the shape of the computational domain to an arbitrary `UlamPolygon`, not just the default rectangle.
 - `poly_type`: One of `"sqr"`, `"hex"` and `"vor"` for coverings by squares, hexagons or Voronoi tesselation. The default is squares.
-- 'poly_number`: The number of polygons requested. The default is 500 for squares/hexagons and 100 for Voronoi.
-- 'stoc_type`: Picks the stochasticization algorithm; one of `"data"` or `"source"`. The default is data.
+- `poly_number`: The number of polygons requested. The default is 500 for squares/hexagons and 100 for Voronoi.
+- `stoc_type`: Picks the stochasticization algorithm; one of `"data"` or `"source"`. The default is data.
 - `stoc_polygon`: Polygons in the covering that intersect `stoc_polygon` will have data re-injected uniformly through them in the `source` algorithm. 
 - `rseed`: A seed for reproducing the random initialization of the kmeans algorithm in the Voronoi covering.
 """
@@ -53,7 +53,7 @@ function UlamDomain(
     @assert poly_number > 1
     @assert stoc_type in global_stoc_types
 
-    if stoc_polygon != nothing && stoc_type != "source"
+    if stoc_polygon !== nothing && stoc_type != "source"
         # assume the user wants to use the source algorithm if they provide a stoc_polygon even if they
         # didn't specify "source"
         stoc_type = "source"
@@ -81,7 +81,7 @@ function Base.show(io::IO, x::UlamDomain)
     show(io, x.poly_number)
     print(io, "@")
     show(io, x.poly_type)
-    if x.domain != nothing
+    if x.domain !== nothing
         print(io, " w/ domain")
     end
     print("]")

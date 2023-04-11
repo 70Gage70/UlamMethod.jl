@@ -13,8 +13,6 @@ defined in a domain, the essential goal of Ulam's method is to partition the dom
 
 The polygons which form the covering and the transition probability matrix are the main outputs.
 
-
-
 ## Installation
 
 In the Julia REPL, run the following code and follow the prompts:
@@ -32,7 +30,11 @@ using UlamMethod
 
 ## Quickstart
 
-The core functionality is provided by `ulam_method(traj, domain)`, where `traj` contains information about trajectories and `domain` contains information about the domain and covering. Here are `10000` random trajectories in the domain $[0, 10]^2$
+The core functionality is provided by 
+```julia
+ulam_method(traj::UlamTrajectories, domain::UlamDomain)
+``` 
+where `traj` contains information about trajectories and `domain` contains information about the domain and covering. Here are `10000` random trajectories in the domain $[0, 10]^2$
 
 ```julia
 n_data = 10000

@@ -35,12 +35,12 @@ end
 
 Construct a container for trajectory data, loading it from `infile`, which should be a `.h5` or `.mat` file.
 
-    ### Optional Arguments
-    These are used if trajectory data in `infile` are named something other than `"x0"`, `"y0"`, `"xT"`, `"yT"`.
-    - `x0_alias`
-    - `y0_alias`
-    - `xT_alias`
-    - `yT_alias`
+### Optional Arguments
+These are used if trajectory data in `infile` are named something other than `"x0"`, `"y0"`, `"xT"`, `"yT"`.
+- `x0_alias`
+- `y0_alias`
+- `xT_alias`
+- `yT_alias`
 """
 function UlamTrajectories(
     infile::String; 

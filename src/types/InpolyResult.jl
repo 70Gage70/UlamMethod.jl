@@ -1,7 +1,7 @@
 """
     InpolyResult{U}
 
-Hold the result of [`inpoly``](@ref).
+Hold the result of [`inpoly`](@ref).
 """
 struct InpolyResult{U<:Integer}
     inds::Vector{U}

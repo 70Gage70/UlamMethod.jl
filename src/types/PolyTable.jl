@@ -12,7 +12,7 @@ end
 """
     Polytable(ulam_polys)
 
-Construct a table of matrices and nodes of a vector of UlamPolygons.
+Construct a table of matrices and nodes of a vector of `UlamPolygon`s.
 """
 function PolyTable(ulam_polys::Vector{UlamPolygon{T}}) where {T<:Real}
     n_polys = length(ulam_polys)

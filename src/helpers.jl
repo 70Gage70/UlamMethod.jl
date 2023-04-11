@@ -4,7 +4,7 @@ import LibGEOS, GeoInterface
 """
     inpoly(data::Matrix{Float64}, polys::PolyTable)
 
-Determine which polygon of `polys` contains the data points in `data`. Return an `InpolyResult`[@ref].
+Determine which polygon of `polys` contains the data points in `data`. Return an [`InpolyResult`](@ref).
 """
 function inpoly(data::Matrix{Float64}, polys::PolyTable)::InpolyResult
     @assert size(data, 1) > 0

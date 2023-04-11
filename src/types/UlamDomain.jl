@@ -21,7 +21,7 @@ Construct an `UlamDomain` defined by the rectangle with bottom left corner (`xmi
 
 ### Optional Arguments
 - `domain`: Points inside the rectangle, but outside the outside `domain` will be considered in nirvana. This can be used to refine the shape of the computational domain to an arbitrary `UlamPolygon`, not just the default rectangle.
-- `poly_type`: One of `"sqr"`, `"hex"` and `"vor"` for coverings by squares, hexagons or Voronoi tesselation. The default is squares.
+- `poly_type`: One of `"sqr"`, `"hex"`, and `"vor"` for coverings by squares, hexagons or Voronoi tesselation. The default is squares.
 - `poly_number`: The number of polygons requested. The default is 500 for squares/hexagons and 100 for Voronoi.
 - `stoc_type`: Picks the stochasticization algorithm; one of `"data"` or `"source"`. The default is data.
 - `stoc_polygon`: Polygons in the covering that intersect `stoc_polygon` will have data re-injected uniformly through them in the `source` algorithm. 

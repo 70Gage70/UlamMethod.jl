@@ -10,6 +10,7 @@ export # from types.jl
     PolyTable,
     InpolyResult,
     show
+export ulam_intersection, ulam_intersects, inpoly # from helpers.jl
 
 include("types.jl")
 include("main.jl")

@@ -1,5 +1,5 @@
 using Test
-using UlamMethod.UlamTypes
+using UlamMethod, HDF5
 
 include("test-functions.jl")
 include("test-cases.jl")

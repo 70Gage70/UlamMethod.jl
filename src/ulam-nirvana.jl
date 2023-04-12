@@ -13,7 +13,9 @@ function ulam_nirvana(traj::UlamTrajectories, domain::UlamDomain, polys::Vector{
     ipT = inpoly([traj.xT ;; traj.yT], PolyTable(polys));
 
     # discard polygons that don't contain data
-    polys = polys[[i for i in keys(ip0.contains)]]
+    # keys(ip0.contains) are the indices of polygons that contain data
+    # want to preserve order of polys so make sure to sort keys
+    polys = polys[[i for i in sort(collect(keys(ip0.contains)))]] 
     n_polys = length(polys)
 
     ############ Construct P_closed

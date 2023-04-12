@@ -17,10 +17,11 @@ end
 """
     UlamDomain(xmin, xmax, ymin, ymax; [...])
 
-Construct an `UlamDomain` defined by the rectangle with bottom left corner (`xmin`, `ymin`) and top right corner (`xmax`, `ymax`).
+Construct an `UlamDomain` defined by the `UlamPolygon` in `domain`.
+
+Points outside `domain` will be considered in nirvana.
 
 ### Optional Arguments
-- `domain`: Points inside the rectangle, but outside the outside `domain` will be considered in nirvana. This can be used to refine the shape of the computational domain to an arbitrary `UlamPolygon`, not just the default rectangle.
 - `poly_type`: One of `"sqr"`, `"hex"`, and `"vor"` for coverings by squares, hexagons or Voronoi tesselation. The default is squares.
 - `poly_number`: The number of polygons requested. The default is 500 for squares/hexagons and 100 for Voronoi.
 - `stoc_type`: Picks the stochasticization algorithm; one of `"data"` or `"source"`. The default is data.
@@ -28,26 +29,20 @@ Construct an `UlamDomain` defined by the rectangle with bottom left corner (`xmi
 - `rseed`: A seed for reproducing the random initialization of the kmeans algorithm in the Voronoi covering.
 """
 function UlamDomain(
-    xmin::T,
-    xmax::T,
-    ymin::T,
-    ymax::T;
-    domain::Union{UlamPolygon{T}, Nothing} = nothing,
+    domain::UlamPolygon{T};
     poly_type::S = global_poly_types[1],
     poly_number::U = global_poly_number_default[poly_type],
     stoc_type::S = global_stoc_types[1],
     stoc_polygon::Union{UlamPolygon{T}, Nothing} = nothing,
     rseed::U = global_rseed_default) where {S<:AbstractString, T<:Real, U<:Integer}
 
+    xmin, xmax = extrema(domain.nodes[:, 1])
+    ymin, ymax = extrema(domain.nodes[:, 2])
+
     @assert xmax > xmin
     @assert ymax > ymin
 
     corners::Vector{Float64} = [xmin, xmax, ymin, ymax]
-
-    # if corners is ever replaced by a generic domain
-    # if domain === nothing
-    #     domain = UlamPolygon([xmin ymin; xmin ymax; xmax ymax; xmin ymax])
-    # end
 
     @assert poly_type in global_poly_types
     @assert poly_number > 1
@@ -63,6 +58,40 @@ function UlamDomain(
         reinjecting data uniformly across all boxes."
         stoc_polygon = UlamPolygon([xmin ymin; xmin ymax; xmax ymax; xmin ymax])
     end
+
+    return UlamDomain{String, Float64, Int64}(
+        corners,
+        domain,
+        poly_type,
+        poly_number,
+        stoc_type,
+        stoc_polygon,
+        rseed)
+end
+
+"""
+    UlamDomain(xmin, xmax, ymin, ymax; [...])
+
+Construct an `UlamDomain` defined by the rectangle with bottom left corner (`xmin`, `ymin`) and top right corner (`xmax`, `ymax`).
+
+This is equivalent to `UlamDomain(domain; [...])` where the provided domain is a rectangular `UlamPolygon`.
+"""
+function UlamDomain(
+    xmin::T,
+    xmax::T,
+    ymin::T,
+    ymax::T;
+    poly_type::S = global_poly_types[1],
+    poly_number::U = global_poly_number_default[poly_type],
+    stoc_type::S = global_stoc_types[1],
+    stoc_polygon::Union{UlamPolygon{T}, Nothing} = nothing,
+    rseed::U = global_rseed_default) where {S<:AbstractString, T<:Real, U<:Integer}
+
+    @assert xmax > xmin
+    @assert ymax > ymin
+
+    corners::Vector{Float64} = [xmin, xmax, ymin, ymax]
+    domain = UlamPolygon([xmin ymin; xmin ymax; xmax ymax; xmax ymin])
 
     return UlamDomain{String, Float64, Int64}(
         corners,

@@ -37,17 +37,11 @@ end
 """
     inpoly(traj::UlamTrajectories, domain::UlamDomain)
 
-Determine the indices of points that are inside the `domain`'s rectangle, but outside `domain.domain`. Return an `InpolyResult`[@ref].
+Determine the indices of points that are inside `domain.domain`. Return an `InpolyResult`[@ref].
 """
 function inpoly(traj::UlamTrajectories, domain::UlamDomain)
     data = [traj.x0 ;; traj.y0]
-
-    if domain.domain === nothing # the domain is a square
-        xmin, xmax, ymin, ymax = domain.corners
-        polys = PolyTable([UlamPolygon([xmin ymin; xmin ymax; xmax ymax; xmax ymin])])
-    else
-        polys = PolyTable([domain.domain])
-    end
+    polys = PolyTable([domain.domain])
 
     return inpoly(data, polys)
 end
@@ -85,9 +79,9 @@ function ulam_intersection(poly1::UlamPolygon, poly2::UlamPolygon)
             return UlamPolygon(pmat)
         end
     elseif GeoInterface.geomtrait(pint) == GeoInterface.MultiPolygonTrait()
-        @error "The intersection of these polygons is a multipolygon, this shouldn't happen." poly1 poly2
+        @error "The intersection of these polygons is a multipolygon, this shouldn't happen." poly1.nodes poly2.nodes
     else
-        @error "The intersection of these polygons is bad, this REALLY shouldn't happen." poly1 poly2
+        @error "The intersection of these polygons is bad, this REALLY shouldn't happen." poly1.nodes poly2.nodes
     end
 end
 

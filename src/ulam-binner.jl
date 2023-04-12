@@ -21,18 +21,15 @@ function ulam_binner(traj::UlamTrajectories, domain::UlamDomain)
         res = binner_voronoi(traj, domain)
     end
 
-    # intersect the binned polygons with the given domain if one exists
-    if domain.domain != nothing
-        intersected = Vector{UlamPolygon{Float64}}()
-        for poly in res
-            int = ulam_intersection(domain, poly)
-            if int != false
-                push!(intersected, int)
-            end
+    # intersect the resulting polygons with the domain
+    # the polygons are now exactly clipped to the boundary of nirvana by the time they get to ulam_nirvana
+    intersected = Vector{UlamPolygon{Float64}}()
+    for poly in res
+        int = ulam_intersection(domain.domain, poly)
+        if int != false
+            push!(intersected, int)
         end
-
-        res = intersected
-    end
+    end   
     
-    return res
+    return intersected
 end

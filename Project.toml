@@ -28,7 +28,7 @@ LazySets = "2.7.3"
 LibGEOS = "0.7.5"
 MAT = "0.10.4"
 PolygonInbounds = "0.2"
-VoronoiCells = "0.3"
+VoronoiCells = "0.3, 0.4"
 julia = "1.8"
 
 [extras]

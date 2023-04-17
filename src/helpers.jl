@@ -79,7 +79,15 @@ function ulam_intersection(poly1::UlamPolygon, poly2::UlamPolygon)
             return UlamPolygon(pmat)
         end
     elseif GeoInterface.geomtrait(pint) == GeoInterface.MultiPolygonTrait()
-        @error "The intersection of these polygons is a multipolygon, this shouldn't happen." poly1.nodes poly2.nodes
+        # there are multiple polygons in the intersection; take the largest one
+        all_ints = GeoInterface.getgeom(pint)
+        largest_p = argmax([LibGEOS.area(p) for p in all_ints])
+        pint = GeoInterface.coordinates(collect(all_ints)[largest_p])
+
+        pmat = reduce(hcat, pint[1])'
+        pmat = pmat[1:end-1,:]
+
+        return UlamPolygon(pmat)        
     else
         @error "The intersection of these polygons is bad, this REALLY shouldn't happen." poly1.nodes poly2.nodes
     end

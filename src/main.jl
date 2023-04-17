@@ -44,6 +44,7 @@ function ulam_write(outfile::String, ulam_result::UlamResult; P_out::Bool = true
     g["n_polys"] = length(ulam_result.polys)
     g["n_polys_dis"] = length(ulam_result.polys_dis)
     g["pi_closed"] = ulam_result.pi_closed
+    g["counts"] = ulam_result.counts
 
     # The polygons are output in to an n_polys x 3 matrix. The first two columns of the matrix are
     # the (x, y) nodes and the third column is the index of the polygon that node belongs to.

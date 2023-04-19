@@ -68,13 +68,21 @@ function ulam_nirvana(traj::UlamTrajectories, domain::UlamDomain, polys::Vector{
 
     # now we handle the reinjection if the user requested source
     if domain.stoc_type == "source" && sum(P_closed[n_polys + 1, :]) > 0.0
-        # findind the polygons that intersect with the given sto_polygon
-        in_source = [ulam_intersects(domain.sto_polygon, polys[i]) for i in largest_component]
+        if typeof(domain.stoc_source) <: UlamPolygon
+            # find the polygons that intersect with the stoc_source
+            in_source = [ulam_intersects(domain.stoc_source, poly) for poly in polys]
+        elseif typeof(domain.stoc_source) <: AbstractMatrix
+            # find the polygons which contain the points in stoc_source
+            ips = unique(inpoly(domain.stoc_source, PolyTable(polys)).inds)
+            in_source = falses(length(largest_component))
+            in_source[ips] .= true
+        end
 
-        # all the reinjection counts are redistributed evenly at those locations
+        # all the reinjection counts are redistributed evenly at in_source locations, sans nirvana 
         total_counts = sum(P_closed[n_polys + 1, :])
-        P_closed[n_polys + 1, :] = zeros(n_polys + 1)
-        P_closed[n_polys + 1, :][in_source] .= total_counts/length(in_source)
+        total_sources = sum(in_source)
+        re_inj = [i ? total_counts/total_sources : 0.0 for i in in_source]
+        P_closed[n_polys + 1, 1:end-1] = re_inj
     end
 
     # stochasticizing P_closed, except last row which is handled separately next

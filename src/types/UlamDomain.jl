@@ -2,6 +2,14 @@
     UlamDomain{S, T, U}
 
 The domain defining the Ulam problem setup.
+
+### Fields
+- `corners`: The rectangular bounding box of the polygon in `domain`. Binning algorithms start by covering this rectangle.
+- `domain`: Data outside this are considered in nirvana.
+- `poly_type`: The kind of polygons which cover `domain`.
+- `poly_number`: The number of polygons which cover `domain`.
+- `stoc_type`: The manner in which trajectories which leave `domain` are reinjected.
+- `stoc_source`: The location in which to reinject data for the `"source"` reinjection algorithm.
 """
 struct UlamDomain{S<:AbstractString, T<:Real, U<:Integer}
     corners::Vector{T}
@@ -9,13 +17,13 @@ struct UlamDomain{S<:AbstractString, T<:Real, U<:Integer}
     poly_type::S
     poly_number::U
     stoc_type::S
-    stoc_polygon::Union{UlamPolygon{T},Nothing}
+    stoc_source::Union{UlamPolygon{T}, Matrix{T}, Nothing}
     rseed::U
 end
 
 
 """
-    UlamDomain(xmin, xmax, ymin, ymax; [...])
+    UlamDomain(domain; [...])
 
 Construct an `UlamDomain` defined by the `UlamPolygon` in `domain`.
 
@@ -25,7 +33,8 @@ Points outside `domain` will be considered in nirvana.
 - `poly_type`: One of `"sqr"`, `"hex"`, and `"vor"` for coverings by squares, hexagons or Voronoi tesselation. The default is squares.
 - `poly_number`: The number of polygons requested. The default is 500 for squares/hexagons and 100 for Voronoi.
 - `stoc_type`: Picks the stochasticization algorithm; one of `"data"` or `"source"`. The default is data.
-- `stoc_polygon`: Polygons in the covering that intersect `stoc_polygon` will have data re-injected uniformly through them in the `source` algorithm. 
+- `stoc_source`::`UlamPolygon`: Polygons in the covering that intersect `stoc_source` will have data re-injected uniformly through them in the `source` algorithm. 
+- `stoc_source`::`Matrix`: Polygons in the covering which contain the points in the `stoc_source` matrix will have data re-injected uniformly through them in the `source` algorithm. 
 - `rseed`: A seed for reproducing the random initialization of the kmeans algorithm in the Voronoi covering.
 """
 function UlamDomain(
@@ -33,7 +42,7 @@ function UlamDomain(
     poly_type::S = global_poly_types[1],
     poly_number::U = global_poly_number_default[poly_type],
     stoc_type::S = global_stoc_types[1],
-    stoc_polygon::Union{UlamPolygon{T}, Nothing} = nothing,
+    stoc_source::Union{UlamPolygon{T}, Matrix{T}, Nothing} = nothing,
     rseed::U = global_rseed_default) where {S<:AbstractString, T<:Real, U<:Integer}
 
     xmin, xmax = extrema(domain.nodes[:, 1])
@@ -48,15 +57,19 @@ function UlamDomain(
     @assert poly_number > 1
     @assert stoc_type in global_stoc_types
 
-    if stoc_polygon !== nothing && stoc_type != "source"
-        # assume the user wants to use the source algorithm if they provide a stoc_polygon even if they
+    if typeof(stoc_source) <: AbstractMatrix
+        @assert size(stoc_source, 1) > 0 
+        @assert size(stoc_source, 2) == 2
+    end
+
+    if stoc_source !== nothing && stoc_type != "source"
+        # assume the user wants to use the source algorithm if they provide a stoc_source even if they
         # didn't specify "source"
         stoc_type = "source"
-    elseif stoc_polygon === nothing && stoc_type == "source"
-        @warn "The `source`` reinjection algorithm was requested, but `stoc_polygon` was not provided. The 
-        `stoc_polygon`` will be set to a rectangle with edges defined by `corners`. This is equivalent to
-        reinjecting data uniformly across all boxes."
-        stoc_polygon = UlamPolygon([xmin ymin; xmin ymax; xmax ymax; xmin ymax])
+    elseif stoc_source === nothing && stoc_type == "source"
+        @warn "The `source`` reinjection algorithm was requested, but `stoc_source` was not provided. The 
+        `stoc_source`` will be set to the domain. This is equivalent to reinjecting data uniformly across all boxes."
+        stoc_source = domain
     end
 
     return UlamDomain{String, Float64, Int64}(
@@ -65,7 +78,7 @@ function UlamDomain(
         poly_type,
         poly_number,
         stoc_type,
-        stoc_polygon,
+        stoc_source,
         rseed)
 end
 
@@ -84,7 +97,7 @@ function UlamDomain(
     poly_type::S = global_poly_types[1],
     poly_number::U = global_poly_number_default[poly_type],
     stoc_type::S = global_stoc_types[1],
-    stoc_polygon::Union{UlamPolygon{T}, Nothing} = nothing,
+    stoc_source::Union{UlamPolygon{T}, Matrix{T}, Nothing} = nothing,
     rseed::U = global_rseed_default) where {S<:AbstractString, T<:Real, U<:Integer}
 
     @assert xmax > xmin
@@ -99,7 +112,7 @@ function UlamDomain(
         poly_type,
         poly_number,
         stoc_type,
-        stoc_polygon,
+        stoc_source,
         rseed)
 end
 

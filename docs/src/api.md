@@ -1,6 +1,6 @@
-# Core API
+# API
 
-These are the core methods and types used by UlamMethod.jl.
+These are the methods and types used by UlamMethod.jl.
 
 ## Index
 ```@index
@@ -11,12 +11,10 @@ Pages = ["api.md"]
 ```@autodocs
 Modules = [UlamMethod, UlamMethod.UlamTypes]
 Order = [:function]
-Private = false
 ``` 
 
 ## Types
 ```@autodocs
 Modules = [UlamMethod, UlamMethod.UlamTypes]
 Order = [:type]
-Private = false
 ``` 

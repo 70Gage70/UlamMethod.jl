@@ -3,9 +3,11 @@
 ## Loading trajectories
 
 The core functionality is provided by 
+
 ```julia
 UlamTrajectories(infile; x0_alias, y0_alias, xT_alias, yT_alias)
 ```
+
 For larger systems, trajectory data may be loaded from a file. This file should be in the [.mat](https://github.com/JuliaIO/MAT.jl) or [.h5](https://github.com/JuliaIO/HDF5.jl) format with the keys `"x0"`, `"y0"`, `"xT"` and `"xT"` in the root of the file. For this example, the file [`test/x0x5-NA-undrogued.h5`](https://github.com/70Gage70/UlamMethod.jl/blob/afba50ee715d0f8e35f98c70409d7807346f3fba/test/x0x5-NA-undrogued.h5) contains trajectory data from undrogued drifters in the North Atlantic obtained from the NOAA GDP [^3].
 ```julia
 infile = "x0x5-NA-undrogued.h5"     # place this file in your working directory, or define a path to it
@@ -16,17 +18,22 @@ Alias for the trajectory data may be provided. For example, if we had a file in 
 ## Defining domains
 
 The core functionality is provided by 
+
 ```julia
-UlamDomain(xmin, xmax, ymin, ymax; domain, poly_type, poly_number, stoc_type, stoc_polygon, rseed)
+UlamDomain(domain; poly_type, poly_number, stoc_type, stoc_polygon, rseed)
 ```
 
-### Refinement
+The field `domain` should be an `UlamPolygon`. All data outside `domain` will be considered to be in nirvana. A convenience method is provided for square domains:
 
-The default behavior is that all data outside the computational rectangle are considered to be in nirvana. The core computatinal rectangle can be refined with the named argument `domain`. This should be a single `UlamPolygon`. The effect `domain` is that data points inside the rectangle but outside the domain are considered to be in nirvana. _TODO: Add examples_.
+```julia
+UlamDomain(xmin, xmax, ymion, ymax; poly_type, poly_number, stoc_type, stoc_polygon, rseed)
+```
+
+This automatically constructs a rectangular domain with bottom left corner `(xmin, ymin)` and upper right corner `(xmax, ymax)`. In either case, the rectangular bounding box of the domain is automatically computed. Refer to `earth-polygons.jl` for some sample domains.
 
 ### [Binning Algorithms](@id binning)
 
-These algorithms control how the computational rectangle is covered in polygons. The named argument `poly_type` to `UlamDomain` can take one of three values:
+These algorithms control how the computational rectangle (that is, the bounding box of the `domain`) is covered in polygons. The named argument `poly_type` to `UlamDomain` can take one of three values:
 
 - `"sqr"`: A covering of the domain by a regular grid of squares (default.) This algorithm is suitable for trajectory data with few "holes" in the observations.
 - `"hex"`: A covering of the domain by a regular grid of hexagons. Hexagons may have some advantages over squares [^1].
@@ -39,7 +46,9 @@ The named argument `poly_number` selects the number of polygons in each case.
 These algorithms control how reinjection counts (trajectories pointing from nirvana to the interior) are distributed. The named argumet `stoc_type` to `UlamDomain` can take one of two values:
 
 - `"data"`: Reinjection occurs according to which boxes trajectories actually enter (this is the default algorithm.)
-- `"source"`: Reinjection occurs uniformly in polygons which intersect with the `UlamPolygon` in the named argument `stoc_poly`. If no `stoc_poly` is provided, reinjection occurs uniformly over the entire domain.
+- `"source"`: Reinjection occurs uniformly in polygons specified by `stoc_source`. If `stoc_source` is provided, `"source"` is automatically selected. If `"source"` is selected but no `stoc_source` is provided, then `stoc_source` is set equal to the `domain`. This is equivalent to reinjecting data uniformly across all boxes.
+ - If `stoc_source` is entered as an $N \times 2$ matrix of numbers, then reinjection occurs at the set of polygons which contain at least one point from `stoc_source`.
+ - If `stoc_source` is entered as an `UlamPolygon`, then reinjection occurs at the set of polygons which intersect `stoc_source`.
 
 ## Using the results
 
@@ -59,9 +68,11 @@ For convenience `P_open` and `pi_open` are also provided, which are identical to
 ## Writing the results
 
 A custom write method is provided
+
 ```julia
 ulam_write(outfile, ulam_result; P_out)
 ```
+
 This will write an `UlamResult` to the file specified by `outfile`. Note that `outfile` must be of the form `"fname.h5"`. Optionally pass `P_out = false` to avoid writing the `P_closed` matrix since it can be very large.
 
 The polygons will be output in an $N \times 3$ matrix such that the first two columns are the $(x, y)$ coordinates of a polygon vertex and the third column is the index of the polygon that vertex belongs to. The vertices are sorted. 

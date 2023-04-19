@@ -17,5 +17,6 @@ makedocs(
 )
 
 deploydocs(;
-    repo = "github.com/70Gage70/UlamMethod.jl.git"
+    repo = "github.com/70Gage70/UlamMethod.jl.git",
+    versions = [devurl => devurl] # versions = ["stable" => "v^", "v#.#", devurl => devurl]
 )

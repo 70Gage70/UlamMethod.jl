@@ -6,7 +6,7 @@ import LibGEOS, GeoInterface
 
 Determine which polygon of `polys` contains the data points in `data`. Return an [`InpolyResult`](@ref).
 """
-function inpoly(data::Matrix{Float64}, polys::PolyTable)::InpolyResult
+function inpoly(data::Matrix{Float64}, polys::PolyTable)
     @assert size(data, 1) > 0
     @assert size(data, 2) == 2
 
@@ -37,7 +37,7 @@ end
 """
     inpoly(traj::UlamTrajectories, domain::UlamDomain)
 
-Determine the indices of points that are inside `domain.domain`. Return an `InpolyResult`[@ref].
+Determine the indices of points that are inside `domain.domain`. Return an [`InpolyResult`](@ref).
 """
 function inpoly(traj::UlamTrajectories, domain::UlamDomain)
     data = [traj.x0 ;; traj.y0]
@@ -50,7 +50,7 @@ end
 """
     ulam_intersection(poly1, poly2)
 
-Compute the intersection of two [`UlamPolygon`](@ref) objects. Return `false`` if they do not intersect.
+Compute the intersection of two [`UlamPolygon`](@ref) objects. Return `false` if they do not intersect.
 """
 function ulam_intersection(poly1::UlamPolygon, poly2::UlamPolygon)
     # UlamPolygons are not closed, so we have to close them for LibGEOS.
@@ -96,7 +96,7 @@ end
 """
     ulam_intersects(poly1, poly2)
 
-Return `true` or `false accoring to whether two [`UlamPolygon`](@ref) objects intersect. Can be faster
+Return `true` or `false` accoring to whether two [`UlamPolygon`](@ref) objects intersect. Can be faster
 than [`ulam_intersection`](@ref) if the shape of the intersection is not needed.
 """
 function ulam_intersects(poly1::UlamPolygon, poly2::UlamPolygon)

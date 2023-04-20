@@ -33,7 +33,7 @@ end
 Write `ulam_result` to the file `outfile`, which must be in the `.h5` format. 
 
 ### Optional Arguments
-- `P_out`: If false, `P_closed`` is not written to file since it can sometimes be very large. Default true.
+- `P_out`: If false, `P_closed` is not written to file since it can sometimes be very large. Default true.
 """
 function ulam_write(outfile::String, ulam_result::UlamResult; P_out::Bool = true)
     @assert outfile[end-2:end] == ".h5" "The output file must be of the form filename.h5"

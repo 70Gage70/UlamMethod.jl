@@ -8,7 +8,7 @@ The core functionality is provided by
 UlamTrajectories(infile; x0_alias, y0_alias, xT_alias, yT_alias)
 ```
 
-For larger systems, trajectory data may be loaded from a file. This file should be in the [.mat](https://github.com/JuliaIO/MAT.jl) or [.h5](https://github.com/JuliaIO/HDF5.jl) format with the keys `"x0"`, `"y0"`, `"xT"` and `"xT"` in the root of the file. For this example, the file [`test/x0x5-NA-undrogued.h5`](https://github.com/70Gage70/UlamMethod.jl/blob/afba50ee715d0f8e35f98c70409d7807346f3fba/test/x0x5-NA-undrogued.h5) contains trajectory data from undrogued drifters in the North Atlantic obtained from the NOAA GDP [^3].
+For larger systems, trajectory data may be loaded from a file. This file should be in the [.mat](https://github.com/JuliaIO/MAT.jl) or [.h5](https://github.com/JuliaIO/HDF5.jl) format with the keys `"x0"`, `"y0"`, `"xT"` and `"xT"` in the root of the file. For this example, the file [`test/x0x5-NA-undrogued.h5`](https://github.com/70Gage70/UlamMethod.jl/blob/afba50ee715d0f8e35f98c70409d7807346f3fba/test/x0x5-NA-undrogued.h5) contains trajectory data from undrogued drifters in the North Atlantic obtained from the NOAA GDP [^3] [^4].
 ```julia
 infile = "x0x5-NA-undrogued.h5"     # place this file in your working directory, or define a path to it
 traj = UlamTrajectories(infile)
@@ -23,7 +23,7 @@ The core functionality is provided by
 UlamDomain(domain; poly_type, poly_number, stoc_type, stoc_polygon, rseed)
 ```
 
-The field `domain` should be an `UlamPolygon`. All data outside `domain` will be considered to be in nirvana. A convenience method is provided for square domains:
+The field `domain` should be an `UlamPolygon`. All data outside `domain` will be considered to be in _nirvana_.[^5] [^6] A convenience method is provided for square domains:
 
 ```julia
 UlamDomain(xmin, xmax, ymion, ymax; poly_type, poly_number, stoc_type, stoc_polygon, rseed)
@@ -84,3 +84,9 @@ The polygons will be output in an $N \times 3$ matrix such that the first two co
 [^2]: https://juliastats.org/Clustering.jl/stable/kmeans.html#K-means
 
 [^3]: https://www.aoml.noaa.gov/phod/gdp/data.php
+
+[^4]: Lumpkin, Rick, and Mayra Pazos. "Measuring surface currents with Surface Velocity Program drifters: the instrument, its data, and some recent results." Lagrangian analysis and prediction of coastal and ocean dynamics 39 (2007): 67.
+
+[^5]: Miron, Philippe, et al. "Transition paths of marine debris and the stability of the garbage patches<? A3B2 show [editpick]?>." Chaos: An Interdisciplinary Journal of Nonlinear Science 31.3 (2021): 033101.
+
+[^6]: In brief, nirvana is an extra state appended to an open system to close it; trajectories which point from inside the domain to the outisde of the domain transition to this nirvana state. Trajectories which point from outside the domain to the inside are transitions "from" nirvana - how exactly these data are reinjected is controlled by the [stochasticization algorithms](@ref stoc).

@@ -9,12 +9,18 @@ Pages = ["api.md"]
 
 ## Functions
 ```@autodocs
-Modules = [UlamMethod, UlamMethod.UlamTypes]
+Modules = [UlamMethod]
 Order = [:function]
 ``` 
 
 ## Types
 ```@autodocs
-Modules = [UlamMethod, UlamMethod.UlamTypes]
+Modules = [UlamMethod]
 Order = [:type]
+``` 
+
+## Constants
+```@autodocs
+Modules = [UlamMethod]
+Order = [:constant]
 ``` 

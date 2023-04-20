@@ -68,8 +68,3 @@ pt.edges[:,3]                       # the index of the polygon that the i'th nod
 
 [^3]: Reddy, Junuthula Narasimha. Introduction to the finite element method. McGraw-Hill Education, 2019.
 
-[^4]: Miron, Philippe, et al. "Transition paths of marine debris and the stability of the garbage patches<? A3B2 show [editpick]?>." Chaos: An Interdisciplinary Journal of Nonlinear Science 31.3 (2021): 033101.
-
-[^5]: Vanden-Eijnden, Eric. "Transition path theory." Computer Simulations in Condensed Matter Systems: From Materials to Chemical Biology Volume 1. Springer, Berlin, Heidelberg, 2006. 453-493.
-
-[^6]: Lumpkin, Rick, and Mayra Pazos. "Measuring surface currents with Surface Velocity Program drifters: the instrument, its data, and some recent results." Lagrangian analysis and prediction of coastal and ocean dynamics 39 (2007): 67.

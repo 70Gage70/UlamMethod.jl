@@ -13,7 +13,7 @@ The domain defining the Ulam problem setup.
 """
 struct UlamDomain{S<:AbstractString, T<:Real, U<:Integer}
     corners::Vector{T}
-    domain::Union{UlamPolygon{T}, Nothing}
+    domain::UlamPolygon{T}
     poly_type::S
     poly_number::U
     stoc_type::S

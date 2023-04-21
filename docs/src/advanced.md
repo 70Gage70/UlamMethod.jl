@@ -2,18 +2,13 @@
 
 ## Loading trajectories
 
-The core functionality is provided by 
+For larger systems, trajectory data may be loaded from a file. The core functionality is provided by 
 
 ```julia
 UlamTrajectories(infile; x0_alias, y0_alias, xT_alias, yT_alias)
 ```
 
-For larger systems, trajectory data may be loaded from a file. This file should be in the [.mat](https://github.com/JuliaIO/MAT.jl) or [.h5](https://github.com/JuliaIO/HDF5.jl) format with the keys `"x0"`, `"y0"`, `"xT"` and `"xT"` in the root of the file. For this example, the file [`test/x0x5-NA-undrogued.h5`](https://github.com/70Gage70/UlamMethod.jl/blob/afba50ee715d0f8e35f98c70409d7807346f3fba/test/x0x5-NA-undrogued.h5) contains trajectory data from undrogued drifters in the North Atlantic obtained from the NOAA GDP [^3] [^4].
-```julia
-infile = "x0x5-NA-undrogued.h5"     # place this file in your working directory, or define a path to it
-traj = UlamTrajectories(infile)
-```
-Alias for the trajectory data may be provided. For example, if we had a file in which the `"x0"` data were instead called `"xtraj0"`, we could use `traj = UlamTrajectories(infile, x0_alias = "xtraj0")` and so on for other keys.
+This file should be in the [.mat](https://github.com/JuliaIO/MAT.jl) or [.h5](https://github.com/JuliaIO/HDF5.jl) format with the keys `"x0"`, `"y0"`, `"xT"` and `"xT"` in the root of the file.  Aliases for the trajectory data may be provided. For example, if we had a file in which the `"x0"` data were instead called `"xtraj0"`, we could use `traj = UlamTrajectories(infile, x0_alias = "xtraj0")` and so on for other keys.
 
 ## Defining domains
 
@@ -29,7 +24,7 @@ The field `domain` should be an `UlamPolygon`. All data outside `domain` will be
 UlamDomain(xmin, xmax, ymion, ymax; poly_type, poly_number, stoc_type, stoc_polygon, rseed)
 ```
 
-This automatically constructs a rectangular domain with bottom left corner `(xmin, ymin)` and upper right corner `(xmax, ymax)`. In either case, the rectangular bounding box of the domain is automatically computed. Refer to `earth-polygons.jl` for some sample domains.
+This automatically constructs a rectangular domain with bottom left corner `(xmin, ymin)` and upper right corner `(xmax, ymax)`. In either case, the rectangular bounding box of the domain is automatically computed. Refer to `src/earth-polygons.jl` for some sample domains.
 
 ### [Binning Algorithms](@id binning)
 
@@ -77,6 +72,33 @@ This will write an `UlamResult` to the file specified by `outfile`. Note that `o
 
 The polygons will be output in an $N \times 3$ matrix such that the first two columns are the $(x, y)$ coordinates of a polygon vertex and the third column is the index of the polygon that vertex belongs to. The vertices are sorted. 
 
+## Full workflow example
+
+For this example, the file [`test/x0x5-NA-undrogued.h5`](x0x5-NA-undrogued.h5) contains trajectory data from undrogued drifters in the North Atlantic obtained from the NOAA GDP [^3] [^4].
+
+```julia
+infile = "x0x5-NA-undrogued.h5"     # place this file in your working directory, or define a path to it
+traj = UlamTrajectories(infile)
+```
+
+Next we define our domain. We'll use `North_Atlantic_clipped_verts` here. For the binning, we'll use the default square covering with 760 polygons. We'll also use the default `"data"` stochasticization algorithm.
+
+```julia
+NA = UlamPolygon(North_Atlantic_clipped_verts)
+poly_type = "sqr"
+poly_number = 760
+
+domain = UlamDomain(NA, poly_type = poly_type, poly_number = poly_number)
+```
+
+The final step is to apply Ulam's method.
+
+```julia
+ulam = ulam_method(traj, domain)
+```
+
+From here, a `.h5` file can be created with `ulam_write("my_ulam_results.h5", ulam)` or `ulam` can be used elsewhere.
+
 ## References
 
 [^1]: https://www.uber.com/blog/h3/
@@ -87,6 +109,6 @@ The polygons will be output in an $N \times 3$ matrix such that the first two co
 
 [^4]: Lumpkin, Rick, and Mayra Pazos. "Measuring surface currents with Surface Velocity Program drifters: the instrument, its data, and some recent results." Lagrangian analysis and prediction of coastal and ocean dynamics 39 (2007): 67.
 
-[^5]: Miron, Philippe, et al. "Transition paths of marine debris and the stability of the garbage patches<? A3B2 show [editpick]?>." Chaos: An Interdisciplinary Journal of Nonlinear Science 31.3 (2021): 033101.
+[^5]: Miron, Philippe, et al. "Transition paths of marine debris and the stability of the garbage patches." Chaos: An Interdisciplinary Journal of Nonlinear Science 31.3 (2021): 033101.
 
 [^6]: In brief, nirvana is an extra state appended to an open system to close it; trajectories which point from inside the domain to the outisde of the domain transition to this nirvana state. Trajectories which point from outside the domain to the inside are transitions "from" nirvana - how exactly these data are reinjected is controlled by the [stochasticization algorithms](@ref stoc).

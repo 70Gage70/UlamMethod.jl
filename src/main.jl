@@ -28,18 +28,36 @@ function ulam_method(traj::UlamTrajectories, domain::UlamDomain)
 end
 
 """
-    ulam_write(outfile, ulam_result; P_out)
+    ulam_write(outfile, ulam_result; dir_name, overwrite, P_out)
 
-Write `ulam_result` to the file `outfile`, which must be in the `.h5` format. 
+Write `ulam_result` to the file `outfile`, which must be in the `.h5` format.
+
+If `outfile` does not exist, it will be created. Results are written to the directory specified by `dir_name`.
 
 ### Optional Arguments
-- `P_out`: If false, `P_closed` is not written to file since it can sometimes be very large. Default true.
+- `dir_name`: The name of the directory that `ulam_result` is written to, default `"ulam"`. Directories can be nested, e.g. `"trial1/ulam"`.
+- `overwrite`: If `true`, the directory `dir_name` will overwrite a directory with the same name if it exists in `outfile`. Default `false`.
+- `P_out`: If `false`, `P_closed` is not written to file. Default `true`.
 """
-function ulam_write(outfile::String, ulam_result::UlamResult; P_out::Bool = true)
-    @assert outfile[end-2:end] == ".h5" "The output file must be of the form filename.h5"
+function ulam_write(
+    outfile::String, 
+    ulam_result::UlamResult; 
+    dir_name::String = "ulam", 
+    overwrite::Bool = false,
+    P_out::Bool = true)
 
-    fout = h5open(outfile, "w")
-    g = create_group(fout, "ulam")
+    @assert outfile[end-2:end] == ".h5" "The output file must be of the form filename.h5"
+    fout = h5open(outfile, "cw")
+
+    if dir_name in keys(fout)
+        if !overwrite
+            @assert !(dir_name in keys(fout)) "This file already has a group with the name: $(dir_name). Pass `overwrite = true` to force a replacement."
+        end
+
+        delete_object(fout, dir_name)
+    end
+
+    g = create_group(fout, dir_name)
 
     g["n_polys"] = length(ulam_result.polys)
     g["n_polys_dis"] = length(ulam_result.polys_dis)

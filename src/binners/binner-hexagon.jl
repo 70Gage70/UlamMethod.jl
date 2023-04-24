@@ -1,7 +1,9 @@
 """
     binner_square(domain)
 
-Cover `domain` by a tight uniform grid of hexagons.
+Cover the rectangle defined by `domain.corners` by a uniform grid of hexagons.
+
+Hexagons near the edges may overlap with the rectangle.
 """
 
 function binner_hexagon(domain::UlamDomain)

@@ -2,6 +2,7 @@
 include("binners/binner-voronoi.jl")
 include("binners/binner-hexagon.jl")
 include("binners/binner-square.jl")
+include("binners/binner-rectangle.jl")
 
 """
     ulam_binner(traj, domain)
@@ -15,6 +16,8 @@ function ulam_binner(traj::UlamTrajectories, domain::UlamDomain)
 
     if poly_type == "sqr"
         res = binner_square(domain)
+    elseif poly_type == "rec"
+        res = binner_rectangle(domain)        
     elseif poly_type == "hex"
         res = binner_hexagon(domain)
     elseif poly_type == "vor"        

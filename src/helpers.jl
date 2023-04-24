@@ -50,7 +50,7 @@ end
 """
     ulam_intersection(poly1, poly2)
 
-Compute the intersection of two [`UlamPolygon`](@ref) objects. Return `false` if they do not intersect.
+Compute the intersection of two [`UlamPolygon`](@ref) objects. Return `false` if they do not intersect or if they only intersect along a point or line.
 """
 function ulam_intersection(poly1::UlamPolygon, poly2::UlamPolygon)
     # UlamPolygons are not closed, so we have to close them for LibGEOS.
@@ -65,9 +65,10 @@ function ulam_intersection(poly1::UlamPolygon, poly2::UlamPolygon)
 
     # Compute the intersection
     pint = LibGEOS.intersection(p1, p2)
+    pkind = GeoInterface.geomtrait(pint)
 
     # Ensure that the result is a polygon
-    if GeoInterface.geomtrait(pint) == GeoInterface.PolygonTrait()
+    if pkind == GeoInterface.PolygonTrait()
         pint = GeoInterface.coordinates(pint)
 
         if length(pint[1]) == 0
@@ -78,7 +79,7 @@ function ulam_intersection(poly1::UlamPolygon, poly2::UlamPolygon)
 
             return UlamPolygon(pmat)
         end
-    elseif GeoInterface.geomtrait(pint) == GeoInterface.MultiPolygonTrait()
+    elseif pkind == GeoInterface.MultiPolygonTrait()
         # there are multiple polygons in the intersection; take the largest one
         all_ints = GeoInterface.getgeom(pint)
         largest_p = argmax([LibGEOS.area(p) for p in all_ints])
@@ -87,29 +88,27 @@ function ulam_intersection(poly1::UlamPolygon, poly2::UlamPolygon)
         pmat = reduce(hcat, pint[1])'
         pmat = pmat[1:end-1,:]
 
-        return UlamPolygon(pmat)        
+        return UlamPolygon(pmat)
+    elseif pkind in [GeoInterface.LineStringTrait(), GeoInterface.PointTrait()]      
+        return false # polygons only intersect at a point, or along a line  
     else
-        @error "The intersection of these polygons is bad, this REALLY shouldn't happen." poly1.nodes poly2.nodes
+        @error "The intersection of these polygons is $(pkind), this shouldn't happen." poly1.nodes poly2.nodes 
     end
 end
 
 """
     ulam_intersects(poly1, poly2)
 
-Return `true` or `false` accoring to whether two [`UlamPolygon`](@ref) objects intersect. Can be faster
-than [`ulam_intersection`](@ref) if the shape of the intersection is not needed.
+Return `true` or `false` accoring to whether two [`UlamPolygon`](@ref) objects intersect.
+
+This is a call to [`ulam_intersection`](@ref), hence two polygons are not considered to intersect if their intersection is only along a point or line.
 """
 function ulam_intersects(poly1::UlamPolygon, poly2::UlamPolygon)
-    # UlamPolygons are not closed, so we have to close them for LibGEOS.
-    nodes1 = poly1.nodes
-    nodes2 = poly2.nodes
-    nodes1 = vcat(nodes1, nodes1[1,:]')
-    nodes2 = vcat(nodes2, nodes2[1,:]')
+    res = ulam_intersection(poly1, poly2)
 
-    # Construct LibGEOS-formatted polygons
-    p1 = LibGEOS.Polygon([[nodes1[i,:] for i = 1:size(nodes1, 1)]])
-    p2 = LibGEOS.Polygon([[nodes2[i,:] for i = 1:size(nodes2, 1)]])
-
-    # Compute the intersection
-    return LibGEOS.intersects(p1, p2)
+    if res == false
+        return false
+    else
+        return true
+    end
 end

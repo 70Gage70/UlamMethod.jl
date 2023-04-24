@@ -35,7 +35,7 @@ Write `ulam_result` to the file `outfile`, which must be in the `.h5` format.
 If `outfile` does not exist, it will be created. Results are written to the directory specified by `dir_name`.
 
 ### Optional Arguments
-- `dir_name`: The name of the directory that `ulam_result` is written to, default `"ulam"`. Directories can be nested, e.g. `"trial1/ulam"`.
+- `dir_name`: The name of the directory that `ulam_result` is written to, default `"ulam"`. Directories can be nested, e.g. `dir_name = "trial1/ulam"`.
 - `overwrite`: If `true`, the directory `dir_name` will overwrite a directory with the same name if it exists in `outfile`. Default `false`.
 - `P_out`: If `false`, `P_closed` is not written to file. Default `true`.
 """

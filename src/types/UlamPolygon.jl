@@ -13,6 +13,8 @@ end
 
 Construct an `UlamPolygon` based on a `nodes` matrix with `n` rows and `2` columns.
 
+The `nodes` should not have a closing node, i.e. the last node should not be a repeat of the first.
+
 The edges of the polygon defined by `nodes` are connected in order.
 
 ### Optional Arguments
@@ -27,7 +29,7 @@ function UlamPolygon(
 
     n_nodes = size(nodes, 1)
 
-    if (edges != nothing) && (edges != [1:n_nodes;; [2:n_nodes; 1]]) # user provided unsorted nodes; sort them
+    if (edges !== nothing) && (edges != [1:n_nodes;; [2:n_nodes; 1]]) # user provided unsorted nodes; sort them
         @assert size(edges) == size(nodes)
 
         ss = sortslices(edges, dims = 1)

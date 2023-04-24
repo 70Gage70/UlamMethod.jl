@@ -65,10 +65,14 @@ For convenience `P_open` and `pi_open` are also provided, which are identical to
 A custom write method is provided
 
 ```julia
-ulam_write(outfile, ulam_result; P_out)
+ulam_write(outfile, ulam_result; dir_name, overwrite, P_out)
 ```
 
-This will write an `UlamResult` to the file specified by `outfile`. Note that `outfile` must be of the form `"fname.h5"`. Optionally pass `P_out = false` to avoid writing the `P_closed` matrix since it can be very large.
+This will write an `UlamResult` to the file specified by `outfile`. Note that `outfile` must be of the form `"my_filename.h5"`. 
+
+- `dir_name` is the name of the directory that the data are written to in `outfile`. The default is `dir_name = "ulam"`. The directory can be nested, e.g. `dir_name = "trial1/ulam"`.
+- `overwrite` is a boolean such that a directory in `outfile` with the same name as `dir_name` will be overwritten with `ulam_result`. The default is `overwrite = false`.
+- `P_out` is a boolean such that `P_closed` is written to the file if `P_out = true` (default). Consider using `P_out = false` if `P_closed` is not needed and smaller file size is desired.
 
 The polygons will be output in an $N \times 3$ matrix such that the first two columns are the $(x, y)$ coordinates of a polygon vertex and the third column is the index of the polygon that vertex belongs to. The vertices are sorted. 
 
@@ -85,7 +89,7 @@ Next we define our domain. We'll use `North_Atlantic_clipped_verts` here. For th
 
 ```julia
 NA = UlamPolygon(North_Atlantic_clipped_verts)
-poly_type = "sqr"
+poly_type = "rec"
 poly_number = 760
 
 domain = UlamDomain(NA, poly_type = poly_type, poly_number = poly_number)

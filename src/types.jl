@@ -5,9 +5,9 @@ import LinearAlgebra
 """
     global_poly_types
 
-One of `"sqr"`, `"hex"` and `"vor"` according to the coverings in [`UlamDomain`](@ref).
+One of `"rec"`, `"sqr"`, `"hex"` and `"vor"` according to the coverings in [`UlamDomain`](@ref).
 """
-const global_poly_types::Vector{String} = ["sqr", "hex", "vor"]
+const global_poly_types::Vector{String} = ["rec", "sqr", "hex", "vor"]
 
 """
     global_stoc_types
@@ -28,11 +28,12 @@ const global_traj_file_types::Vector{String} = ["mat", "h5"]
 
 The default number of polygons for each of the types of coverings.
 
+- `"rec"`: 500
 - `"sqr"`: 500
 - `"hex"`: 500
 - `"vor"`: 100
 """
-const global_poly_number_default::Dict = Dict("sqr" => 500, "hex" => 500, "vor" => 100)
+const global_poly_number_default::Dict = Dict("rec" => 500, "sqr" => 500, "hex" => 500, "vor" => 100)
 
 """
     global_rseed_default

@@ -42,11 +42,11 @@ x0, y0, xT, yT = 10*rand(n_data), 10*rand(n_data), 10*rand(n_data), 10*rand(n_da
 traj = UlamTrajectories(x0 = x0, y0 = y0, xT = xT, yT = yT)
 ```
 
-We will take our domain to be the rectangular subset $[3, 5] \times [4, 8]$ and generate a covering with 40 squares.
+We will take our domain to be the rectangular subset $[3, 5] \times [4, 8]$ and generate a covering with 40 rectangles.
 
 ```julia
 xmin, xmax, ymin, ymax = 3, 5, 4, 8
-domain = UlamDomain(xmin, xmax, ymin, ymax, poly_type = "sqr", poly_number = 40)
+domain = UlamDomain(xmin, xmax, ymin, ymax, poly_type = "rec", poly_number = 40)
 ```
 
 Run Ulam's method.

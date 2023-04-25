@@ -86,7 +86,7 @@ infile = "x0x5-NA-undrogued.h5"     # place this file in your working directory,
 traj = UlamTrajectories(infile)
 ```
 
-Next we define our domain. We'll use `North_Atlantic_clipped_verts` here. For the binning, we'll use the default square covering with 760 polygons. We'll also use the default `"data"` stochasticization algorithm.
+Next we define our domain. We'll use `North_Atlantic_clipped_verts` here. For the binning, we'll use the default rectangle covering `"rec"` with 760 polygons. We'll also use the default `"data"` stochasticization algorithm.
 
 ```julia
 NA = UlamPolygon(North_Atlantic_clipped_verts)

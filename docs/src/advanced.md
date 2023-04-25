@@ -43,8 +43,8 @@ These algorithms control how reinjection counts (trajectories pointing from nirv
 
 - `"data"`: Reinjection occurs according to which boxes trajectories actually enter (this is the default algorithm.)
 - `"source"`: Reinjection occurs uniformly in polygons specified by `stoc_source`. If `stoc_source` is provided, `"source"` is automatically selected. If `"source"` is selected but no `stoc_source` is provided, then `stoc_source` is set equal to the `domain`. This is equivalent to reinjecting data uniformly across all boxes.
- - If `stoc_source` is entered as an $N \times 2$ matrix of numbers, then reinjection occurs at the set of polygons which contain at least one point from `stoc_source`.
- - If `stoc_source` is entered as an `UlamPolygon`, then reinjection occurs at the set of polygons which intersect `stoc_source`.
+    - If `stoc_source` is entered as an $N \times 2$ matrix of numbers, then reinjection occurs at the set of polygons which contain at least one point from `stoc_source`.
+    - If `stoc_source` is entered as an `UlamPolygon`, then reinjection occurs at the set of polygons which intersect `stoc_source`.
 
 ## Using the results
 

@@ -2,11 +2,11 @@ import PolygonInbounds
 import LibGEOS, GeoInterface
 
 """
-    inpoly(data::Matrix{Float64}, polys::PolyTable)
+    inpoly(data::Matrix{<:Real}, polys::PolyTable)
 
 Determine which polygon of `polys` contains the data points in `data`. Return an [`InpolyResult`](@ref).
 """
-function inpoly(data::Matrix{Float64}, polys::PolyTable)
+function inpoly(data::Matrix{<:Real}, polys::PolyTable)
     @assert size(data, 1) > 0
     @assert size(data, 2) == 2
 

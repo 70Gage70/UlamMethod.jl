@@ -1,7 +1,7 @@
 """
     binner_square(domain)
 
-    Cover the rectangle defined by `domain.corners`by a uniform grid of squares. 
+Cover the rectangle defined by `domain.corners`by a uniform grid of squares. 
 
 The squares near the edges may overlap with `domain.corners` depending on the number requested.
 """

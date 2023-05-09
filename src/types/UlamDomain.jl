@@ -30,7 +30,7 @@ Construct an `UlamDomain` defined by the `UlamPolygon` in `domain`.
 Points outside `domain` will be considered in nirvana.
 
 ### Optional Arguments
-- `poly_type`: One of `"rec"`, `"sqr"`, `"hex"`, and `"vor"` for coverings by rectangles, squares, hexagons or Voronoi tesselation. The default is rectangles.
+- `poly_type`: One of `"rec"`, `"sqr"`, `"tri"`, `"hex"`, and `"vor"` for coverings by rectangles, squares, hexagons or Voronoi tesselation. The default is rectangles.
 - `poly_number`: The number of polygons requested. The default is 500 for rectangles/squares/hexagons and 100 for Voronoi.
 - `stoc_type`: Picks the stochasticization algorithm; one of `"data"` or `"source"`. The default is data.
 - `stoc_source`::`UlamPolygon`: Polygons in the covering that intersect `stoc_source` will have data re-injected uniformly through them in the `source` algorithm. 

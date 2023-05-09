@@ -1,5 +1,5 @@
 """
-    binner_square(domain)
+    binner_hexagon(domain)
 
 Cover the rectangle defined by `domain.corners` by a uniform grid of hexagons.
 
@@ -86,3 +86,9 @@ function binner_hexagon(domain::UlamDomain)
     return polys
 end
 
+# provides an interface for binner-triangle
+function binner_hexagon(xmin::Real, xmax::Real, ymin::Real, ymax::Real, poly_number::Integer)
+    domain = UlamDomain(xmin, xmax, ymin, ymax, poly_number = poly_number)
+
+    return binner_hexagon(domain)
+end

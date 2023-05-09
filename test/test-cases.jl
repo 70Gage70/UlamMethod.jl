@@ -16,10 +16,17 @@ t2 = [
 
 t3 = [
     UlamTrajectories(ftest), 
+    UlamDomain([-100, 15, -9, 39]..., poly_type = "tri", poly_number = 3000),
+    joinpath(@__DIR__, "ulam_tri_3000.h5")
+    
+]
+
+t4 = [
+    UlamTrajectories(ftest), 
     UlamDomain([-100, 15, -9, 39]..., poly_type = "hex", poly_number = 500),
     joinpath(@__DIR__, "ulam_hex_500.h5")]
 
-t4 = [
+t5 = [
     UlamTrajectories(ftest), 
     UlamDomain([-100, 15, -9, 39]..., poly_type = "vor", poly_number = 50),
     joinpath(@__DIR__, "ulam_vor_50.h5")
@@ -29,7 +36,8 @@ test_cases = [
     t1,
     t2,
     t3,
-    t4
+    t4,
+    t5
 ]
 
 function generate_tests(test_cases::Vector)

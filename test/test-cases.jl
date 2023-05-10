@@ -4,27 +4,25 @@ t1 = [
     UlamTrajectories(ftest), 
     UlamDomain([-100, 15, -9, 39]..., poly_type = "rec", poly_number = 500),
     joinpath(@__DIR__, "ulam_rec_500.h5")
-    
 ]
 
 t2 = [
     UlamTrajectories(ftest), 
     UlamDomain([-100, 15, -9, 39]..., poly_type = "sqr", poly_number = 500),
     joinpath(@__DIR__, "ulam_sqr_500.h5")
-    
 ]
 
 t3 = [
     UlamTrajectories(ftest), 
     UlamDomain([-100, 15, -9, 39]..., poly_type = "tri", poly_number = 3000),
     joinpath(@__DIR__, "ulam_tri_3000.h5")
-    
 ]
 
 t4 = [
     UlamTrajectories(ftest), 
     UlamDomain([-100, 15, -9, 39]..., poly_type = "hex", poly_number = 500),
-    joinpath(@__DIR__, "ulam_hex_500.h5")]
+    joinpath(@__DIR__, "ulam_hex_500.h5")
+]
 
 t5 = [
     UlamTrajectories(ftest), 
@@ -50,4 +48,8 @@ function generate_tests(test_cases::Vector)
     return
 end
 
-# generate_tests(test_cases) # generates a new test set in the test directory
+### in src directory
+# include("types.jl")
+# include("main.jl")
+# include("../test/test-cases.jl")
+# generate_tests(test_cases)

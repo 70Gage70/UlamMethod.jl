@@ -1,7 +1,7 @@
 name = "UlamMethod"
 uuid = "4cc20838-1966-48f0-823a-5def0ad5c24d"
 authors = ["Gage Bonner <gage.bonner@gmail.com>"]
-version = "0.5.8"
+version = "0.5.9"
 
 [deps]
 Clustering = "aaaa29a8-35af-508c-8bc3-b662a17a0fe5"

@@ -67,8 +67,8 @@ function UlamDomain(
         # didn't specify "source"
         stoc_type = "source"
     elseif stoc_source === nothing && stoc_type == "source"
-        @warn "The `source`` reinjection algorithm was requested, but `stoc_source` was not provided. The 
-        `stoc_source`` will be set to the domain. This is equivalent to reinjecting data uniformly across all boxes."
+        @warn "The `source` reinjection algorithm was requested, but `stoc_source` was not provided. The 
+        `stoc_source` will be set to the domain. This is equivalent to reinjecting data uniformly across all boxes."
         stoc_source = domain
     end
 

@@ -62,6 +62,16 @@ The output of `ulam_method` is an `UlamResult`. This contains the main objects c
 
 For convenience `P_open` and `pi_open` are also provided, which are identical to `P_closed` and `pi_closed` with the nirvana entries removed.
 
+## Working with polygons
+
+It is sometimes desirable to determine which polygons contain a given set of points, or intersect with a given region. This functionality is provided by
+```julia
+ulam_polys_to_indices(polys, region)
+```
+The output of `ulam_polys_to_indices` is a list of indices which identify the polygons that intersect with the region.
+
+Here, `polys` can be an `UlamResult` or the vector of `UlamPolygon`s can be provided directly. The behavior of `region` is identical to that of `domain.stoc_source`, i.e. it can be a matrix of points or an `UlamPolygon`. 
+
 ## Writing the results
 
 A custom write method is provided
@@ -103,7 +113,13 @@ The final step is to apply Ulam's method.
 ulam = ulam_method(traj, domain)
 ```
 
-From here, a `.h5` file can be created with `ulam_write("my_ulam_results.h5", ulam)` or `ulam` can be used elsewhere.
+From here, a `.h5` file can be created with `ulam_write("my_ulam_results.h5", ulam)` or `ulam` can be used elsewhere. We can also quickly determine which polygon contains some point in the domain.
+
+```julia
+point = [-15.5 8.7]
+inds = ulam_polys_to_indices(ulam, point)
+ulam.polys[inds[1]].nodes
+```
 
 ## References
 

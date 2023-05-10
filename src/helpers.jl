@@ -112,3 +112,43 @@ function ulam_intersects(poly1::UlamPolygon, poly2::UlamPolygon)
         return true
     end
 end
+
+"""
+    ulam_polys_to_indices(ulam_res::Vector{<:UlamPolygon}, region)
+
+Find the indicies of `polys` which contain `region`.
+
+- If `region` is entered as an `N x 2` matrix of numbers, then the indices are of polygons which contain at least one point from `region`.
+- If `region` is entered as an `UlamPolygon`, then the indices are of polygons which intersect with `region`.
+"""
+function ulam_polys_to_indices(polys::Vector{<:UlamPolygon}, region::Union{Matrix{<:Real}, UlamPolygon})
+    if typeof(region) <: UlamPolygon
+        inds = [i for i in 1:length(polys) if ulam_intersects(region, polys[i])]
+    elseif typeof(region) <: Matrix
+        inds = unique(inpoly(region, PolyTable(polys)).inds)
+    end
+
+    filter!(x->x!=0, inds)
+
+    return inds
+end
+
+"""
+    ulam_polys_to_indices(ulam_res::UlamResult, region)
+
+When applied to `UlamResult`, find the container indices of `ulam_res.polys`.
+"""
+function ulam_polys_to_indices(ulam_res::UlamResult, region::Union{Matrix{<:Real}, UlamPolygon})
+    polys = ulam_res.polys
+
+    if typeof(region) <: UlamPolygon
+        inds = [i for i in 1:length(polys) if ulam_intersects(region, polys[i])]
+    elseif typeof(region) <: Matrix
+        inds = unique(inpoly(region, PolyTable(polys)).inds)
+    end
+
+    filter!(x->x!=0, inds)
+
+    return inds
+end
+

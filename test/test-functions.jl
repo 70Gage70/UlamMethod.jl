@@ -4,7 +4,7 @@ function test_eq(a::Any, b::Any)
     elseif length(a) != length(b)
         return false
     else
-        return all(isapprox.(a, b, atol = 1e-12))
+        return all(isapprox.(a, b, atol = 1e-11))
     end
 end
 

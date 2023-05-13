@@ -57,7 +57,7 @@ function UlamDomain(
     @assert poly_number > 1
     @assert stoc_type in global_stoc_types
 
-    if typeof(stoc_source) <: AbstractMatrix
+    if stoc_source isa Matrix
         @assert size(stoc_source, 1) > 0 
         @assert size(stoc_source, 2) == 2
     end

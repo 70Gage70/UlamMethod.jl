@@ -122,9 +122,9 @@ Find the indicies of `polys` which contain `region`.
 - If `region` is entered as an `UlamPolygon`, then the indices are of polygons which intersect with `region`.
 """
 function ulam_polys_to_indices(polys::Vector{<:UlamPolygon}, region::Union{Matrix{<:Real}, UlamPolygon})
-    if typeof(region) <: UlamPolygon
+    if region isa UlamPolygon
         inds = [i for i in 1:length(polys) if ulam_intersects(region, polys[i])]
-    elseif typeof(region) <: Matrix
+    elseif region isa Matrix
         inds = unique(inpoly(region, PolyTable(polys)).inds)
     end
 
@@ -141,9 +141,9 @@ When applied to `UlamResult`, find the container indices of `ulam_res.polys`.
 function ulam_polys_to_indices(ulam_res::UlamResult, region::Union{Matrix{<:Real}, UlamPolygon})
     polys = ulam_res.polys
 
-    if typeof(region) <: UlamPolygon
+    if region isa UlamPolygon
         inds = [i for i in 1:length(polys) if ulam_intersects(region, polys[i])]
-    elseif typeof(region) <: Matrix
+    elseif region isa Matrix
         inds = unique(inpoly(region, PolyTable(polys)).inds)
     end
 

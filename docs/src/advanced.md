@@ -90,13 +90,18 @@ The polygons will be output in an $N \times 3$ matrix such that the first two co
 
 ## Full workflow example
 
-For this example, the file [`test/x0x5-NA-undrogued.h5`](https://github.com/70Gage70/UlamMethod.jl/blob/main/test/x0x5-NA-undrogued.h5) contains trajectory data from undrogued drifters in the North Atlantic obtained from the NOAA GDP [^3] [^4].
+For this example, the file [`test/x0x5-NA-undrogued.h5`](https://github.com/70Gage70/UlamMethod.jl/blob/main/test/x0x5-NA-undrogued.h5) contains trajectory data from undrogued drifters in the North Atlantic obtained from the NOAA GDP [^3] [^4]. First, we download the data from the GitHub repository:
 
 ```julia
 import Downloads.download as dl
 url = "https://github.com/70Gage70/UlamMethod.jl/raw/main/test/x0x5-NA-undrogued.h5"
-infile = dl(url, pwd() * "/traj.h5") # download the data, placing it in the current directory
-traj = UlamTrajectories(infile) # load the trajectories
+infile = dl(url, pwd() * "/traj.h5")
+```
+
+Next, we load the trajectories.
+
+```
+traj = UlamTrajectories(infile)
 ```
 
 Next we define our domain. We'll use `North_Atlantic_clipped_verts` here from `UlamMethod.EarthUlamPolygons`. For the binning, we'll use the default rectangle covering `"rec"` with 760 polygons. We'll also use the default `"data"` stochasticization algorithm.

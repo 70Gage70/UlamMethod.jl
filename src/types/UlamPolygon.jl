@@ -47,6 +47,23 @@ function UlamPolygon(
     return UlamPolygon{Float64}(nodes, center)
 end
 
+"""
+    UlamPolygon(xmin, xmax, ymin, ymax)
+
+Construct a rectangular `UlamPolygon` with bottom left corner (`xmin`, `ymin`) and top right corner (`xmax`, `ymax`).
+"""
+function UlamPolygon(
+    xmin::Real,
+    xmax::Real,
+    ymin::Real,
+    ymax::Real)
+
+    @assert xmin < xmax
+    @assert ymin < ymax
+
+    return UlamPolygon([xmin ymin; xmin ymax; xmax ymax; xmax ymin])
+end
+
 function Base.show(io::IO, x::UlamPolygon)
     print(io, "UlamPolygon[")
     show(io, size(x.nodes, 1))

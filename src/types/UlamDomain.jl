@@ -100,11 +100,8 @@ function UlamDomain(
     stoc_source::Union{UlamPolygon{T}, Matrix{T}, Nothing} = nothing,
     rseed::U = global_rseed_default) where {S<:AbstractString, T<:Real, U<:Integer}
 
-    @assert xmax > xmin
-    @assert ymax > ymin
-
     corners::Vector{Float64} = [xmin, xmax, ymin, ymax]
-    domain = UlamPolygon([xmin ymin; xmin ymax; xmax ymax; xmax ymin])
+    domain = UlamPolygon(xmin, xmax, ymin, ymax)
 
     return UlamDomain{String, Float64, Int64}(
         corners,

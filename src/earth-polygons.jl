@@ -1,3 +1,10 @@
+"""
+    North_Atlantic_clipped_verts
+
+Vertices defining a polygon contained in the rectangle with lower left 
+corner (-100, -9) and upper right corner (15, 39). This polygon clips away the 
+land, leaving only the ocean in the rectangle.
+"""
 North_Atlantic_clipped_verts = [
     -76.3 39; 
     -5.89 39; 
@@ -41,6 +48,11 @@ North_Atlantic_clipped_verts = [
     -76.5 34.9
 ]
 
+"""
+    North_Atlantic_box_verts
+
+Vertices defining a rectangle with lower left corner (-100, -9) and upper right corner (15, 39).
+"""
 North_Atlantic_box_verts = [
     -100 -9;
     -100 39;
@@ -48,6 +60,11 @@ North_Atlantic_box_verts = [
     15 -9
 ]
 
+"""
+    GoG_big_verts
+
+Vertices defining the entirety of the Gulf of Guinea.
+"""
 GoG_big_verts = [
     -1.38 6.48;
     4.34 7.88; 
@@ -56,6 +73,11 @@ GoG_big_verts = [
     1.01 -1.49
 ]
 
+"""
+    GoG_small_verts
+
+Vertices defining the interior of the Gulf of Guinea closest to the shore.
+"""
 GoG_small_verts = [
     6.96 4.82;
     6.82 0.0591;

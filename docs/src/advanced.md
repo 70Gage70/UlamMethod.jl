@@ -93,14 +93,17 @@ The polygons will be output in an $N \times 3$ matrix such that the first two co
 For this example, the file [`test/x0x5-NA-undrogued.h5`](https://github.com/70Gage70/UlamMethod.jl/blob/main/test/x0x5-NA-undrogued.h5) contains trajectory data from undrogued drifters in the North Atlantic obtained from the NOAA GDP [^3] [^4].
 
 ```julia
-infile = "x0x5-NA-undrogued.h5"     # place this file in your working directory, or define a path to it
-traj = UlamTrajectories(infile)
+import Downloads.download as dl
+url = "https://github.com/70Gage70/UlamMethod.jl/raw/main/test/x0x5-NA-undrogued.h5"
+infile = dl(url, pwd() * "/traj.h5") # download the data, placing it in the current directory
+traj = UlamTrajectories(infile) # load the trajectories
 ```
 
-Next we define our domain. We'll use `North_Atlantic_clipped_verts` here. For the binning, we'll use the default rectangle covering `"rec"` with 760 polygons. We'll also use the default `"data"` stochasticization algorithm.
+Next we define our domain. We'll use `North_Atlantic_clipped_verts` here from `UlamMethod.EarthUlamPolygons`. For the binning, we'll use the default rectangle covering `"rec"` with 760 polygons. We'll also use the default `"data"` stochasticization algorithm.
 
 ```julia
-NA = UlamPolygon(North_Atlantic_clipped_verts)
+import UlamMethod.EarthUlamPolygons.North_Atlantic_clipped_verts as NAcv
+NA = UlamPolygon(NAcv)
 poly_type = "rec"
 poly_number = 760
 

@@ -78,5 +78,5 @@ end
 function Base.show(io::IO, x::UlamTrajectories{T}) where {T<:Real}
     print(io, "UlamTrajectories[")
     show(io, length(x.x0))
-    print("]")
+    print(io, "]")
 end

@@ -50,7 +50,7 @@ function _membership(traj::Trajectories{2}, bins::Bins{K, 2, CRS}) where {K, CRS
     ip2 = inpoly2(permutedims(hcat(traj.x0, traj.xT)), nodes, edges) 
     # returns stats[:, 1:2, area], where : has the index of the points and 1:2 are [inside, onboundary]
     # therefore, stats[:, 1, k] is a bitvector of point membership to the kth polygon
-    # therefore, stats[n, 1, :] is bitfector of polygon membership to the nth point
+    # therefore, stats[n, 1, :] is bitvector of polygon membership to the nth point
     
     membs = [
         begin 

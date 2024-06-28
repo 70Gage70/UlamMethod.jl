@@ -1,14 +1,16 @@
 # Meshes Formulation
 
-- A `Boundary` is a `Meshes.Mesh`. For example, a rectangular region:
+- The user should provide a shape that defines the boundary.
+    - 1D: `<:Chain`, i.e. 1D `Polytope`
+    - 2D: `<:Polygon`, i.e. 2D `Polytope`
 
+- `Bins` is a struct with one field `bins` that holds the bins; it is a vector of `Geometry`s, essentially equivalent to a `GeometrySet`.
 
-```julia
-points = [(0,0),(1,0),(0,1),(1,1)]
-connec = connect.([(1,2,4,3)], Ngon)
-mesh = SimpleMesh(points, connec)
-```
-- The user should provide a `Boundary`, then all data outside the boundary are considered to be in nirvana. 
+- `AbstractBinner{Dim}` is the abstract type for a binning algorithm in dimension `Dim`. Each subtype should implement a method `_bin(boundary, binner)` which returns a `Bins`
+    - 1D: `LineBinner <: AbstractBinner{1}`
+    - 1D: `RectangleBinner <: AbstractBinner{2}`
 
-- The user should provide a `AbstractBinner` which calculates a `SimpleMesh` from a `Boundary`.
+- `bin` handles the dispatch to the appropriate `_bin` and any other high level binning options.
+
+- `Trajectories{Dim}` holds `x0` and `xT` as `Dim x n_points` matrices.
 

@@ -1,3 +1,17 @@
+"""
+    struct Trajectories{Dim}
+
+A container for trajectory data of dimension `Dim`.
+
+### Fields
+
+- `x0`: Initial coordinates, should be a matrix of size `Dim` x `n_traj`.
+- `xT`: Final coordinates, should be a matrix of size `Dim` x `n_traj`.
+
+### Constructor
+
+`Trajectories(x0, xT)`
+"""
 struct Trajectories{Dim}
     x0::Matrix{Float64}
     xT::Matrix{Float64}

@@ -16,8 +16,9 @@ end
 
 An abstract type for binning algorithms of dimension `Dim`.
 
-Each subtype `binner` should implement a function `_bin(boundary, binner)` that
-returns `Bins`.
+Each subtype `binner` should implement the following:
+
+- a function `_bin(boundary, binner)` that partitions `boundary` and return `Bins`.
 """
 abstract type AbstractBinner{Dim} end
 
@@ -36,11 +37,11 @@ struct LineBinner <: AbstractBinner{1}
     nbins::Int64
 end
 
-function _bin(boundary::Chain, binner::LineBinner)
+function _bin(boundary::Boundary{1, CRS}, binner::LineBinner) where {CRS}
     nbins = binner.nbins
-    bbox = Meshes.boundingbox(boundary)
+    bbox = Meshes.boundingbox(boundary.boundary)
     grid = CartesianGrid(bbox.min, bbox.max, dims = (nbins, ))
-    return Bins([elem for elem in elements(grid) if intersects(elem, boundary)])
+    return Bins([elem for elem in elements(grid) if intersects(elem, boundary.boundary)])
 end 
 
 ### 2D ALGORITHMS
@@ -60,10 +61,10 @@ struct RectangleBinner <: AbstractBinner{2}
     nbins::Int64
 end
 
-function _bin(boundary::Polygon, binner::RectangleBinner)
+function _bin(boundary::Boundary{2, CRS}, binner::RectangleBinner) where  {CRS}
     nbins = binner.nbins
 
-    bbox = Meshes.boundingbox(boundary)
+    bbox = Meshes.boundingbox(boundary.boundary)
     bbox_W = coords(bbox.max).x - coords(bbox.min).x
     bbox_L = coords(bbox.max).y - coords(bbox.min).y
     
@@ -71,7 +72,7 @@ function _bin(boundary::Polygon, binner::RectangleBinner)
     n_y = sqrt(bbox_L*nbins/bbox_W) |> x -> round(Int64, x)
     
     grid = CartesianGrid(bbox.min, bbox.max, dims = (n_x, n_y))
-    return Bins([elem for elem in elements(grid) if intersects(elem, boundary)])
+    return Bins([elem for elem in elements(grid) if intersects(elem, boundary.boundary)])
 end 
 
 """
@@ -84,9 +85,9 @@ Bin the `boundary` according to the `binner` algorithm.
 - `hardclip`: When set, clip all bins to the boundary so there is no overlap. Default: `false`.
 """
 function bin(
-    boundary::Polytope{K, Dim, CRS}, 
-    binner::AbstractBinner{K};
-    hardclip::Bool = false) where {K, Dim, CRS}
+    boundary::Boundary{Dim, CRS}, 
+    binner::AbstractBinner{Dim};
+    hardclip::Bool = false) where {Dim, CRS}
 
     bins = _bin(boundary, binner)
     return hardclip ? Bins([intersect(boundary, bin) for bin in bins]) : bins

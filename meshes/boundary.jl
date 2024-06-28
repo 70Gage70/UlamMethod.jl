@@ -9,16 +9,23 @@ Data outside the boundary are considered in nirvana regardless of binning.
 
 ### Fields
 
-- `boundary`: A `Polytope` whose dimension matches the dimension of the data.
+- `boundary`: A `Polytope` defining the boundary.
 
 ### Constructor
 
-`Boundary(boundary)`
+- 1D: `Boundary(boundary::Segment)`
+- 2D: `Boundary(boundary::Ngon)`
 """
-struct Boundary{Dim, CRS}
-    boundary::Polytope{Dim, Dim, CRS}
+struct Boundary{K, Dim, CRS}
+    boundary::Polytope{K, Dim, CRS}
 
-    function Boundary(boundary::Polytope{Dim, Dim, CRS}) where {Dim, CRS}
-        new{Dim, CRS}(boundary)
+    function Boundary(; boundary::Polytope{K, Dim, CRS} = boundary) where {K, Dim, CRS}
+        return new{K, Dim, CRS}(boundary)
     end
 end
+
+### 1D
+Boundary(boundary::Segment) = Boundary(boundary = boundary)
+
+### 2D
+Boundary(boundary::Ngon) = Boundary(boundary = boundary)

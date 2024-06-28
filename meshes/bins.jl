@@ -1,14 +1,14 @@
 """
-    struct Bins{Dim, CRS}
+    struct Bins{K, Dim, CRS}
 
 A container type for bins.
 
 ### Fields
 
-- `bins`: A vector of `Geometry` objects of dimension `Dim` and coordinate reference system `CRS`.
+- `bins`: A vector of `Polytope` objects of dimension `Dim` and coordinate reference system `CRS`.
 """
-struct Bins{Dim, CRS}
-    bins::Vector{<:Geometry{Dim, CRS}}
+struct Bins{K, Dim, CRS}
+    bins::Vector{<:Polytope{K, Dim, CRS}}
 end
 
 """
@@ -27,7 +27,7 @@ abstract type AbstractBinner{Dim} end
 """
     struct LineBinner
 
-Bin a one dimensional `Chain` (line segement) with `nbins` equally-spaced bins.
+Bin a one dimensional `Segment` (line segement) with `nbins` equally-spaced bins.
 
 ### Fields
 
@@ -85,9 +85,9 @@ Bin the `boundary` according to the `binner` algorithm.
 - `hardclip`: When set, clip all bins to the boundary so there is no overlap. Default: `false`.
 """
 function bin(
-    boundary::Boundary{Dim, CRS}, 
+    boundary::Boundary{K, Dim, CRS}, 
     binner::AbstractBinner{Dim};
-    hardclip::Bool = false) where {Dim, CRS}
+    hardclip::Bool = false) where {K, Dim, CRS}
 
     bins = _bin(boundary, binner)
     return hardclip ? Bins([intersect(boundary, bin) for bin in bins]) : bins

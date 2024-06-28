@@ -5,8 +5,6 @@ A container type for the computational domain within which Ulam's method is appl
 
 The boundary is partitioned according to an [`AbstractBinner`](@ref).
 
-Data outside the boundary are considered in nirvana regardless of binning.
-
 ### Fields
 
 - `boundary`: A `Polytope` defining the boundary.

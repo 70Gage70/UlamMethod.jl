@@ -1,4 +1,7 @@
-### 1D Algorithms
+### 2D Algorithm
 
-# membership(trajectories::Trajectories{2}, bins::Bins{2, CRS}) where {CRS}
+function membership(trajectories::Trajectories{2}, bins::Bins{K, 2, CRS}) where {K, CRS}
+
+    return nothing
+end
 

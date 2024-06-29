@@ -28,4 +28,4 @@ traj2d = Trajectories(x0_rand, xT_rand)
 boundary2d = Boundary([(0,0),(6,0),(1,7),(1,6)])
 boundary2d = Boundary(0, 6, 0, 4)
 
-ur = ulam_method(traj2d, boundary2d, RectangleBinner(500))
+ur = ulam_method(traj2d, boundary2d, RectangleBinner(500), reinj_algo = SourceReinjection([(1, 3)]))

@@ -62,7 +62,7 @@ function ulam_method(
     n_bins = length(bins_final.bins)
 
     ### REINJECTION ALGORITHM
-    Pij = reinject(bins_final, Pij, reinj_algo)
+    reinject!(bins_final, Pij, reinj_algo)
 
     ### STOCHASTICIZE
     Pω2O = Pij[n_bins+1, 1:n_bins]

@@ -60,8 +60,6 @@ function _bin(boundary::Boundary{K, 1, CRS}, binner::LineBinner) where {K, CRS}
         end
     end
 
-    @info bins
-
     return Bins(bins)
 end 
 

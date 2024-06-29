@@ -2,6 +2,7 @@ using Meshes, CairoMakie
 using ArgCheck
 using PolygonInbounds
 using Graphs: SimpleDiGraph, strongly_connected_components
+using ParallelKMeans
 
 using Distributions # FOR TESTING ONLY
 

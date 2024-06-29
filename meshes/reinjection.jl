@@ -66,7 +66,6 @@ function _reinject!(bins::Bins, Pij::Matrix{Float64}, reinj_algo::SourceReinject
     end
 
     memb = memb[findall(!isnothing, memb)]
-    @warn memb
     Pij[end, :] .= 0
     Pij[end, memb] .= 1
     return nothing

@@ -10,6 +10,7 @@ include("bins.jl")
 include("traj.jl")
 include("membership.jl")
 include("reinjection.jl")
+include("P.jl")
 
 ### 1d
 boundary1d = Segment((0,), (1,)) |> Boundary
@@ -20,7 +21,7 @@ membs1d = membership(traj1d, bin1d)
 ### 2d
 boundary2d = Ngon([(0,0),(6,0),(1,7),(1,6)]...) |> Boundary
 bin2d = bin(boundary2d, RectangleBinner(500))
-x0_rand = rand(MvNormal([1, 4], [1 0; 0 1]), 1000)
+x0_rand = rand(MvNormal([1, 4], [1 0; 0 1]), 10000)
 xT_rand = x0_rand + rand(MvNormal([0, 0], [1 0; 0 1]), size(x0_rand, 2))
 traj2d = Trajectories(x0_rand, xT_rand)
 membs2d = membership(traj2d, bin2d)
@@ -42,6 +43,12 @@ for i = 1:n_points
     end # otherwise, transition from nirvana to nirvana and ignore
 end 
 
+### REMOVE EMPTY BINS
+full = [findall(!iszero, vec(sum(Pij[1:n_bins, 1:n_bins], dims = 2))) ; n_bins + 1] # don't check nirvana
+Pij = Pij[full, full]
+bins_full = Bins(splice!(bin2d.bins, full[1:end-1]))
+n_bins = length(bins_full.bins)
+
 ### LARGEST STRONGLY CONNECTED COMPONENT 
 
 # create the adjacency matrix of Pij; note that nirvana is excluded since we assume it's always connected
@@ -52,11 +59,22 @@ scc = sort(scc, by = length)[end] # get the largest scc
 scc = [sort(scc) ; n_bins + 1] # ensure bin labels are sorted, then put nirvana back
 
 Pij = Pij[scc, scc]
-bins_full = Bins(splice!(bin2d.bins, scc[1:end-1]))
-bins_empty = bin2d
+bins_final = Bins(splice!(bins_full.bins, scc[1:end-1]))
+bins_dis = bins_full
+n_bins = length(bins_final.bins)
 
 ### REINJECTION ALGORITHM
-Pij = reinject(bin2d, Pij, DataReinjection())
+Pij = reinject(bins_final, Pij, DataReinjection())
 
 ### STOCHASTICIZE
-Pij = Pij ./ sum(Pij, dims = 2)
+Pω2O = Pij[n_bins+1, 1:n_bins]
+try
+    Pω2O = Pω2O / sum(Pω2O)
+catch
+end
+
+Pij = Pij[1:end-1, :] ./ sum(Pij[1:end-1, :], dims = 2)
+PO2O = Pij[1:n_bins, 1:n_bins]
+PO2ω = Pij[1:n_bins, n_bins+1]
+
+um = UlamMatrix(PO2O, PO2ω, Pω2O)

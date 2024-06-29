@@ -1,83 +1,81 @@
-using HDF5
-# using .UlamTypes
-
-include("helpers.jl")
-
-include("ulam-nirvana.jl")
-include("ulam-binner.jl")
-
-include("earth-polygons.jl")
-
-#########################################################################################################
-
-
 """
-    ulam_method(traj, domain)
+    ulam_method(traj, boundary, binner; reinj_algo)
 
-Run the high-level Ulam method and return an [`UlamResult`](@ref).
+Run the main Ulam's method calculation and return an [`UlamResult`](@ref).
 
 ### Arguments
-- `traj`: An [`UlamTrajectories`](@ref); contains the trajectory data.
-- `domain`: An [`UlamDomain`](@ref); contains the domain specification.
-"""
-function ulam_method(traj::UlamTrajectories, domain::UlamDomain)
-    polys = ulam_binner(traj, domain)
-    ulam = ulam_nirvana(traj, domain, polys)
 
-    return ulam
-end
-
-"""
-    ulam_write(outfile, ulam_result; dir_name, overwrite, P_out)
-
-Write `ulam_result` to the file `outfile`, which must be in the `.h5` format.
-
-If `outfile` does not exist, it will be created. Results are written to the directory specified by `dir_name`.
+- `traj`: A [`Trajectories`](@ref) object, holding the short-range trajectory data.
+- `boundary`: A [`Boundary`](@ref) object, holding the geometry that defines the computational boundary.
+- `binner`: A [`BinningAlgorithm`](@ref) that specifies the algorithm used to partition the boundary into bins.
 
 ### Optional Arguments
-- `dir_name`: The name of the directory that `ulam_result` is written to, default `"ulam"`. Directories can be nested, e.g. `dir_name = "trial1/ulam"`.
-- `overwrite`: If `true`, the directory `dir_name` will overwrite a directory with the same name if it exists in `outfile`. Default `false`.
-- `P_out`: If `false`, `P_closed` is not written to file. Default `true`.
+
+- `reinj_algo`: A [`ReinjectionAlgorithm`](@ref) that specifies how trajectories pointing \
+from nirvana to the interior should be reinjected. Default [`DataReinjection`](@ref).
 """
-function ulam_write(
-    outfile::String, 
-    ulam_result::UlamResult; 
-    dir_name::String = "ulam", 
-    overwrite::Bool = false,
-    P_out::Bool = true)
+function ulam_method(
+    traj::Trajectories{Dim},
+    boundary::Boundary{K, Dim, CRS}, 
+    binner::BinningAlgorithm{Dim};
+    reinj_algo::ReinjectionAlgorithm = DataReinjection()) where {K, Dim, CRS}
 
-    @assert outfile[end-2:end] == ".h5" "The output file must be of the form filename.h5"
-    fout = h5open(outfile, "cw")
+    ### COMPUTE BINS BASED ON BOUNDARY
+    bins = bin(boundary, binner)
+    n_bins = length(bins.bins)
+    
+    ### COMPUTE BIN MEMBERSHIP
+    x0_idx, xT_idx = membership(traj, bins)
 
-    if dir_name in keys(fout)
-        if !overwrite
-            @assert !(dir_name in keys(fout)) "This file already has a group with the name: $(dir_name). Pass `overwrite = true` to force a replacement."
-        end
+    ### COMPUTE TRANSITION MATRIX
+    Pij = zeros(n_bins + 1, n_bins + 1)
+    n_points = size(traj.x0, 2)
+    for i = 1:n_points
+        x0, xT = x0_idx[i],xT_idx[i]
+        if !isnothing(x0) && !isnothing(xT) # interior to interior
+            Pij[x0, xT] += 1
+        elseif !isnothing(x0) && isnothing(xT) # interior to nirvana
+            Pij[x0, end] += 1
+        elseif isnothing(x0) && !isnothing(xT) # nirvana to interior
+            Pij[end, xT] += 1
+        end # otherwise, transition from nirvana to nirvana and ignore
+    end 
 
-        delete_object(fout, dir_name)
+    ### REMOVE EMPTY BINS
+    full = [findall(!iszero, vec(sum(Pij[1:n_bins, 1:n_bins], dims = 2))) ; n_bins + 1] # don't check nirvana
+    Pij = Pij[full, full]
+    bins_full = Bins(splice!(bins.bins, full[1:end-1]))
+    n_bins = length(bins_full.bins)
+
+    ### LARGEST STRONGLY CONNECTED COMPONENT 
+
+    # create the adjacency matrix of Pij; note that nirvana is excluded since we assume it's always connected
+    Padj = [iszero(Pij[i,j]) ? 0 : 1 for i in 1:n_bins, j in 1:n_bins]
+
+    scc = strongly_connected_components(SimpleDiGraph(Padj)) # Construct the directed graph with adjacency matrix Padj
+    scc = sort(scc, by = length)[end] # get the largest scc
+    scc = [sort(scc) ; n_bins + 1] # ensure bin labels are sorted, then put nirvana back
+
+    Pij = Pij[scc, scc]
+    bins_final = Bins(splice!(bins_full.bins, scc[1:end-1]))
+    bins_dis = bins_full
+    n_bins = length(bins_final.bins)
+
+    ### REINJECTION ALGORITHM
+    reinject!(bins_final, Pij, reinj_algo)
+
+    ### STOCHASTICIZE
+    Pω2O = Pij[n_bins+1, 1:n_bins]
+    try
+        Pω2O = Pω2O / sum(Pω2O)
+    catch
+        # Pω2O is a vector of zeros, so leave it alone
     end
 
-    g = create_group(fout, dir_name)
+    Pij = Pij[1:end-1, :] ./ sum(Pij[1:end-1, :], dims = 2)
+    PO2O = Pij[1:n_bins, 1:n_bins]
+    PO2ω = Pij[1:n_bins, n_bins+1]
 
-    g["n_polys"] = length(ulam_result.polys)
-    g["n_polys_dis"] = length(ulam_result.polys_dis)
-    g["pi_closed"] = ulam_result.pi_closed
-    g["counts"] = ulam_result.counts
-
-    # The polygons are output in to an n_polys x 3 matrix. The first two columns of the matrix are
-    # the (x, y) nodes and the third column is the index of the polygon that node belongs to.
-    g["polys"] = [PolyTable(ulam_result.polys).nodes ;; PolyTable(ulam_result.polys).edges[:,3]]
-
-    # Similarly for disconnected polygons, but we explicitly write an empty array if there are no
-    # disconnected polygons.
-    g["polys_dis"] = ulam_result.info.n_polys_dis == 0 ? zeros(0) : 
-    [PolyTable(ulam_result.polys_dis).nodes ;; PolyTable(ulam_result.polys_dis).edges[:,3]]
-
-    if P_out g["P_closed"] = ulam_result.P_closed end
-
-    close(fout)
-
-    @info "UlamResult written to $(outfile)."
-
-    return
+    ### RETURN
+    return UlamResult(PO2O, PO2ω, Pω2O, bins_final, bins_dis)
 end

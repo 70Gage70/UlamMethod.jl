@@ -1,3 +1,5 @@
+module EarthPolygon
+
 """
     North_Atlantic_clipped_verts
 
@@ -84,3 +86,5 @@ GoG_small_verts = [
     11.2 0.0827; 
     11.1 4.25
 ]
+
+end # module

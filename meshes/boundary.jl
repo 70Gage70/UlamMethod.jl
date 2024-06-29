@@ -9,6 +9,10 @@ The boundary is partitioned according to an [`BinningAlgorithm`](@ref).
 
 - `boundary`: A `Polytope` defining the boundary.
 
+### Methods
+
+Use `points(boundary)` to calculate a `Dim x N` matrix of boundary vertices.
+
 ### 1D Constructor
 
 In 1D, the boundary is a continuous line segment between `x_start` and `x_end`. Use
@@ -41,6 +45,12 @@ function Boundary(x_start::Real, x_end::Real)
     return Boundary(boundary = Segment(Meshes.Point(float(x_start)), Meshes.Point(float(x_end))))
 end
 
+function points(boundary::Boundary{K, 1, CRS}) where {K, CRS}
+    verts = boundary.boundary.vertices
+    
+    return stack([[coords(v).x.val] for v in verts])
+end
+
 ### 2D
 function Boundary(verts::Vector{<:Tuple{Real, Real}})
     @argcheck all(length.(verts) .== 2)
@@ -53,4 +63,10 @@ function Boundary(xmin::Real, xmax::Real, ymin::Real, ymax::Real)
     @argcheck ymin < ymax
 
     return Boundary([(xmin, ymin), (xmax, ymin), (xmax, ymax), (xmin, ymax)])
+end
+
+function points(boundary::Boundary{K, 2, CRS}) where {K, CRS}
+    verts = boundary.boundary.vertices
+    
+    return stack([[coords(v).x.val, coords(v).y.val] for v in verts])
 end

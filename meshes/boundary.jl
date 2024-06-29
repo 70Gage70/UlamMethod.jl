@@ -3,7 +3,7 @@
 
 A container type for the computational domain within which Ulam's method is applied.
 
-The boundary is partitioned according to an [`AbstractBinner`](@ref).
+The boundary is partitioned according to an [`BinningAlgorithm`](@ref).
 
 ### Fields
 

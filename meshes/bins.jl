@@ -12,7 +12,7 @@ struct Bins{K, Dim, CRS}
 end
 
 """
-    abstract type AbstractBinner{Dim}
+    abstract type BinningAlgorithm{Dim}
 
 An abstract type for binning algorithms of dimension `Dim`.
 
@@ -20,7 +20,7 @@ Each subtype `binner` should implement the following:
 
 - a function `_bin(boundary, binner)` that partitions `boundary` and return `Bins`.
 """
-abstract type AbstractBinner{Dim} end
+abstract type BinningAlgorithm{Dim} end
 
 ### 1D ALGORITHMS
 
@@ -38,7 +38,7 @@ Bin a one dimensional `Segment` (line segement) with `nbins` equally-spaced bins
 
 `LineBinner(nbins; hardclip = true)`
 """
-struct LineBinner <: AbstractBinner{1}
+struct LineBinner <: BinningAlgorithm{1}
     nbins::Int64
     hardclip::Bool
 
@@ -83,7 +83,7 @@ may be slightly different than the number requested.
 
 `RectangleBinner(nbins; hardclip = true)`
 """
-struct RectangleBinner <: AbstractBinner{2}
+struct RectangleBinner <: BinningAlgorithm{2}
     nbins::Int64
     hardclip::Bool
 
@@ -123,6 +123,6 @@ end
 
 Bin the `boundary` according to the `binner` algorithm.
 """
-function bin(boundary::Boundary{K, Dim, CRS}, binner::AbstractBinner{Dim}) where {K, Dim, CRS}
+function bin(boundary::Boundary{K, Dim, CRS}, binner::BinningAlgorithm{Dim}) where {K, Dim, CRS}
     return _bin(boundary, binner)
 end

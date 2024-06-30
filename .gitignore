@@ -81,3 +81,14 @@ Temporary Items
 /extras
 **/src/data
 
+docs/build
+.DS_Store
+docs/src/.vitepress/cache
+docs/src/.vitepress/dist
+docs/Manifest.toml
+docs/.vscode
+docs/node_modules
+docs/.vitepress/cache
+docs/.vitepress/dist
+docs/.DS_Store
+docs/package-lock.json

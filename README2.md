@@ -49,6 +49,7 @@ Here are `10000` random trajectories in the domain $[0, 10]^2$
 
 ```julia
 using UlamMethod
+import Random; Random.seed!(1234) # reproducible randomness
 
 n_data = 10000
 x0, xT = 10*rand(2, n_data), 10*rand(2, n_data)

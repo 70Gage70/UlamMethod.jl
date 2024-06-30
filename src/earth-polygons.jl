@@ -1,4 +1,4 @@
-module EarthPolygon
+module EarthPolygons
 
 """
     North_Atlantic_clipped_verts

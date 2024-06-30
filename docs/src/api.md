@@ -24,3 +24,8 @@ Order = [:type]
 Modules = [UlamMethod]
 Order = [:constant]
 ``` 
+
+## Polygons
+```@autodocs
+Modules = [UlamMethod.EarthPolygons]
+``` 

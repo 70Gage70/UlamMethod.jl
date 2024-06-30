@@ -5,24 +5,24 @@
 
 ## Introduction
 
-This package is an implementation of Ulam's method [^1] [^2] (see also Galerkin projection [^3]) for the discretization of a stochastic operator using pure Julia. Given a set of two-dimensional, one-step trajectories 
+This package is an implementation of Ulam's method [^1] [^2] (see also Galerkin projection [^3]) for the discretization of a stochastic operator using pure Julia. Given a set of one-step trajectories 
 ```math
-(x_{0, 1}, y_{0, 1}) \to  (x_{T, 1}, y_{T, 1}), (x_{0, 2}, y_{0, 2}) \to  (x_{T, 2}, y_{T, 2}) \dots
+\mathbf{x}_{0, 1} \to  \mathbf{x}_{T, 1}, \mathbf{x}_{0, 2} \to  \mathbf{x}_{T, 2} \dots
 ```
-defined in a domain, the essential goal of Ulam's method is to partition the domain into a series of non-intersecting regions and construct a transition probability matrix $P$ on these regions. In UlamMethod.jl, this is accomplished in two main steps
+defined in a domain, the essential goal of Ulam's method is to partition the domain into a series of non-intersecting regions and construct a transition probability matrix $P$ on these regions.  In UlamMethod.jl, this is accomplished in two main steps
 
-1. The user provides a geometry containing the data, and covering of the the domain is generated according to one of several different binning algorithms (lines, rectangles, and [Voronoi cells](https://en.wikipedia.org/wiki/Voronoi_diagram).)
+1. The user provides a geometry containing the data, and covering of the the domain is generated according to one of several different binning algorithms (lines, rectangles, triangles, hexagons, and [Voronoi cells](https://en.wikipedia.org/wiki/Voronoi_diagram).)
 
 2. The number of trajectories beginning in polygon $i$ and ending in polygon $j$ is used to create the entry $P_{i, j}$ of $P$ such that the edges of the domain are handled by a stochasticization algorithm which re-injects the data either according to interior-exterior trajectories or at a user-defined location.
 
-The geometries which form the covering and the transition probability matrix are the main outputs.
+Currently, 1 and 2 dimensional data are supported. The geometries which form the covering and the transition probability matrix are the main outputs.
 
 ## Installation
 
 This package is in the Julia General Registry. In the Julia REPL, run the following code and follow the prompts:
 
 ```julia
-using Pkg
+import Pkg
 Pkg.add("UlamMethod")
 ```
 
@@ -55,17 +55,13 @@ x0, xT = 10*rand(2, n_data), 10*rand(2, n_data)
 traj = Trajectories(x0, xT)
 ```
 
-We will take our domain to be the rectangular subset $[3, 5] \times [4, 8]$ and generate a covering with 40 rectangles.
+We will take our domain to be the rectangular subset $[3, 5] \times [4, 8]$ and generate a covering with 40 rectangles. We then call `ulam_method` to run the main calculation.
 
 ```julia
 xmin, xmax, ymin, ymax = 3, 5, 4, 8
 boundary = Boundary(xmin, xmax, ymin, ymax)
 binner = RectangleBinner(40)
-```
 
-Run Ulam's method.
-
-```julia
 ulam = ulam_method(traj, boundary, binner)
 ```
 

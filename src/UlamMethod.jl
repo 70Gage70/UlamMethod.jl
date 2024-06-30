@@ -17,7 +17,7 @@ export Boundary, points
 
 include("bins.jl")
 export Bins, BinningAlgorithm
-export LineBinner, RectangleBinner, VoronoiBinner
+export LineBinner, RectangleBinner, TriangleBinner, HexagonBinner, VoronoiBinner
 export bin
 
 include("membership.jl")
@@ -45,7 +45,7 @@ export ulam_method
 
     ur = ulam_method(traj1d, boundary1d, LineBinner(10))
 
-    ### 2dx
+    ### 2d
     n_points = 100
     x0_rand = randn(2, n_points) + [fill(1, n_points) ;; fill(4, n_points)]'
     xT_rand = x0_rand + rand(2, n_points)
@@ -54,9 +54,14 @@ export ulam_method
     boundary2d = Boundary(0, 6, 0, 4)
     boundary2d = Boundary([(0,0),(6,0),(1,7),(1,6)])
 
-    ur = ulam_method(traj2d, boundary2d, RectangleBinner(10), reinj_algo = DataReinjection())
+    ur = ulam_method(traj2d, boundary2d, RectangleBinner(10))
     ur = ulam_method(traj2d, boundary2d, RectangleBinner(10), reinj_algo = SourceReinjection([(1, 3)]))
+    ur = ulam_method(traj2d, boundary2d, VoronoiBinner(10, traj2d))
     ur = ulam_method(traj2d, boundary2d, VoronoiBinner(10, traj2d), reinj_algo = SourceReinjection([(1, 3)]))
+    ur = ulam_method(traj2d, boundary2d, TriangleBinner(10))
+    ur = ulam_method(traj2d, boundary2d, TriangleBinner(10), reinj_algo = SourceReinjection([(1, 3)]))
+    ur = ulam_method(traj2d, boundary2d, HexagonBinner(10))
+    ur = ulam_method(traj2d, boundary2d, HexagonBinner(10), reinj_algo = SourceReinjection([(1, 3)]))
 end
 
 end # module

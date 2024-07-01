@@ -9,19 +9,17 @@ The boundary is partitioned according to an [`BinningAlgorithm`](@ref).
 
 - `boundary`: A `Polytope` defining the boundary.
 
-### Methods
+### 1D
 
-Use `points(boundary)` to calculate a `Dim x N` matrix of boundary vertices.
-
-### 1D Constructor
-
-In 1D, the boundary is a continuous line segment between `x_start` and `x_end`. Use
+The boundary is a continuous line segment `Segment` between `x_start` and `x_end`. Use
 
 `Boundary(x_start, x_end)`
 
-### 2D Constructors
+Use `points(boundary)` to calculate a `Dim x N` matrix of boundary vertices.
 
-In 2D, the boundary is a closed polygon with vertices `verts`, which should be be a
+### 2D 
+
+The boundary is a closed polygon `Ngon` with vertices `verts`, which should be be a
 vector of `[x, y]` coordinates. Use
 
 `Boundary(verts)`
@@ -29,11 +27,21 @@ vector of `[x, y]` coordinates. Use
 A convenience constructor is also provided for the case of a rectangular boundary. Use
 
 `Boundary(xmin, xmax, ymin, ymax)`
+
+Use `points(boundary)` to calculate a `Dim x N` matrix of boundary vertices.
+
+### ≥3D
+
+The boundary is a `HyperRectangle` with minimum and maximum vertices `corner_min`, `corner_max`. Use
+
+`Boundary(corner_min, corner_max)`
+
+where the corners are `NTuple`s, `(x_min, y_min, z_min, ...)`, `(x_max, y_max, z_max, ...)`.
 """
 struct Boundary{K, Dim, CRS}
     boundary::Polytope{K, Dim, CRS}
 
-    function Boundary(; boundary::Polytope{K, Dim, CRS} = boundary) where {K, Dim, CRS}
+    function Boundary(; boundary::Polytope{K, Dim, CRS}) where {K, Dim, CRS}
         return new{K, Dim, CRS}(boundary)
     end
 end
@@ -69,4 +77,11 @@ function points(boundary::Boundary{K, 2, CRS}) where {K, CRS}
     verts = boundary.boundary.vertices
     
     return stack([[coords(v).x.val, coords(v).y.val] for v in verts])
+end
+
+### ≥3D
+function Boundary(corner_min::NTuple{N, Real}, corner_max::NTuple{N, Real}) where {N}
+    @argcheck length(corner_min) == length(corner_max)
+    @argcheck N ≥ 3 "Prefer to not use a HyperRectangle in 1 or 2 dimensions"
+    return Boundary(boundary = HyperRectangle(corner_min, corner_max))
 end

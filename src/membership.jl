@@ -64,6 +64,19 @@ function _membership(traj::Trajectories{2}, bins::Bins{K, 2, CRS}) where {K, CRS
     return (membs[1:n_points], membs[n_points+1:end])
 end
 
+### ≥3D Algorithm
+
+function _membershipND(data::Matrix{<:Real}, bins::Bins{K, Dim, CRS}) where {K, Dim, CRS}
+    @argcheck size(data, 1) == Dim
+
+    membs = Int64[]
+
+    # for bin in bins.bins
+
+
+    return membs
+end
+
 """
     membership(traj, bins)
 

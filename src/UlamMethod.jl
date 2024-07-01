@@ -9,6 +9,9 @@ using PrecompileTools: @compile_workload
 
 include("earth-polygons.jl") # EarthPolygons module
 
+include("hyperrectangle.jl")
+export HyperRectangle
+
 include("traj.jl")
 export Trajectories
 
@@ -17,7 +20,7 @@ export Boundary, points
 
 include("bins.jl")
 export Bins, BinningAlgorithm
-export LineBinner, RectangleBinner, TriangleBinner, HexagonBinner, VoronoiBinner
+export LineBinner, RectangleBinner, TriangleBinner, HexagonBinner, VoronoiBinner, HyperRectangleBinner
 export bin
 
 include("membership.jl")

@@ -7,8 +7,6 @@ using Graphs: SimpleDiGraph, strongly_connected_components
 using ParallelKMeans
 using PrecompileTools: @compile_workload 
 
-include("earth-polygons.jl") # EarthPolygons module
-
 include("traj.jl")
 export Trajectories
 
@@ -52,6 +50,8 @@ export ulam_method
 
 include("show.jl")
 export show
+
+include("earth-polygons.jl") # EarthPolygons module
 
 @compile_workload begin
     import Random

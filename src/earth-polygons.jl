@@ -1,13 +1,15 @@
 module EarthPolygons
+using UlamMethod
+
 
 """
-    North_Atlantic_clipped_verts
+    North_Atlantic_clipped
 
 Vertices defining a polygon contained in the rectangle with lower left 
 corner (-100, -9) and upper right corner (15, 39). This polygon clips away the 
 land, leaving only the ocean in the rectangle.
 """
-North_Atlantic_clipped_verts = [
+North_Atlantic_clipped = [
     -76.3 39; 
     -5.89 39; 
     -5.61 34.3; 
@@ -48,43 +50,43 @@ North_Atlantic_clipped_verts = [
     -79.3 25.8; 
     -81.4 31.7; 
     -76.5 34.9
-]
+] |> permutedims |> Boundary
 
 """
-    North_Atlantic_box_verts
+    North_Atlantic_box
 
 Vertices defining a rectangle with lower left corner (-100, -9) and upper right corner (15, 39).
 """
-North_Atlantic_box_verts = [
+North_Atlantic_box = [
     -100 -9;
     -100 39;
     15 39;
     15 -9
-]
+] |> permutedims |> Boundary
 
 """
-    GoG_big_verts
+    GoG_big
 
 Vertices defining the entirety of the Gulf of Guinea.
 """
-GoG_big_verts = [
+GoG_big = [
     -1.38 6.48;
     4.34 7.88; 
     10.1 4.52; 
     11.4 -0.871; 
     1.01 -1.49
-]
+] |> permutedims |> Boundary
 
 """
-    GoG_small_verts
+    GoG_small
 
 Vertices defining the interior of the Gulf of Guinea closest to the shore.
 """
-GoG_small_verts = [
+GoG_small = [
     6.96 4.82;
     6.82 0.0591;
     11.2 0.0827; 
     11.1 4.25
-]
+] |> permutedims |> Boundary
 
 end # module

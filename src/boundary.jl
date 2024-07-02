@@ -20,7 +20,7 @@ Use `points(boundary)` to calculate a `Dim x N` matrix of boundary vertices.
 ### 2D 
 
 The boundary is a closed polygon `Ngon` with vertices `verts`, which should be be a
-vector of `[x, y]` coordinates. Use
+vector of `(x, y)` coordinates or a `2 x N` matrix. Use
 
 `Boundary(verts)`
 
@@ -64,6 +64,12 @@ function Boundary(verts::Vector{<:Tuple{Real, Real}})
     @argcheck all(length.(verts) .== 2)
 
     return Boundary(boundary = Ngon(verts...))
+end
+
+function Boundary(verts::Matrix{<:Real})
+    @argcheck size(verts, 1) == 2
+
+    return Boundary([(verts[1, i], verts[2, i]) for i = 1:size(verts, 2)])
 end
 
 function Boundary(xmin::Real, xmax::Real, ymin::Real, ymax::Real)

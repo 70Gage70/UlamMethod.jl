@@ -61,7 +61,6 @@ function TriangleBinner(nbins::Int64, boundary::Boundary{2, CRS}; hardclip::Bool
     
     c_box = ((xmin + xmax)/2, (ymin + ymax)/2)
     c_hex = centroid(boundingbox(triangles)) |> p -> (coords(p).x.val, coords(p).y.val)
-    @info c_box .- c_hex
     triangles = Translate(c_box .- c_hex)(triangles)
 
     # points near but not exactly equal to zero cause problems for Meshes.intersect, so round them to zero
@@ -70,8 +69,6 @@ function TriangleBinner(nbins::Int64, boundary::Boundary{2, CRS}; hardclip::Bool
 
     bins = Polytope{2, 2, CRS}[]
     for bin_ in triangles
-        display(bin_)
-        display(boundary.boundary)
         isect = hardclip ? intersect(bin_, boundary.boundary) : intersects(bin_, boundary.boundary) ? bin_ : nothing
         if isect isa PolyArea
             # if the intersection is a PolyArea (i.e. a polygon possibly with holes), we convert it to an Ngon with the outer ring

@@ -1,6 +1,6 @@
 # API
 
-These are the methods and types used by UlamMethod.jl.
+These are the full docstrings for UlamMethod.jl.
 
 ## Index
 ```@index
@@ -19,13 +19,13 @@ Modules = [UlamMethod]
 Order = [:type]
 ``` 
 
-## Constants
+<!-- ## Constants
 ```@autodocs
 Modules = [UlamMethod]
 Order = [:constant]
-``` 
+```  -->
 
-## Polygons
+## Earth Polygons
 ```@autodocs
 Modules = [UlamMethod.EarthPolygons]
 ``` 

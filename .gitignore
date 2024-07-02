@@ -79,7 +79,7 @@ Temporary Items
 
 # in prog
 /extras
-**/src/data
+**/data
 
 docs/build
 .DS_Store

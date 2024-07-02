@@ -9,9 +9,6 @@ using PrecompileTools: @compile_workload
 
 include("earth-polygons.jl") # EarthPolygons module
 
-include("hyperrectangle.jl")
-export HyperRectangle
-
 include("traj.jl")
 export Trajectories
 
@@ -40,7 +37,7 @@ include(joinpath(@__DIR__, "..", "src", "binners", "voronoi.jl"))
 export VoronoiBinner
 
 include(joinpath(@__DIR__, "..", "src", "binners", "hyperrectangle.jl"))
-export HyperRectangleBinner
+export HyperRectangle, HyperRectangleBinner
 
 include("reinjection.jl")
 export ReinjectionAlgorithm
@@ -52,6 +49,9 @@ export P_open, P_closed, bins, bins_dis, membership
 
 include("main.jl")
 export ulam_method
+
+include("show.jl")
+export show
 
 @compile_workload begin
     import Random

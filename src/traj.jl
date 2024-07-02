@@ -19,7 +19,6 @@ struct Trajectories{Dim}
     function Trajectories(x0::Matrix{<:Real}, xT::Matrix{<:Real})
         @argcheck size(x0) == size(xT)
         @argcheck all(size(x0) .> 0)
-        @argcheck size(x0, 1) in [1, 2] "Dimension of data must be 1 or 2."
 
         return new{size(x0, 1)}(x0, xT)
     end

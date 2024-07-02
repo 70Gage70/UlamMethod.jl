@@ -60,6 +60,10 @@ function ulam_method(
     bins_dis = splice!(bins, not_scc)
     n_bins = length(bins)
 
+    if any(iszero.(vec(sum(Pij[1:n_bins, 1:n_bins], dims = 2))))
+        error("The transition probability matrix contains rows with no counts. This probably means that the trajectories do not create enough communication between bins.")
+    end
+
     ### REINJECTION ALGORITHM
     reinject!(binner, Pij, reinj_algo)
 

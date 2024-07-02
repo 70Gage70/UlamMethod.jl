@@ -58,6 +58,10 @@ function HexagonBinner(nbins::Int64, boundary::Boundary{2, CRS}; hardclip::Bool 
     c_hex = centroid(boundingbox(hexagons)) |> p -> (coords(p).x.val, coords(p).y.val)
     hexagons = Translate(c_box .- c_hex)(hexagons)
 
+    # points near but not exactly equal to zero cause problems for Meshes.intersect, so round them to zero
+    near_zero_p(p) = ([coords(p).x.val, coords(p).y.val] .|> x -> (y -> abs(y) < 10^(-15) ? 0.0 : y).(x)) |> z -> Meshes.Point(z...)
+    hexagons = [Hexagon(near_zero_p.(vertices(tri))...) for tri in hexagons]
+
     bins = Polytope{2, 2, CRS}[]
     for bin_ in hexagons
         isect = hardclip ? intersect(bin_, boundary.boundary) : intersects(bin_, boundary.boundary) ? bin_ : nothing

@@ -18,8 +18,9 @@ An abstract type for binning algorithms of dimension `Dim`.
 
 Each subtype should have a fields:
 
-- boundary::Boundary{Dim, CRS}
--`bins::Bins{Dim, CRS}`
+- `boundary::Boundary{Dim, CRS}``
+- `bins::Bins{Dim, CRS}`
+- `idx2pos::Vector{Union{Int64, Nothing}}`
 
 Each subtype should implement the following:
 

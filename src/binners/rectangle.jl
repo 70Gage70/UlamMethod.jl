@@ -9,6 +9,8 @@ may be slightly different than the number requested.
 
 - `boundary`: A [`Boundary`](@ref) object.
 - `bins`: A [`Bins`](@ref) object.
+- `idx2pos`: A vector such that `idx2pos[i]` gives the position (in bins) of the bin initially \
+(before removing dataless and disconnected bins) labelled `i`. `idx2pos[i] == nothing` if this bin was removed.
 
 ### Constructor 
 
@@ -17,6 +19,7 @@ may be slightly different than the number requested.
 struct RectangleBinner{CRS} <: BinningAlgorithm{2}
     boundary::Boundary{2, CRS}
     bins::Bins{2, CRS}
+    idx2pos::Vector{Union{Int64, Nothing}}
 end
 
 function RectangleBinner(nbins::Int64, boundary::Boundary{2, CRS}; hardclip::Bool = true) where {CRS}
@@ -45,7 +48,7 @@ function RectangleBinner(nbins::Int64, boundary::Boundary{2, CRS}; hardclip::Boo
         end
     end
 
-    return RectangleBinner(boundary, Bins(bins))
+    return RectangleBinner(boundary, Bins(bins), Vector{Union{Int64, Nothing}}(1:length(bins)))
 end 
 
 membership(data::Matrix{<:Real}, binner::RectangleBinner{CRS}) where {CRS} = _membership2d(data, binner.bins)

@@ -14,6 +14,8 @@ The final number of bins may be different (larger) than the number requested.
 
 - `boundary`: A [`Boundary`](@ref) object.
 - `bins`: A [`Bins`](@ref) object.
+- `idx2pos`: A vector such that `idx2pos[i]` gives the position (in bins) of the bin initially \
+(before removing dataless and disconnected bins) labelled `i`. `idx2pos[i] == nothing` if this bin was removed.
 - `ranges`: A vector such that `ranges[i]` is the `AbstractRange` giving the gridpoints of the bins along dimension `i`.
 
 ### Constructor
@@ -23,6 +25,7 @@ The final number of bins may be different (larger) than the number requested.
 struct HyperRectangleBinner{Dim, CRS, R<:AbstractRange} <: BinningAlgorithm{Dim}
     boundary::Boundary{Dim, CRS}
     bins::Bins{Dim, CRS}
+    idx2pos::Vector{Union{Int64, Nothing}}
     ranges::Vector{R}
 end
 
@@ -52,7 +55,7 @@ function HyperRectangleBinner(nbins::Int64, boundary::Boundary{Dim, CRS}) where 
         end
     end
 
-    return HyperRectangleBinner(boundary, Bins(bins), ranges)
+    return HyperRectangleBinner(boundary, Bins(bins), Vector{Union{Int64, Nothing}}(1:length(bins)), ranges)
 end
 
 
@@ -83,11 +86,12 @@ function membership(data::Matrix{<:Real}, binner::HyperRectangleBinner{Dim, CRS,
         end
     end
 
-    return membs
+    # this entire calculation assumes that the bins are arranged as they are when `HyperRectangleBinner` is 
+    # initially constructed; when bins are removed, the structure changes, so we have to find where the bins 
+    # actually are using `idx2pos`
+    return [isnothing(m) ? nothing : binner.idx2pos[m] for m in membs]
 end
 
 function membership(traj::Trajectories{Dim}, binner::HyperRectangleBinner{Dim, CRS, R}) where {Dim, CRS, R}    
-    n_points = size(traj.x0, 2)
-    membs = membership(hcat(traj.x0, traj.xT), binner)
-    return (membs[1:n_points], membs[n_points+1:end])
+    return (membership(traj.x0, binner), membership(traj.xT, binner))
 end

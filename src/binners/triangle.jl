@@ -9,6 +9,8 @@ The final number of bins may be slightly different than the number requested.
 
 - `boundary`: A [`Boundary`](@ref) object.
 - `bins`: A [`Bins`](@ref) object.
+- `idx2pos`: A vector such that `idx2pos[i]` gives the position (in bins) of the bin initially \
+(before removing dataless and disconnected bins) labelled `i`. `idx2pos[i] == nothing` if this bin was removed.
 
 ### Constructor 
 
@@ -17,6 +19,7 @@ The final number of bins may be slightly different than the number requested.
 struct TriangleBinner{CRS} <: BinningAlgorithm{2}
     boundary::Boundary{2, CRS}
     bins::Bins{2, CRS}
+    idx2pos::Vector{Union{Int64, Nothing}}
 end
 
 function TriangleBinner(nbins::Int64, boundary::Boundary{2, CRS}; hardclip::Bool = true) where {CRS}
@@ -74,7 +77,7 @@ function TriangleBinner(nbins::Int64, boundary::Boundary{2, CRS}; hardclip::Bool
         end
     end
 
-    return TriangleBinner(boundary, Bins(bins))
+    return TriangleBinner(boundary, Bins(bins), Vector{Union{Int64, Nothing}}(1:length(bins)))
 end 
 
 membership(data::Matrix{<:Real}, binner::TriangleBinner{CRS}) where {CRS} = _membership2d(data, binner.bins)

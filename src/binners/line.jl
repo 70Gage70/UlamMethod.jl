@@ -7,6 +7,8 @@ Bin a one dimensional `Segment` (line segement) with `nbins` equally-spaced bins
 
 - `boundary`: A [`Boundary`](@ref) object.
 - `bins`: A [`Bins`](@ref) object.
+- `idx2pos`: A vector such that `idx2pos[i]` gives the position (in bins) of the bin initially \
+(before removing dataless and disconnected bins) labelled `i`. `idx2pos[i] == nothing` if this bin was removed.
 
 ### Constructor 
 
@@ -15,6 +17,7 @@ Bin a one dimensional `Segment` (line segement) with `nbins` equally-spaced bins
 struct LineBinner{CRS} <: BinningAlgorithm{1}
     boundary::Boundary{1, CRS}
     bins::Bins{1, CRS}
+    idx2pos::Vector{Union{Int64, Nothing}}
 end
 
 function LineBinner(nbins::Int64, boundary::Boundary{1, CRS}; hardclip::Bool = true) where {CRS}
@@ -29,7 +32,7 @@ function LineBinner(nbins::Int64, boundary::Boundary{1, CRS}; hardclip::Bool = t
         end
     end
 
-    return LineBinner(boundary, Bins(bins))
+    return LineBinner(boundary, Bins(bins), Vector{Union{Int64, Nothing}}(1:length(bins)))
 end 
 
 membership(data::Matrix{<:Real}, binner::LineBinner{CRS}) where {CRS} = _membership1d(data, binner.bins)

@@ -21,6 +21,8 @@ function ulam_method(
     ### COMPUTE BINS BASED ON BOUNDARY
     bins = binner.bins.bins
     n_bins = length(bins)
+    n_bins_initial = n_bins
+    pos2idx = collect(1:n_bins)
     
     ### COMPUTE BIN MEMBERSHIP
     x0_idx, xT_idx = membership(traj, binner)
@@ -39,14 +41,16 @@ function ulam_method(
         end # otherwise, transition from nirvana to nirvana and ignore
     end 
 
-    ### REMOVE EMPTY BINS
+    ### REMOVE EMPTY BINS, POS2IDX
     full = [findall(!iszero, vec(sum(Pij[1:n_bins, 1:n_bins], dims = 2))) ; n_bins + 1] # don't check nirvana
     not_full = setdiff(1:n_bins+1, full)
     Pij = Pij[full, full]
     splice!(bins, not_full)
     n_bins = length(bins)
 
-    ### LARGEST STRONGLY CONNECTED COMPONENT 
+    pos2idx = pos2idx[full[1:end-1]] # post2idx[i] gives the original index of what is now the ith bin
+    
+    ### LARGEST STRONGLY CONNECTED COMPONENT, POS2IDX
 
     # create the adjacency matrix of Pij; note that nirvana is excluded since we assume it's always connected
     Padj = [iszero(Pij[i,j]) ? 0 : 1 for i in 1:n_bins, j in 1:n_bins]
@@ -60,6 +64,10 @@ function ulam_method(
     bins_dis = splice!(bins, not_scc)
     n_bins = length(bins)
 
+    pos2idx = pos2idx[scc[1:end-1]]
+    binner.idx2pos .= [findfirst(x -> x == i, pos2idx) for i = 1:n_bins_initial]
+
+    ### VALIDATION
     if any(iszero.(vec(sum(Pij[1:n_bins, 1:n_bins], dims = 2))))
         error("The transition probability matrix contains rows with no counts. This probably means that the trajectories do not create enough communication between bins.")
     end

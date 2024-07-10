@@ -1,5 +1,5 @@
 """
-    ulam_method(traj, boundary, binner; reinj_algo)
+    ulam_method(traj, binner; reinj_algo)
 
 Run the main Ulam's method calculation and return an [`UlamResult`](@ref).
 

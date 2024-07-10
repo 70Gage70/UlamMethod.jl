@@ -40,13 +40,12 @@ using UlamMethod
 
 The core functionality is provided by 
 ```julia
-ulam_method(traj, boundary, binner; reinj_algo)
+ulam_method(traj, binner; reinj_algo)
 ``` 
 where
 
 - `traj`: A `Trajectories` object, holding the short-range trajectory data.
 - `boundary`: A `Boundary` object, holding the geometry that defines the computational boundary.
-- `binner`: A `BinningAlgorithm` that specifies the algorithm used to partition the boundary into bins.
 - `reinj_algo`: A `ReinjectionAlgorithm` that specifies how trajectories pointing from nirvana[^4] to the interior should be reinjected. Default [`DataReinjection`](@ref).
 
 Here are `10000` random trajectories in the domain $[0, 10]^2$
@@ -60,14 +59,14 @@ x0, xT = 10*rand(2, n_data), 10*rand(2, n_data)
 traj = Trajectories(x0, xT)
 ```
 
-We will take our domain to be the rectangular subset $[3, 5] \times [4, 8]$ and generate a covering with 40 rectangles. We then call `ulam_method` to run the main calculation.
+We will take our domain to be the rectangular subset $[3, 5] \times [4, 8]$ and generate a covering with 40 rectangles. This covering is defined inside a `Boundary` object, which can be quickly created in 2D using the syntax `Boundary(xmin, xmax, ymin, ymax)`. We then call `ulam_method` to run the main calculation.
 
 ```julia
 xmin, xmax, ymin, ymax = 3, 5, 4, 8
 boundary = Boundary(xmin, xmax, ymin, ymax)
 binner = RectangleBinner(40)
 
-ulam = ulam_method(traj, boundary, binner)
+ulam = ulam_method(traj, binner)
 ```
 
 - `P_closed(ulam)` gives the full transition probability matrix.

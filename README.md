@@ -64,7 +64,7 @@ We will take our domain to be the rectangular subset $[3, 5] \times [4, 8]$ and 
 ```julia
 xmin, xmax, ymin, ymax = 3, 5, 4, 8
 boundary = Boundary(xmin, xmax, ymin, ymax)
-binner = RectangleBinner(40)
+binner = RectangleBinner(40, boundary)
 
 ulam = ulam_method(traj, binner)
 ```

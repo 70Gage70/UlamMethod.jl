@@ -18,7 +18,7 @@ end
 """
     points(bins)
 
-Return a vector of raw vertices for each bin. Can also be applied to an [`UlamResult`](@ref).
+Return a vector of raw vertices for each bin. Can also be applied to a [`BinningAlgorithm`](@ref).
 """
 function points(bins::Bins{Dim, CRS}) where {Dim, CRS}
     bins = bins.bins

@@ -1,7 +1,9 @@
 """
-    struct Boundary{Dim, CRS}
+    struct Boundary{Dim, M, CRS}
 
 A container type for the computational domain within which Ulam's method is applied.
+
+The boundary has dimension `Dim` embedded in manifold `M` with coordinate reference system `CRS`.
 
 The boundary is partitioned according to an [`BinningAlgorithm`](@ref).
 
@@ -38,11 +40,11 @@ The boundary is a `HyperRectangle` with minimum and maximum vertices `corner_min
 
 where the corners are `NTuple`s, `(x_min, y_min, z_min, ...)`, `(x_max, y_max, z_max, ...)`.
 """
-struct Boundary{Dim, CRS}
-    boundary::Polytope{Dim, Dim, CRS}
+struct Boundary{Dim, M, CRS}
+    boundary::Polytope{Dim, M, CRS}
 
-    function Boundary(; boundary::Polytope{Dim, Dim, CRS}) where {Dim, CRS}
-        return new{Dim, CRS}(boundary)
+    function Boundary(; boundary::Polytope{Dim, M, CRS}) where {Dim, M, CRS}
+        return new{Dim, M, CRS}(boundary)
     end
 end
 
@@ -53,7 +55,7 @@ function Boundary(x_start::Real, x_end::Real)
     return Boundary(boundary = Segment(Meshes.Point(float(x_start)), Meshes.Point(float(x_end))))
 end
 
-function points(boundary::Boundary{1, CRS}) where {CRS}
+function points(boundary::Boundary{1, M, CRS}) where {M, CRS}
     verts = boundary.boundary.vertices
     
     return stack([[coords(v).x.val] for v in verts])
@@ -79,7 +81,7 @@ function Boundary(xmin::Real, xmax::Real, ymin::Real, ymax::Real)
     return Boundary([(xmin, ymin), (xmax, ymin), (xmax, ymax), (xmin, ymax)])
 end
 
-function points(boundary::Boundary{2, CRS}) where {CRS}
+function points(boundary::Boundary{2, M, CRS}) where {M, CRS}
     verts = boundary.boundary.vertices
     
     return stack([[coords(v).x.val, coords(v).y.val] for v in verts])

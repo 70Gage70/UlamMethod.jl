@@ -1,5 +1,5 @@
 """
-    struct RectangleBinner{CRS}
+    struct RectangleBinner{M, CRS}
 
 Bin a two dimensional `Polygon` with a tight covering of rectangles. The rectangles
 are chosen to be as close as possible to squares and so the final number of bins
@@ -16,13 +16,13 @@ may be slightly different than the number requested.
 
 `RectangleBinner(nbins, boundary; hardclip = true)`
 """
-struct RectangleBinner{CRS} <: BinningAlgorithm{2}
-    boundary::Boundary{2, CRS}
-    bins::Bins{2, CRS}
+struct RectangleBinner{M, CRS} <: BinningAlgorithm{2}
+    boundary::Boundary{2, M, CRS}
+    bins::Bins{2, M, CRS}
     idx2pos::Vector{Union{Int64, Nothing}}
 end
 
-function RectangleBinner(nbins::Int64, boundary::Boundary{2, CRS}; hardclip::Bool = true) where {CRS}
+function RectangleBinner(nbins::Int64, boundary::Boundary{2, M, CRS}; hardclip::Bool = true) where {M, CRS}
     bbox = Meshes.boundingbox(boundary.boundary)
     bbox_W = coords(bbox.max).x - coords(bbox.min).x
     bbox_L = coords(bbox.max).y - coords(bbox.min).y
@@ -33,7 +33,7 @@ function RectangleBinner(nbins::Int64, boundary::Boundary{2, CRS}; hardclip::Boo
     n_y = sqrt(bbox_L*nbins/bbox_W) |> x -> round(Int64, x)
     
     grid = CartesianGrid(bbox.min, bbox.max, dims = (n_x, n_y))
-    bins = Polytope{2, 2, CRS}[]
+    bins = Polytope{2, 𝔼{2}, CRS}[]
 
     for bin_ in elements(grid)
         isect = hardclip ? intersect(bin_, boundary.boundary) : intersects(bin_, boundary.boundary) ? bin_ : nothing
@@ -51,5 +51,5 @@ function RectangleBinner(nbins::Int64, boundary::Boundary{2, CRS}; hardclip::Boo
     return RectangleBinner(boundary, Bins(bins), Vector{Union{Int64, Nothing}}(1:length(bins)))
 end 
 
-membership(data::Matrix{<:Real}, binner::RectangleBinner{CRS}) where {CRS} = _membership2d(data, binner.bins)
-membership(traj::Trajectories{2}, binner::RectangleBinner{CRS}) where {CRS} = _membership2d(traj, binner.bins)
+membership(data::Matrix{<:Real}, binner::RectangleBinner{M, CRS}) where {M, CRS} = _membership2d(data, binner.bins)
+membership(traj::Trajectories{2}, binner::RectangleBinner{M, CRS}) where {M, CRS} = _membership2d(traj, binner.bins)

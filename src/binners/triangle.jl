@@ -1,5 +1,5 @@
 """
-    struct TriangleBinner{CRS}
+    struct TriangleBinner{M, CRS}
 
 Bin a two dimensional `Polygon` with a covering of equilateral triangles. 
 
@@ -16,13 +16,13 @@ The final number of bins may be slightly different than the number requested.
 
 `TriangleBinner(nbins, boundary; hardclip = true)`
 """
-struct TriangleBinner{CRS} <: BinningAlgorithm{2}
-    boundary::Boundary{2, CRS}
-    bins::Bins{2, CRS}
+struct TriangleBinner{M, CRS} <: BinningAlgorithm{2}
+    boundary::Boundary{2, M, CRS}
+    bins::Bins{2, M, CRS}
     idx2pos::Vector{Union{Int64, Nothing}}
 end
 
-function TriangleBinner(nbins::Int64, boundary::Boundary{2, CRS}; hardclip::Bool = true) where {CRS}
+function TriangleBinner(nbins::Int64, boundary::Boundary{2, M, CRS}; hardclip::Bool = true) where {M, CRS}
     bbox = Meshes.boundingbox(boundary.boundary)
     xmin, xmax, ymin, ymax = coords(bbox.min).x.val, coords(bbox.max).x.val, coords(bbox.min).y.val, coords(bbox.max).y.val
     W = xmax - xmin
@@ -67,7 +67,7 @@ function TriangleBinner(nbins::Int64, boundary::Boundary{2, CRS}; hardclip::Bool
     near_zero_p(p) = ([coords(p).x.val, coords(p).y.val] .|> x -> (y -> abs(y) < 10^(-15) ? 0.0 : y).(x)) |> z -> Meshes.Point(z...)
     triangles = [Triangle(near_zero_p.(vertices(tri))...) for tri in triangles]
 
-    bins = Polytope{2, 2, CRS}[]
+    bins = Polytope{2, 𝔼{2}, CRS}[]
     for bin_ in triangles
         isect = hardclip ? intersect(bin_, boundary.boundary) : intersects(bin_, boundary.boundary) ? bin_ : nothing
         if isect isa PolyArea
@@ -84,5 +84,5 @@ function TriangleBinner(nbins::Int64, boundary::Boundary{2, CRS}; hardclip::Bool
     return TriangleBinner(boundary, Bins(bins), Vector{Union{Int64, Nothing}}(1:length(bins)))
 end 
 
-membership(data::Matrix{<:Real}, binner::TriangleBinner{CRS}) where {CRS} = _membership2d(data, binner.bins)
-membership(traj::Trajectories{2}, binner::TriangleBinner{CRS}) where {CRS} = _membership2d(traj, binner.bins)
+membership(data::Matrix{<:Real}, binner::TriangleBinner{M, CRS}) where {M, CRS} = _membership2d(data, binner.bins)
+membership(traj::Trajectories{2}, binner::TriangleBinner{M, CRS}) where {M, CRS} = _membership2d(traj, binner.bins)

@@ -1,4 +1,4 @@
-function _membership1d(data::Matrix{<:Real}, bins::Bins{1, CRS}) where {CRS}
+function _membership1d(data::Matrix{<:Real}, bins::Bins{1, M, CRS}) where {M, CRS}
     @argcheck size(data, 1) == 1 
     bins = bins.bins
     memb = Union{Nothing, Int64}[]
@@ -18,6 +18,6 @@ function _membership1d(data::Matrix{<:Real}, bins::Bins{1, CRS}) where {CRS}
     return memb
 end
 
-function _membership1d(traj::Trajectories{1}, bins::Bins{1, CRS}) where {CRS}  
+function _membership1d(traj::Trajectories{1}, bins::Bins{1, M, CRS}) where {M, CRS}  
     return (_membership1d(traj.x0, bins), _membership1d(traj.xT, bins))
 end

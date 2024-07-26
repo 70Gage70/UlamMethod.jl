@@ -1,18 +1,18 @@
 """
-    struct Bins{Dim, CRS}
+    struct Bins{Dim, M, CRS}
 
-A container type for bins.
+A container type for bins of dimension `Dim` embedded in manifold `M` with coordinate reference system `CRS`.
 
 ### Fields
 
-- `bins`: A vector of `Polytope` objects of dimension `Dim` and coordinate reference system `CRS`.
+- `bins`: A vector of `Polytope{Dim, M, CRS}` objects.
 
 ### Methods
 
 Use `points(bins)` to return a vector of raw vertices for each bin.
 """
-struct Bins{Dim, CRS}
-    bins::Vector{<:Polytope{Dim, Dim, CRS}}
+struct Bins{Dim, M, CRS}
+    bins::Vector{<:Polytope{Dim, M, CRS}}
 end
 
 """
@@ -20,7 +20,7 @@ end
 
 Return a vector of raw vertices for each bin. Can also be applied to a [`BinningAlgorithm`](@ref).
 """
-function points(bins::Bins{Dim, CRS}) where {Dim, CRS}
+function points(bins::Bins{Dim, M, CRS}) where {Dim, M, CRS}
     bins = bins.bins
 
     if Dim == 1

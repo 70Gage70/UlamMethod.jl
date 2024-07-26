@@ -1,4 +1,4 @@
-function _membership2d(data::Matrix{<:Real}, bins::Bins{2, CRS}) where {CRS}
+function _membership2d(data::Matrix{<:Real}, bins::Bins{2, M, CRS}) where {M, CRS}
     @argcheck size(data, 1) == 2
 
     nodes = []
@@ -33,7 +33,7 @@ function _membership2d(data::Matrix{<:Real}, bins::Bins{2, CRS}) where {CRS}
     return membs
 end
 
-function _membership2d(traj::Trajectories{2}, bins::Bins{2, CRS}) where {CRS}    
+function _membership2d(traj::Trajectories{2}, bins::Bins{2, M, CRS}) where {M, CRS}    
     n_points = size(traj.x0, 2)
     membs = _membership2d(hcat(traj.x0, traj.xT), bins)
     return (membs[1:n_points], membs[n_points+1:end])

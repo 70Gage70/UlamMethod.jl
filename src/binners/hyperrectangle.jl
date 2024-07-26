@@ -1,5 +1,5 @@
 """
-    struct HyperRectangle{K, Dim, CRS}
+    struct HyperRectangle{Dim, M, CRS}
 
 An extention of `Meshes` to dimensions greater than 3.
 
@@ -15,19 +15,19 @@ The extension is minimal and implements no methods and does not interface with C
 
 `HyperRectangle(min, max)`
 """
-struct HyperRectangle{K, Dim, CRS} <: Polytope{K, Dim, CRS}
+struct HyperRectangle{Dim, M, CRS} <: Polytope{Dim, M, CRS}
     min::NTuple{Dim, Float64}
     max::NTuple{Dim, Float64}
     vertices::Vector{NTuple{Dim, Float64}}
 
     function HyperRectangle(min::NTuple{Dim, Real}, max::NTuple{Dim, Real}) where {Dim}
-        t = typeof(Box(tuple(zeros(Dim)...), tuple(zeros(Dim)...))).parameters[2]
-        return new{Dim, Dim, t}(min, max, [min, max])
+        b = Box(tuple(zeros(Dim)...), tuple(zeros(Dim)...)) |> typeof
+        return new{Dim, b.parameters[1], b.parameters[2]}(min, max, [min, max])
     end
 end
 
 """
-    struct HyperRectangleBinner{Dim, CRS}
+    struct HyperRectangleBinner{Dim, M, CRS}
 
 Bin `Dim`-dimensional (where `Dim ≥ 3`) dataset based on a tight covering of identical HyperRectangles.
 
@@ -50,14 +50,14 @@ The final number of bins may be different (larger) than the number requested.
 
 `HyperRectangleBinner(nbins, boundary)`
 """
-struct HyperRectangleBinner{Dim, CRS, R<:AbstractRange} <: BinningAlgorithm{Dim}
-    boundary::Boundary{Dim, CRS}
-    bins::Bins{Dim, CRS}
+struct HyperRectangleBinner{Dim, M, CRS, R<:AbstractRange} <: BinningAlgorithm{Dim}
+    boundary::Boundary{Dim, M, CRS}
+    bins::Bins{Dim, M, CRS}
     idx2pos::Vector{Union{Int64, Nothing}}
     ranges::Vector{R}
 end
 
-function HyperRectangleBinner(nbins::Int64, boundary::Boundary{Dim, CRS}) where {Dim, CRS}
+function HyperRectangleBinner(nbins::Int64, boundary::Boundary{Dim, M, CRS}) where {Dim, M, CRS}
     @argcheck Dim >= 3 "In dimensions 1 and 2, LineBinner and RectangleBinner are preferred (respectively)."
 
     x_min = boundary.boundary.min
@@ -72,7 +72,7 @@ function HyperRectangleBinner(nbins::Int64, boundary::Boundary{Dim, CRS}) where 
     verts = Iterators.product(ranges...) |> collect
     idx = Iterators.product(axes(verts)...) |> collect
 
-    bins = Polytope{Dim, Dim, CRS}[]
+    bins = Polytope{Dim, 𝔼{Dim}, CRS}[]
 
     for i in idx
         if all((i .+ 1) .<= length.(ranges))
@@ -87,7 +87,7 @@ function HyperRectangleBinner(nbins::Int64, boundary::Boundary{Dim, CRS}) where 
 end
 
 
-function membership(data::Matrix{<:Real}, binner::HyperRectangleBinner{Dim, CRS, R}) where {Dim, CRS, R}
+function membership(data::Matrix{<:Real}, binner::HyperRectangleBinner{Dim, M, CRS, R}) where {Dim, M, CRS, R}
     @argcheck size(data, 1) == Dim
 
     ranges = binner.ranges
@@ -120,6 +120,6 @@ function membership(data::Matrix{<:Real}, binner::HyperRectangleBinner{Dim, CRS,
     return [isnothing(m) ? nothing : binner.idx2pos[m] for m in membs]
 end
 
-function membership(traj::Trajectories{Dim}, binner::HyperRectangleBinner{Dim, CRS, R}) where {Dim, CRS, R}    
+function membership(traj::Trajectories{Dim}, binner::HyperRectangleBinner{Dim, M, CRS, R}) where {Dim, M, CRS, R}    
     return (membership(traj.x0, binner), membership(traj.xT, binner))
 end

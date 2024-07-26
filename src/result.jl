@@ -1,5 +1,5 @@
 """
-    struct UlamResult{Dim, CRS}
+    struct UlamResult{Dim, M, CRS}
 
 A container for the result of the main Ulam's method calculation. 
 
@@ -26,12 +26,12 @@ Use `P_open(UlamResult)` to access `P_O2O` and `P_closed(UlamResult)` to access 
 
 Use `bins(UlamResult)` and `bins_dis(UlamResult)` to access `bins` and `bins_dis`, respectively.
 """
-struct UlamResult{Dim, CRS}
+struct UlamResult{Dim, M, CRS}
     P_O2O::Matrix{Float64}
     P_O2ω::Vector{Float64}
     P_ω2O::Vector{Float64}
     binner::BinningAlgorithm{Dim}
-    bins_dis::Bins{Dim, CRS}
+    bins_dis::Bins{Dim, M, CRS}
 end
 
 """
@@ -68,7 +68,7 @@ bins_dis(ur::UlamResult) = ur.bins_dis
 Takes a `Dim x N_points` matrix of points and returns a vector `memb` where `memb[i] = j` if `data[:,i]` is 
 inside `ulam_result.binner.bins[j]` and `memb[i] = nothing` if `data[:,i]` is not inside any bin.
 """
-function membership(data::Matrix{<:Real}, ur::UlamResult{Dim, CRS}) where {Dim, CRS}
+function membership(data::Matrix{<:Real}, ur::UlamResult{Dim, M, CRS}) where {Dim, M, CRS}
     @argcheck size(data, 1) == Dim
     return membership(data, ur.binner)
 end

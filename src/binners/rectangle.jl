@@ -14,7 +14,7 @@ may be slightly different than the number requested.
 
 ### Constructor 
 
-`RectangleBinner(nbins, boundary; hardclip = true)`
+    RectangleBinner(nbins, boundary; hardclip = true)
 """
 struct RectangleBinner{M, CRS} <: BinningAlgorithm{2}
     boundary::Boundary{2, M, CRS}

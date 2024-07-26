@@ -8,23 +8,35 @@ bins and the bins that were disconnected.
 
 The transition probability matrix is of the form
 
-| P_O2O | P_O2ω | 
+| `P_O2O` | `P_O2ω` | 
 
-| P_ω2O |  0  |
+| `P_ω2O` |  `0`  |
 
 ### Fields 
 
 `P_O2O`: As in diagram.
 `P_O2ω`: As in diagram.
 `P_ω2O`: As in diagram.
-`binner`: The [`BinningAlgorithm`] used to bin the data.
+`binner`: The [`BinningAlgorithm`](@ref) used to bin the data.
 `bins_dis`: The bins that contained data but were removed when the largest strongly connected component was taken.
 
 ### Methods
 
-Use `P_open(UlamResult)` to access `P_O2O` and `P_closed(UlamResult)` to access the full matrix.
+    P_closed(UlamResult)
 
-Use `bins(UlamResult)` and `bins_dis(UlamResult)` to access `bins` and `bins_dis`, respectively.
+Access the full matrix.
+
+    P_open(UlamResult)
+    
+Access `P_O2O`.
+
+    bins(UlamResult)
+    
+Access `bins`.
+
+    bins_dis(UlamResult)
+
+Access `bins_dis`.
 """
 struct UlamResult{Dim, M, CRS}
     P_O2O::Matrix{Float64}

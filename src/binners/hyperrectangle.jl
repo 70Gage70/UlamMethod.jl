@@ -13,7 +13,7 @@ The extension is minimal and implements no methods and does not interface with C
 
 ### Constructor
 
-`HyperRectangle(min, max)`
+    HyperRectangle(min, max)
 """
 struct HyperRectangle{Dim, M, CRS} <: Polytope{Dim, M, CRS}
     min::NTuple{Dim, Float64}
@@ -48,7 +48,7 @@ The final number of bins may be different (larger) than the number requested.
 
 ### Constructor
 
-`HyperRectangleBinner(nbins, boundary)`
+    HyperRectangleBinner(nbins, boundary)
 """
 struct HyperRectangleBinner{Dim, M, CRS, R<:AbstractRange} <: BinningAlgorithm{Dim}
     boundary::Boundary{Dim, M, CRS}

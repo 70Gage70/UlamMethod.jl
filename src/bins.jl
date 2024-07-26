@@ -9,7 +9,9 @@ A container type for bins of dimension `Dim` embedded in manifold `M` with coord
 
 ### Methods
 
-Use `points(bins)` to return a vector of raw vertices for each bin.
+    points(bins)
+    
+Return a vector of raw vertices for each bin.
 """
 struct Bins{Dim, M, CRS}
     bins::Vector{<:Polytope{Dim, M, CRS}}
@@ -55,7 +57,9 @@ will be given by `(membership(traj.x0, binner), membership(traj.xT, binner))`.
 
 ### Methods
 
-Use `points(binner)` to return a vector of raw vertices for each bin.
+    points(binner)
+    
+Return a vector of raw vertices for each bin.
 """
 abstract type BinningAlgorithm{Dim} end
 

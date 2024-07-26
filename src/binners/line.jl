@@ -12,7 +12,7 @@ Bin a one dimensional `Segment` (line segement) with `nbins` equally-spaced bins
 
 ### Constructor 
 
-`LineBinner(nbins, boundary; hardclip = true)`
+    LineBinner(nbins, boundary; hardclip = true)
 """
 struct LineBinner{M, CRS} <: BinningAlgorithm{1}
     boundary::Boundary{1, M, CRS}

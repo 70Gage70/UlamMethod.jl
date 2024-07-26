@@ -11,33 +11,34 @@ The boundary is partitioned according to an [`BinningAlgorithm`](@ref).
 
 - `boundary`: A `Polytope` defining the boundary.
 
-### 1D
+### Methods
 
-The boundary is a continuous line segment `Segment` between `x_start` and `x_end`. Use
+    points(boundary)
 
-`Boundary(x_start, x_end)`
+Calculate a `Dim x N` matrix of boundary vertices.
 
-Use `points(boundary)` to calculate a `Dim x N` matrix of boundary vertices.
+### 1D Constructors
 
-### 2D 
+    Boundary(x_start, x_end)
+
+The boundary is a continuous line segment `Segment` between `x_start` and `x_end`.
+
+### 2D Constructors
+
+    Boundary(verts)
 
 The boundary is a closed polygon `Ngon` with vertices `verts`, which should be be a
-vector of `(x, y)` coordinates or a `2 x N` matrix. Use
+vector of `(x, y)` coordinates or a `2 x N` matrix.
 
-`Boundary(verts)`
+    Boundary(xmin, xmax, ymin, ymax)
 
-A convenience constructor is also provided for the case of a rectangular boundary. Use
+A convenience constructor is also provided for the case of a rectangular boundary.
 
-`Boundary(xmin, xmax, ymin, ymax)`
+### ≥3D Constructors
 
-Use `points(boundary)` to calculate a `Dim x N` matrix of boundary vertices.
+    Boundary(corner_min, corner_max)
 
-### ≥3D
-
-The boundary is a `HyperRectangle` with minimum and maximum vertices `corner_min`, `corner_max`. Use
-
-`Boundary(corner_min, corner_max)`
-
+The boundary is a `HyperRectangle` with minimum and maximum vertices `corner_min`, `corner_max`
 where the corners are `NTuple`s, `(x_min, y_min, z_min, ...)`, `(x_max, y_max, z_max, ...)`.
 """
 struct Boundary{Dim, M, CRS}
@@ -93,3 +94,9 @@ function Boundary(corner_min::NTuple{N, Real}, corner_max::NTuple{N, Real}) wher
     @argcheck N ≥ 3 "Prefer to not use a HyperRectangle in 1 or 2 dimensions"
     return Boundary(boundary = HyperRectangle(corner_min, corner_max))
 end
+
+### GENERAL
+
+# autoboundary
+## start with bounding box of data
+## iteratively shrink (bisect ?) until a certain fraction of data is in nirvana

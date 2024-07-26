@@ -21,7 +21,7 @@ for `DataReinjection` does nothing.
 
 ### Constructor
 
-`DataReinjection()`
+    DataReinjection()
 """
 struct DataReinjection <: ReinjectionAlgorithm
 end
@@ -43,7 +43,7 @@ reinjected uniformly across all bins that contain at least one member of `points
 
 ### Constructor
 
-`SourceReinjection(points; fallback = DataReinjection())`
+    SourceReinjection(points; fallback = DataReinjection())
 """
 struct SourceReinjection{Dim} <: ReinjectionAlgorithm
     points::Vector{NTuple{Dim, Float64}}

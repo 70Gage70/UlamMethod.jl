@@ -14,7 +14,7 @@ The final number of bins may be slightly different than the number requested.
 
 ### Constructor 
 
-`HexagonBinner(nbins, boundary; hardclip = true)`
+    HexagonBinner(nbins, boundary; hardclip = true)
 """
 struct HexagonBinner{M, CRS} <: BinningAlgorithm{2}
     boundary::Boundary{2, M, CRS}

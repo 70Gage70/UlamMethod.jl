@@ -14,7 +14,7 @@ The final number of bins may be slightly different than the number requested.
 
 ### Constructor 
 
-`TriangleBinner(nbins, boundary; hardclip = true)`
+    TriangleBinner(nbins, boundary; hardclip = true)
 """
 struct TriangleBinner{M, CRS} <: BinningAlgorithm{2}
     boundary::Boundary{2, M, CRS}

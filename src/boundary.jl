@@ -40,6 +40,19 @@ A convenience constructor is also provided for the case of a rectangular boundar
 
 The boundary is a `HyperRectangle` with minimum and maximum vertices `corner_min`, `corner_max`
 where the corners are `NTuple`s, `(x_min, y_min, z_min, ...)`, `(x_max, y_max, z_max, ...)`.
+
+### Automatric Boundary Construction
+
+    AutoBoundary(traj; nirvana = 0.10)
+
+Construct a rectangular boundary in arbitrary dimensions based on the [`Trajectories`](@ref) in `traj`.
+
+The boundary is placed such that a fraction `nirvana` of the data is in nirvana. For example, with the default 
+value of `0.10`, roughly `10%` of all of the datapoints (split between `x0` and `xT`) will be outside the boundary with 
+a roughly equal amount on each side.
+
+The shape of the boundary can be further controlled by providing `nirvana` as a vector of tuples of the form `(min, max)` such 
+that a fraction `min` (respectively `max`) will be "below" (respectively "above") the boundary along each dimension. 
 """
 struct Boundary{Dim, M, CRS}
     boundary::Polytope{Dim, M, CRS}
@@ -95,8 +108,36 @@ function Boundary(corner_min::NTuple{N, Real}, corner_max::NTuple{N, Real}) wher
     return Boundary(boundary = HyperRectangle(corner_min, corner_max))
 end
 
-### GENERAL
+### AutoBoundary
+function AutoBoundary(
+    traj::Trajectories{Dim}; 
+    nirvana::Union{Real, Vector{<:Tuple{Real, Real}}} = 0.10) where {Dim}
 
-# autoboundary
-## start with bounding box of data
-## iteratively shrink (bisect ?) until a certain fraction of data is in nirvana
+    if nirvana isa Real
+        @argcheck 0 <= nirvana < 1
+        nirvana = [(nirvana/(2*Dim), nirvana/(2*Dim)) for _ = 1:Dim]
+    else
+        @argcheck length(nirvana) == Dim
+        facs = nirvana |> Iterators.flatten |> collect
+        @argcheck all(0 .<= facs .<= 1)
+        @argcheck sum(facs) <= 1
+    end
+
+    data = [traj.x0 ;; traj.xT]
+    n_points = [size(data, 2) .* fac .|> x -> ceil(Int64, x) for fac in nirvana]
+    
+    sort_perms = [sortperm(data[d,:]) for d = 1:Dim]
+    bounds = [(
+        data[d, sort_perms[d][n_points[d][1]]], 
+        data[d, sort_perms[d][end-n_points[d][2]]]) for d = 1:Dim]
+
+    if Dim == 1
+        return Boundary(bounds[1][1], bounds[1][2])
+    elseif Dim == 2
+        return Boundary(bounds[1][1], bounds[1][2], bounds[2][1], bounds[2][2])
+    else
+        corner_min = [bounds[i][1] for i = 1:Dim] |> Tuple
+        corner_max = [bounds[i][2] for i = 1:Dim] |> Tuple
+        return Boundary(corner_min, corner_max)
+    end
+end

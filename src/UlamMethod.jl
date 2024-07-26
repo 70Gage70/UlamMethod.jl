@@ -12,7 +12,7 @@ include("traj.jl")
 export Trajectories
 
 include("boundary.jl")
-export Boundary, points
+export Boundary, points, AutoBoundary
 
 include("bins.jl")
 export Bins, BinningAlgorithm

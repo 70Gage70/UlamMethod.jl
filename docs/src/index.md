@@ -18,6 +18,7 @@ defined in a subset of $\mathbb{R}^N$, the essential goal of Ulam's method is to
 ## Features
 - Built on the [Meshes.jl](https://github.com/JuliaGeometry/Meshes.jl) computational geometry framework.
 - Supports trajectory data in arbitrary dimensions.
+- Supports automatic boundary construction.
 - Multiple 2D algorithms for partitioning to triangles, rectangles, hexagons and adaptively sized [Voronoi cells](https://en.wikipedia.org/wiki/Voronoi_diagram).
 - Multiple stochasticization algorithms.
 

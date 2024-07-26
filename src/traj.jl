@@ -18,7 +18,7 @@ Construct `Trajectories` directly from data.
 
 Construct `n_traj` random `Trajectories` of dimension `dim` for testing. 
 
-The trajectories will lie inside the box defined by `corners = ((xmin, ymin, zmin, ...), (xmax, ymax, zmax, ...))` which 
+The `x0` will lie inside the box defined by `corners = ((xmin, ymin, zmin, ...), (xmax, ymax, zmax, ...))` which 
 defaults to the unit box when not provided.
 
 The `xT` are displaced from the `x0` by normal distributions along each dimension with means and variances defined by 
@@ -57,7 +57,7 @@ function Trajectories(
     box_min, box_max = corners
     @argcheck all(box_max .> box_min)
 
-    x0 = [box_min[i] + (box_max[i] - box_min[i])*rand() for i = 1:dim, _ = 1:n_traj]
+    x0 = stack([rand(Distributions.Uniform(box_min[i], box_max[i]), n_traj) for i = 1:dim], dims = 1)
     xT = x0 + stack([rand(Distributions.Normal(mu_sigma[i]...), n_traj) for i = 1:dim], dims = 1)
 
     return Trajectories(x0, xT)

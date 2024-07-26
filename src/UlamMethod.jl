@@ -5,6 +5,7 @@ using ArgCheck
 using PolygonInbounds
 using Graphs: SimpleDiGraph, strongly_connected_components
 using ParallelKMeans
+import Distributions
 using PrecompileTools: @compile_workload 
 
 include("traj.jl")
@@ -58,19 +59,17 @@ include("earth-polygons.jl") # EarthPolygons module
     Random.seed!(1234)
 
     ### 1d
-    boundary1d = Boundary(0, 1)
-    traj1d = Trajectories(rand(1, 10), rand(1, 10))
+    traj1d = Trajectories(1, 1000)
 
+    boundary1d = Boundary(0, 1)
+    
     ur = ulam_method(traj1d, LineBinner(10, boundary1d))
 
     ### 2d
-    n_points = 1000
-    x0_rand = randn(2, n_points) + [fill(1, n_points) ;; fill(4, n_points)]'
-    xT_rand = x0_rand + randn(2, n_points)
-    traj2d = Trajectories(x0_rand, xT_rand)
+    traj2d = Trajectories(2, 1000)
 
-    boundary2d = Boundary(0, 6, 0, 4)
     boundary2d = Boundary([(0,0),(6,0),(1,7),(1,6)])
+    boundary2d = Boundary(0, 6, 0, 4)
 
     ur = ulam_method(traj2d, RectangleBinner(10, boundary2d))
     ur = ulam_method(traj2d, RectangleBinner(10, boundary2d, hardclip = false))
@@ -81,17 +80,15 @@ include("earth-polygons.jl") # EarthPolygons module
     ur = ulam_method(traj2d, TriangleBinner(10, boundary2d), reinj_algo = SourceReinjection([(1, 3)]))
     ur = ulam_method(traj2d, HexagonBinner(10, boundary2d))
     ur = ulam_method(traj2d, HexagonBinner(10, boundary2d), reinj_algo = SourceReinjection([(1, 3)]))
+    ur = ulam_method(traj2d, VoronoiBinner(100, boundary2d, traj2d), reinj_algo = SourceReinjection([(1, 3)]))
 
     ### ≥3D
-    n_points = 1000
-    x0_rand = randn(3, n_points) + [fill(1, n_points) ;; fill(1, n_points) ;; fill(4, n_points)]'
-    xT_rand = x0_rand + randn(3, n_points)
-    traj3d = Trajectories(x0_rand, xT_rand)
-    
+    traj3d = Trajectories(3, 100000)
+
     boundary3d = Boundary((0,0,0), (5, 5, 5))
-    
-    ur = ulam_method(traj3d, HyperRectangleBinner(100, boundary3d))
-    ur = ulam_method(traj3d, HyperRectangleBinner(100, boundary3d), reinj_algo = SourceReinjection([(1, 2, 3)]))
+
+    ur = ulam_method(traj3d, HyperRectangleBinner(1000, boundary3d))
+    ur = ulam_method(traj3d, HyperRectangleBinner(1000, boundary3d), reinj_algo = SourceReinjection([(1, 2, 3)])) 
 end
 
 end # module

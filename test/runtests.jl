@@ -4,17 +4,15 @@ import Random
 Random.seed!(1234)
 
 @testset "1D" begin
+    traj1d = Trajectories(1, 1000)
+
     boundary1d = Boundary(0, 1)
-    traj1d = Trajectories(rand(1, 10), rand(1, 10))
+    
     ur = ulam_method(traj1d, LineBinner(10, boundary1d))
 end
 
-
 @testset "2D" begin
-    n_points = 1_000
-    x0_rand = randn(2, n_points) + [fill(1, n_points) ;; fill(4, n_points)]'
-    xT_rand = x0_rand + randn(2, n_points)
-    traj2d = Trajectories(x0_rand, xT_rand)
+    traj2d = Trajectories(2, 1000)
 
     boundary2d = Boundary([(0,0),(6,0),(1,7),(1,6)])
     boundary2d = Boundary(0, 6, 0, 4)
@@ -32,10 +30,7 @@ end
 end
 
 @testset "3D" begin
-    n_points = 100000
-    x0_rand = randn(3, n_points) + [fill(1, n_points) ;; fill(1, n_points) ;; fill(4, n_points)]'
-    xT_rand = x0_rand + randn(3, n_points)
-    traj3d = Trajectories(x0_rand, xT_rand)
+    traj3d = Trajectories(3, 100000)
 
     boundary3d = Boundary((0,0,0), (5, 5, 5))
 

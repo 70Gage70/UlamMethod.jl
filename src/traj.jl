@@ -14,10 +14,15 @@ A container for trajectory data of dimension `Dim`.
 
 Construct `Trajectories` directly from data.
 
-    Trajectories(dim, n_traj; corners = nothing)
+    Trajectories(dim, n_traj; corners = nothing, mu_sigma = nothing)
 
-Construct `n_traj` random `Trajectories` of dimension `dim` for testing. The trajectories will lie inside the box defined 
-by `corners = ((xmin, ymin, zmin, ...), (xmax, ymax, zmax, ...))` which defaults to the unit box when not provided.
+Construct `n_traj` random `Trajectories` of dimension `dim` for testing. 
+
+The trajectories will lie inside the box defined by `corners = ((xmin, ymin, zmin, ...), (xmax, ymax, zmax, ...))` which 
+defaults to the unit box when not provided.
+
+The `xT` are displaced from the `x0` by normal distributions along each dimension with means and variances defined by 
+`mu_sigma = [(mu1, sigma1), (mu2, sigma2), ...]`. If not provided, default to `mu = 1.0`, `sigma = 1.0`
 """
 struct Trajectories{Dim}
     x0::Matrix{Float64}
@@ -34,7 +39,8 @@ end
 function Trajectories(
     dim::Integer, 
     n_traj::Integer; 
-    corners::Union{Tuple{NTuple{N, Real}, NTuple{N, Real}}, Nothing} = nothing) where {N}
+    corners::Union{Tuple{NTuple{N, Real}, NTuple{N, Real}}, Nothing} = nothing,
+    mu_sigma::Union{Vector{<:Tuple{Real, Real}}, Nothing} = nothing) where {N}
 
     if corners === nothing
         corners = (zeros(dim), ones(dim))
@@ -42,11 +48,17 @@ function Trajectories(
         @argcheck dim == N
     end
 
+    if mu_sigma === nothing
+        mu_sigma = [(1.0, 1.0) for _ = 1:dim]
+    else
+        @argcheck dim == length(mu_sigma)
+    end
+
     box_min, box_max = corners
     @argcheck all(box_max .> box_min)
 
     x0 = [box_min[i] + (box_max[i] - box_min[i])*rand() for i = 1:dim, _ = 1:n_traj]
-    xT = [box_min[i] + (box_max[i] - box_min[i])*rand() for i = 1:dim, _ = 1:n_traj]
+    xT = x0 + stack([rand(Distributions.Normal(mu_sigma[i]...), n_traj) for i = 1:dim], dims = 1)
 
     return Trajectories(x0, xT)
 end

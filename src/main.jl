@@ -18,7 +18,7 @@ function ulam_method(
     binner::BinningAlgorithm{Dim};
     reinj_algo::ReinjectionAlgorithm = DataReinjection()) where {Dim}
 
-    ### COMPUTE BINS BASED ON BOUNDARY
+    ### BIN SETUP
     bins = binner.bins.bins
     n_bins = length(bins)
     n_bins_initial = n_bins
@@ -65,10 +65,24 @@ function ulam_method(
     n_bins = length(bins)
 
     pos2idx = pos2idx[scc[1:end-1]]
+
+    ### IDX2POS
     binner.idx2pos .= [findfirst(x -> x == i, pos2idx) for i = 1:n_bins_initial]
 
     ### VALIDATION
+    if n_bins == 1
+        @info Padj
+        @info n_bins
+        @info Pij
+        @info scc
+        error("The largest strongly connected component only has one state. This happens when bins have no communication, either beacuse they are too big or the trajectories do not create enough communication.")
+    end
+
     if any(iszero.(vec(sum(Pij[1:n_bins, 1:n_bins], dims = 2))))
+        @info Padj
+        @info n_bins
+        @info Pij
+        @info scc
         error("The transition probability matrix contains rows with no counts. This probably means that the trajectories do not create enough communication between bins.")
     end
 

@@ -103,7 +103,9 @@ function membership(data::Matrix{<:Real}, binner::HyperRectangleBinner{Dim, M, C
                 in_nirv = true
                 continue
             else
-                dim_idx[j] = ceil(Int64, (pt[j] - first(ranges[j]))/step(ranges[j]))
+                # clamp ensures that points exactly on the edge of ranges are handled properly
+                # upper clamp is length(ranges[j]) - 1 because N gridpoints define N - 1 bins
+                dim_idx[j] = ceil(Int64, (pt[j] - first(ranges[j]))/step(ranges[j])) |> x -> clamp(x, 1, length(ranges[j]) - 1)
             end
         end
 

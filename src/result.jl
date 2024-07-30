@@ -12,13 +12,16 @@ The transition probability matrix is of the form
 
 | `P_ω2O` |  `0`  |
 
+Where `O` represents the "open" (interior) region and `ω` reprsents the "nirvana" (exterior) region.
+The union of `O` and `ω` form a closed region.
+
 ### Fields 
 
-`P_O2O`: As in diagram.
-`P_O2ω`: As in diagram.
-`P_ω2O`: As in diagram.
-`binner`: The [`BinningAlgorithm`](@ref) used to bin the data.
-`bins_dis`: The bins that contained data but were removed when the largest strongly connected component was taken.
+- `P_O2O`: As in diagram.
+- `P_O2ω`: As in diagram.
+- `P_ω2O`: As in diagram.
+- `binner`: The [`BinningAlgorithm`](@ref) used to bin the data.
+- `bins_dis`: The bins that contained data but were removed when the largest strongly connected component was taken.
 
 ### Methods
 
@@ -37,6 +40,10 @@ Access `bins`.
     bins_dis(UlamResult)
 
 Access `bins_dis`.
+
+    membership(data, ulam_result)
+
+Compute `membership(data, ulam_result.binner)`.
 """
 struct UlamResult{Dim, M, CRS}
     P_O2O::Matrix{Float64}
@@ -86,7 +93,7 @@ Compute `(membership(traj.x0, binner), membership(traj.xT, binner))`.
 
     membership(data, ulam_result)
 
-Compute `membership(data, ur.binner)`.
+Compute `membership(data, ulam_result.binner)`.
 """
 function membership(data::Matrix{<:Real}, ur::UlamResult{Dim, M, CRS}) where {Dim, M, CRS}
     @argcheck size(data, 1) == Dim

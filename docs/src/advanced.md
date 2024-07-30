@@ -10,7 +10,7 @@ Depth = 5
 Use of this package proceeds as follows.
 
 1. Create `Trajectories` using your trajectory data
-2. Select the computational domain (`Boundary`). Data inside the boundary are considered "interior" and data outside the boundary are considered "exterior" or "in nirvana"[^1] [^2]. Use the `AutoBoundary` function to attempt to select a reasonable boundary automatically.
+2. Select the computational domain (`Boundary`). Data inside the boundary are considered "interior" and data outside the boundary are considered "exterior" or "in nirvana"[^1] [^2]. Use the `AutoBoundary` function to attempt to select a reasonable boundary automatically. In 2D, the `AutoBoundary2D` function is also available, which may find a tighter boundary than `AutoBoundary`.
 3. Select a `BinningAlgorithm` and set any parameters it has.
 4. Optionally, select a `ReinjectionAlgorithm` to handle the behavior of trajectories points from nirvana to the interior.
 5. Run `ulam_method(traj, binner; reinj_algo)`.

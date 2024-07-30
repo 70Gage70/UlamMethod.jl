@@ -39,26 +39,23 @@ end
 function Trajectories(
     dim::Integer, 
     n_traj::Integer; 
-    corners::Union{Tuple{NTuple{N, Real}, NTuple{N, Real}}, Nothing} = nothing,
-    mu_sigma::Union{Vector{<:Tuple{Real, Real}}, Nothing} = nothing) where {N}
+    mu_sigma0::Union{Vector{<:Tuple{Real, Real}}, Nothing} = nothing,
+    mu_sigmaT::Union{Vector{<:Tuple{Real, Real}}, Nothing} = nothing)
 
-    if corners === nothing
-        corners = (zeros(dim), ones(dim))
+    if mu_sigma0 === nothing
+        mu_sigma0 = [(0.0, 1.0) for _ = 1:dim]
     else
-        @argcheck dim == N
+        @argcheck dim == length(mu_sigma0)
     end
 
-    if mu_sigma === nothing
-        mu_sigma = [(1.0, 1.0) for _ = 1:dim]
+    if mu_sigmaT === nothing
+        mu_sigmaT = [(0.0, 1.0) for _ = 1:dim]
     else
-        @argcheck dim == length(mu_sigma)
+        @argcheck dim == length(mu_sigmaT)
     end
 
-    box_min, box_max = corners
-    @argcheck all(box_max .> box_min)
-
-    x0 = stack([rand(Distributions.Uniform(box_min[i], box_max[i]), n_traj) for i = 1:dim], dims = 1)
-    xT = x0 + stack([rand(Distributions.Normal(mu_sigma[i]...), n_traj) for i = 1:dim], dims = 1)
+    x0 = stack([rand(Distributions.Normal(mu_sigma0[i]...), n_traj) for i = 1:dim], dims = 1)
+    xT = x0 + stack([rand(Distributions.Normal(mu_sigmaT[i]...), n_traj) for i = 1:dim], dims = 1)
 
     return Trajectories(x0, xT)
 end

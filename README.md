@@ -46,7 +46,7 @@ ulam_method(traj, binner; reinj_algo)
 where
 
 - `traj`: A `Trajectories` object, holding the short-range trajectory data.
-- `boundary`: A `Boundary` object, holding the geometry that defines the computational boundary.
+- `binner`: A `BinningAlgorithm` which contains both a `Boundary` object that specifies the boundary of the computational domain as well as the algorithm used to partition it into bins.
 - `reinj_algo`: A `ReinjectionAlgorithm` that specifies how trajectories pointing from nirvana[^4] to the interior should be reinjected. Default [`DataReinjection`](@ref).
 
 Here are `10000` random trajectories in the domain $[0, 10]^2$

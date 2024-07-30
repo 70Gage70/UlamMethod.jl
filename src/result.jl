@@ -75,10 +75,18 @@ Return the bins that contained data but were removed when the largest strongly c
 bins_dis(ur::UlamResult) = ur.bins_dis
 
 """
-    membership(data, ulam_result)
+    membership(data, binner)
 
 Takes a `Dim x N_points` matrix of points and returns a vector `memb` where `memb[i] = j` if `data[:,i]` is 
-inside `ulam_result.binner.bins[j]` and `memb[i] = nothing` if `data[:,i]` is not inside any bin.
+inside `binner.bins[j]` and `memb[i] = nothing` if `data[:,i]` is not inside any bin.
+
+    membership(traj, binner)
+
+Compute `(membership(traj.x0, binner), membership(traj.xT, binner))`.
+
+    membership(data, ulam_result)
+
+Compute `membership(data, ur.binner)`.
 """
 function membership(data::Matrix{<:Real}, ur::UlamResult{Dim, M, CRS}) where {Dim, M, CRS}
     @argcheck size(data, 1) == Dim

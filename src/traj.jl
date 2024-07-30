@@ -62,3 +62,5 @@ function Trajectories(
 
     return Trajectories(x0, xT)
 end
+
+Base.length(traj::Trajectories) = size(traj.x0, 2)

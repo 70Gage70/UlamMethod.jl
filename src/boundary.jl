@@ -51,8 +51,15 @@ The boundary is placed such that a fraction `nirvana` of the data is in nirvana.
 value of `0.10`, roughly `10%` of all of the datapoints (split between `x0` and `xT`) will be outside the boundary with 
 a roughly equal amount on each side.
 
-The shape of the boundary can be further controlled by providing `nirvana` as a vector of tuples of the form `(min, max)` such 
+The shape of the boundary can be further controlled by providing `nirvana` as a vector of length `Dim` of tuples of the form `(min, max)` such 
 that a fraction `min` (respectively `max`) will be "below" (respectively "above") the boundary along each dimension. 
+
+    AutoBoundary2D(traj; nirvana = 0.10, tol = 0.001)
+
+Construct a tight boundary in two dimensions based on the [`Trajectories`](@ref) in `traj`.
+
+The boundary in question is formed by scaling the convex hull of the trajectory data until a fraction `nirvana` of 
+the data are bouside the boundary to within `tol` percent. 
 """
 struct Boundary{Dim, M, CRS}
     boundary::Polytope{Dim, M, CRS}
@@ -140,4 +147,46 @@ function AutoBoundary(
         corner_max = [bounds[i][2] for i = 1:Dim] |> Tuple
         return Boundary(corner_min, corner_max)
     end
+end
+
+function AutoBoundary2D(
+    traj::Trajectories{Dim}; 
+    nirvana::Real = 0.10,
+    tol::Real = 0.001) where {Dim}
+
+    @argcheck Dim == 2
+    @argcheck 0 <= nirvana <= 1
+    @argcheck tol > 0
+
+    # compute convex hull of data
+    data = [traj.x0 ;; traj.xT]
+    ps = [Point(data[:,i]...) for i = 1:size(data, 2)] |> PointSet
+    hull = convexhull(ps).rings[1].vertices |> x -> Ngon(x...)
+    hull = Scale(1.01)(hull) # scale up slightly to avoid floating point errors at the boundary
+
+    # compute the fraction of data inside the hull when it has been scaled by `scale`
+    _interior(scale) = _membership2d(data, Bins([Scale(scale)(hull)])) |> x -> length(findall(!isnothing, x))/size(data, 2)
+    
+    interior = 1 - nirvana
+    a, b = 0.0, 1.0
+    c = (a + b)/2
+    n_iter = 0
+    
+    # use bisection to find the correct scale
+    while abs(_interior(c) - interior)/interior > tol
+        if _interior(c) - interior > 0
+            b = c
+        else
+            a = c
+        end
+        
+        c = (a + b)/2
+        n_iter += 1
+    
+        if n_iter >= 20
+            break
+        end
+    end
+
+    return Boundary(boundary = Scale(c)(hull))
 end

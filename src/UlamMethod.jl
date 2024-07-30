@@ -11,14 +11,14 @@ using PrecompileTools: @compile_workload
 include("traj.jl")
 export Trajectories
 
-include("boundary.jl")
-export Boundary, points, AutoBoundary
-
 include("bins.jl")
 export Bins, BinningAlgorithm
 
 include(joinpath(@__DIR__, "..", "src", "binners", "membership-1d.jl"))
 include(joinpath(@__DIR__, "..", "src", "binners", "membership-2d.jl"))
+
+include("boundary.jl")
+export Boundary, points, AutoBoundary, AutoBoundary2D
 
 include(joinpath(@__DIR__, "..", "src", "binners", "line.jl"))
 export LineBinner
@@ -70,6 +70,7 @@ include("earth-polygons.jl") # EarthPolygons module
     traj2d = Trajectories(2, 1000)
 
     boundary2d = AutoBoundary(traj2d)
+    boundary2d = AutoBoundary2D(traj2d)
     boundary2d = Boundary([(0,0),(6,0),(1,7),(1,6)])
     boundary2d = Boundary(0, 6, 0, 4)
 

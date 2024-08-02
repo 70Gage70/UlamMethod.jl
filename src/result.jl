@@ -99,3 +99,4 @@ function membership(data::Matrix{<:Real}, ur::UlamResult{Dim, M, CRS}) where {Di
     @argcheck size(data, 1) == Dim
     return membership(data, ur.binner)
 end
+

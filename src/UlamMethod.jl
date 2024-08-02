@@ -6,6 +6,7 @@ using PolygonInbounds
 using Graphs: SimpleDiGraph, strongly_connected_components
 using ParallelKMeans
 import Distributions
+using StatsBase: countmap
 using PrecompileTools: @compile_workload 
 
 include("traj.jl")
@@ -51,6 +52,9 @@ export ulam_method
 
 include("show.jl")
 export show
+
+include("viz.jl")
+export viz, viz!
 
 include("earth-polygons.jl") # EarthPolygons module
 

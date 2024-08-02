@@ -7,21 +7,31 @@ version = "0.7.3"
 ArgCheck = "dce04be8-c92d-5529-be00-80e4d2c0e197"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 Graphs = "86223c79-3864-5bf0-83f7-82e725a168b6"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Meshes = "eacbb407-ea5a-433e-ab97-5258b1ca43fa"
 ParallelKMeans = "42b8e9d4-006b-409a-8472-7f34b3fb58af"
 PolygonInbounds = "e4521ec6-8c1d-418e-9da2-b3bc4ae105d6"
 PrecompileTools = "aea7be01-6a6a-4083-8856-8a6e6704d82a"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[weakdeps]
+Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
+
+[extensions]
+UlamMethodMakieExt = "Makie"
 
 [compat]
 ArgCheck = "2.3"
 Distributions = "0.25.109"
 Graphs = "1.10"
+Makie = "0.21"
 Meshes = "0.47.4"
 ParallelKMeans = "1.1"
 PolygonInbounds = "0.2"
 PrecompileTools = "1.2"
+StatsBase = "0.34"
 julia = "1.10"
 
 [extras]

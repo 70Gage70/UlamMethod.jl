@@ -45,7 +45,7 @@ export DataReinjection, SourceReinjection
 
 include("result.jl")
 export UlamResult
-export P_open, P_closed, bins, bins_dis, membership
+export P_open, P_closed, bins, bins_dis, membership, counts
 
 include("main.jl")
 export ulam_method

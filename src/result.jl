@@ -41,9 +41,13 @@ Access `bins`.
 
 Access `bins_dis`.
 
-    membership(data, ulam_result)
+    membership(data_or_traj, ulam_result)
 
-Compute `membership(data, ulam_result.binner)`.
+Compute the membership of `data_or_traj` to the binned domain. See the [`membership`](@ref) function for more information.
+
+    counts(data_or_traj, ulam_result)
+
+Compute the bin counts of `data_or_traj` for the binned domain. See the [`counts`](@ref) function for more information.
 """
 struct UlamResult{Dim, M, CRS}
     P_O2O::Matrix{Float64}
@@ -87,16 +91,40 @@ bins_dis(ur::UlamResult) = ur.bins_dis
 Takes a `Dim x N_points` matrix of points and returns a vector `memb` where `memb[i] = j` if `data[:,i]` is 
 inside `binner.bins[j]` and `memb[i] = nothing` if `data[:,i]` is not inside any bin.
 
+    membership(data, ulam_result)
+
+Compute `membership(data, ulam_result.binner)`.
+
     membership(traj, binner)
 
 Compute `(membership(traj.x0, binner), membership(traj.xT, binner))`.
 
-    membership(data, ulam_result)
+    membership(traj, ulam_result)
 
-Compute `membership(data, ulam_result.binner)`.
+Compute `membership(traj, ulam_result.binner)`.
 """
 function membership(data::Matrix{<:Real}, ur::UlamResult{Dim, M, CRS}) where {Dim, M, CRS}
     @argcheck size(data, 1) == Dim
     return membership(data, ur.binner)
 end
 
+membership(traj::Trajectories{Dim}, ur::UlamResult{Dim, M, CRS}) where {Dim, M, CRS} = membership(traj, ur.binner)
+
+"""
+    counts(data, ulam_result)
+
+Compute a vector `counts` such that `counts[i]` is equal to the number of points inside the ith bin and 
+`counts[end]` is the number of points outside the boundary (in nirvana).
+
+    counts(traj, ulam_result)
+
+Compute `(counts(traj.x0, ulam_result), counts(traj.xT, ulam_result)`.
+"""
+function counts(data::Matrix{<:Real}, ur::UlamResult{Dim, M, CRS}) where {Dim, M, CRS}
+    cm = countmap(membership(data, ur))
+    return [[cm[i] for i = 1:length(cm)-1]; cm[nothing]]
+end
+
+function counts(traj::Trajectories{Dim}, ur::UlamResult{Dim, M, CRS}) where {Dim, M, CRS}
+    return (counts(traj.x0, ur), counts(traj.xT, ur))
+end

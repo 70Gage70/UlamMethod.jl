@@ -1,5 +1,6 @@
 using Documenter
 using UlamMethod
+import CairoMakie
 
 makedocs(
     sitename = "UlamMethod.jl",

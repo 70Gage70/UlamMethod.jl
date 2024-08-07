@@ -43,7 +43,7 @@ Access `bins_dis`.
 
     membership(data_or_traj, ulam_result)
 
-Compute the membership of `data_or_traj` to the binned domain. See the [`membership`](@ref) function for more information.
+Compute the membership of `data_or_traj` for the binned domain. See the [`membership`](@ref) function for more information.
 
     counts(data_or_traj, ulam_result)
 

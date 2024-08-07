@@ -21,6 +21,7 @@ defined in a subset of $\mathbb{R}^N$, the essential goal of Ulam's method is to
 - Supports automatic boundary construction.
 - Multiple 2D algorithms for partitioning to triangles, rectangles, hexagons and adaptively sized [Voronoi cells](https://en.wikipedia.org/wiki/Voronoi_diagram).
 - Multiple stochasticization algorithms.
+- One-line plotting conveniences in 2D for easy visualization.
 
 # Installation
 
@@ -39,40 +40,51 @@ using UlamMethod
 
 ## Quickstart
 
-The core functionality is provided by 
+### Applying Ulam's method
+
+The highest level function is 
 ```julia
-ulam_method(traj, binner; reinj_algo)
+ulam_method(traj, nbins; nirvana)
 ``` 
 where
 
 - `traj`: A `Trajectories` object, holding the short-range trajectory data.
-- `binner`: A `BinningAlgorithm` which contains both a `Boundary` object that specifies the boundary of the computational domain as well as the algorithm used to partition it into bins.
-- `reinj_algo`: A `ReinjectionAlgorithm` that specifies how trajectories pointing from nirvana[^4] to the interior should be reinjected. Default [`DataReinjection`](@ref).
+- `nbins`: The number of bins requested. When using this high-level convenience function, these will be uniform segements (1D), rectangles (2D) and hypercubes (≥3D).
+- `nirvana`: The boundary of the bins will be set such that the fraction of data in nirvana[^4] is equal to this value. In other words, a fraction `nirvana` of the data will be outside of the binned region.
 
-Here are `10000` random trajectories in the domain $[0, 10]^2$
+In general, your trajectory data can be loaded simply as `traj = Trajectories(x0, xT)`, where `x0` and `xT` are `Dim x N` matrices such that `Dim` is the dimension of the data and `N` is the number of points. For testing, the function `Trajectories(Dim, N)` is provided that generates random trajectories automatically. We will generate `1000` trajectories in 2D and apply Ulam's method with `200` bins.
 
-```julia
+```@example 1
 using UlamMethod
 import Random; Random.seed!(1234) # reproducible randomness
 
-n_data = 10000
-x0, xT = 10*rand(2, n_data), 10*rand(2, n_data)
-traj = Trajectories(x0, xT)
+traj = Trajectories(2, 1000)
+ulam = ulam_method(traj, 200)
+nothing # hide
 ```
 
-We will take our domain to be the rectangular subset $[3, 5] \times [4, 8]$ and generate a covering with 40 rectangles. This covering is defined inside a `Boundary` object, which can be quickly created in 2D using the syntax `Boundary(xmin, xmax, ymin, ymax)`. We then call `ulam_method` to run the main calculation.
+### Using the result
 
-```julia
-xmin, xmax, ymin, ymax = 3, 5, 4, 8
-boundary = Boundary(xmin, xmax, ymin, ymax)
-binner = RectangleBinner(40, boundary)
-
-ulam = ulam_method(traj, binner)
-```
+After computing `ulam`, use the following functions:
 
 - `P_closed(ulam)` gives the full transition probability matrix.
 -  `bins(ulam)` gives the bins and `points(bins(ulam))` gives their vertices.
-- `membership(points, ulam)` returns the bin membership of a `Dim x n_points` matrix `points`.
+- `membership(points, ulam)` returns the bin membership of a `Dim x n_points` matrix `points`. 
+
+### Plotting
+
+In order to use the plotting functionality, a Makie backend is required. For this example, this amounts to including the line `import CairoMakie`. This provides access to the function `viz(object; kwargs...)` which can visualize any UlamMethod object.
+
+```@example 1
+import CairoMakie
+viz(traj)
+```
+
+```@example 1
+viz(ulam)
+```
+
+Note that bins colored black are bins that contained data but were not a member of the largest strongly connected component.
 
 # Citation
 

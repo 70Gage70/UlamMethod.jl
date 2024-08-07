@@ -15,6 +15,7 @@ Use of this package proceeds as follows.
 4. Optionally, select a `ReinjectionAlgorithm` to handle the behavior of trajectories points from nirvana to the interior.
 5. Run `ulam_method(traj, binner; reinj_algo)`.
 6. Inspect and process the result with `P_closed`, `bins`, `membership` and other functions.
+7. Visualize the result with `viz` and `viz!`.
 
 # Loading trajectories
 
@@ -64,6 +65,7 @@ ReinjectionAlgorithm
 ```@docs; canonical=false
 DataReinjection
 SourceReinjection
+StationaryReinjection
 ```
 
 # Computing the main results
@@ -81,6 +83,14 @@ bins
 bins_dis
 membership
 points
+counts
+```
+
+# Visualization
+
+```@docs; canonical=false
+viz
+viz!
 ```
 
 # References

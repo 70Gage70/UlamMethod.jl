@@ -3,6 +3,8 @@
 
 Run the main Ulam's method calculation and return an [`UlamResult`](@ref).
 
+This is the lower level method with all options available.
+
 ### Arguments
 
 - `traj`: A [`Trajectories`](@ref) object, holding the short-range trajectory data.
@@ -12,6 +14,23 @@ Run the main Ulam's method calculation and return an [`UlamResult`](@ref).
 
 - `reinj_algo`: A [`ReinjectionAlgorithm`](@ref) that specifies how trajectories pointing \
 from nirvana to the interior should be reinjected. Default [`DataReinjection`](@ref).
+
+---
+
+    ulam_method(traj, nbins; nirvana = 0.10)
+
+Run the main Ulam's method calculation and return an [`UlamResult`](@ref).
+
+This is the higher level "convenience" method with most options selected automatically.
+
+### Nirvana Optional Argument
+
+The boundary is placed such that a fraction `nirvana` of the data is in nirvana. For example, with the default 
+value of `0.10`, roughly `10%` of all of the datapoints (split between `x0` and `xT`) will be outside the boundary with 
+a roughly equal amount on each side.
+
+The shape of the boundary can be further controlled by providing `nirvana` as a vector of length `Dim` of tuples of the form `(min, max)` such 
+that a fraction `min` (respectively `max`) will be "below" (respectively "above") the boundary along each dimension. 
 """
 function ulam_method(
     traj::Trajectories{Dim},
@@ -71,18 +90,10 @@ function ulam_method(
 
     ### VALIDATION
     if n_bins == 1
-        @info Padj
-        @info n_bins
-        @info Pij
-        @info scc
         error("The largest strongly connected component only has one state. This happens when bins have no communication, either beacuse they are too big or the trajectories do not create enough communication.")
     end
 
     if any(iszero.(vec(sum(Pij[1:n_bins, 1:n_bins], dims = 2))))
-        @info Padj
-        @info n_bins
-        @info Pij
-        @info scc
         error("The transition probability matrix contains rows with no counts. This probably means that the trajectories do not create enough communication between bins.")
     end
 
@@ -103,4 +114,22 @@ function ulam_method(
 
     ### RETURN
     return UlamResult(PO2O, PO2ω, Pω2O, binner, Bins(bins_dis))
+end
+
+function ulam_method(
+    traj::Trajectories{Dim}, 
+    nbins::Integer; 
+    nirvana::Union{Real, Vector{<:Tuple{Real, Real}}} = 0.10) where {Dim}
+
+    boundary = AutoBoundary(traj, nirvana = nirvana)
+    
+    if Dim == 1
+        binner = LineBinner(nbins, boundary, hardclip = false)
+    elseif Dim == 2
+        binner = RectangleBinner(nbins, boundary, hardclip = false)
+    else # Dim ≥ 3
+        binner = HyperRectangleBinner(nbins, boundary)
+    end
+
+    return ulam_method(traj, binner)
 end

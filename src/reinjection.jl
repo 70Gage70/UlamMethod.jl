@@ -57,16 +57,58 @@ struct SourceReinjection{Dim} <: ReinjectionAlgorithm
     end
 end
 
-function reinject!(binner::BinningAlgorithm, Pij::Matrix{Float64}, reinj_algo::SourceReinjection)
+function reinject!(
+    binner::BinningAlgorithm{Dim}, 
+    Pij::Matrix{Float64}, 
+    reinj_algo::SourceReinjection{Dim}) where {Dim}
+
     memb = membership(stack(collect.(reinj_algo.points)), binner)
     total_counts = sum(Pij[end,:])
 
     if all(isnothing.(memb)) || total_counts == 0
+        @warn "Could not reinject at source - using fallback."
         return reinject!(binner, Pij, reinj_algo.fallback)
     end
 
     memb = memb[findall(!isnothing, memb)]
     Pij[end, :] .= 0
     Pij[end, memb] .= 1
+    return nothing
+end
+
+"""
+    struct StationaryReinjection
+
+Reinject the data weighted by the stationary distribution of `P_open`.
+
+### Fields
+
+- `fallback`: The `ReinjectionAlgorithm` to apply in case the stationary distribution can not be computed.
+
+### Constructor
+
+    StationaryReinjection(; fallback = DataReinjection())
+"""
+struct StationaryReinjection <: ReinjectionAlgorithm
+    fallback::ReinjectionAlgorithm
+
+    function StationaryReinjection(; fallback::ReinjectionAlgorithm = DataReinjection())
+        return new(fallback)
+    end
+end
+
+function reinject!(
+    binner::BinningAlgorithm{Dim}, 
+    Pij::Matrix{Float64}, 
+    reinj_algo::StationaryReinjection) where {Dim}
+
+    try
+        p = Pij[1:end-1, 1:end-1]
+        Pij[end,1:end-1] .= abs.(eigvecs(p')[:,end])
+    catch
+        @warn "Could not reinject using stationary distribution - using fallback."
+        return reinject!(binner, Pij, reinj_algo.fallback)
+    end
+
     return nothing
 end

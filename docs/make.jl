@@ -1,5 +1,6 @@
 using Documenter
 using UlamMethod
+import Meshes
 
 makedocs(
     sitename = "UlamMethod.jl",
@@ -9,7 +10,8 @@ makedocs(
         "Home" => "index.md",
         "Advanced Usage" => "advanced.md",
         "API" => "api.md",
-    ]
+    ],
+    warnonly = true
 )
 
 deploydocs(;

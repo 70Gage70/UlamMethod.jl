@@ -1,6 +1,5 @@
 using Documenter
 using UlamMethod
-import Meshes
 
 makedocs(
     sitename = "UlamMethod.jl",

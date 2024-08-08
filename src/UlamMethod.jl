@@ -104,4 +104,9 @@ include("earth-polygons.jl") # EarthPolygons module
     ur = ulam_method(traj3d, HyperRectangleBinner(1000, boundary3d), reinj_algo = SourceReinjection([(1, 2, 3)])) 
 end
 
+function julia_main()::Cint
+    # do something based on ARGS?
+    return 0 # if things finished successfully
+  end
+
 end # module

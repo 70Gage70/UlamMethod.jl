@@ -21,6 +21,7 @@ end
 
     ur = ulam_method(traj2d, RectangleBinner(100, boundary2d))
     ur = ulam_method(traj2d, RectangleBinner(100, boundary2d, hardclip = false))
+    ur = ulam_method(traj2d, RectangleBinner(100, boundary2d), reinj_algo = UniformReinjection())
     ur = ulam_method(traj2d, RectangleBinner(100, boundary2d), reinj_algo = SourceReinjection(pts))
     ur = ulam_method(traj2d, RectangleBinner(100, boundary2d), reinj_algo = StationaryReinjection())
     ur = ulam_method(traj2d, VoronoiBinner(10, boundary2d, traj2d))
@@ -41,6 +42,7 @@ end
 
     ur = ulam_method(traj2d, RectangleBinner(100, boundary2d))
     ur = ulam_method(traj2d, RectangleBinner(100, boundary2d, hardclip = false))
+    ur = ulam_method(traj2d, RectangleBinner(100, boundary2d), reinj_algo = UniformReinjection())
     ur = ulam_method(traj2d, RectangleBinner(100, boundary2d), reinj_algo = SourceReinjection(pts))
     ur = ulam_method(traj2d, RectangleBinner(100, boundary2d), reinj_algo = StationaryReinjection())
     ur = ulam_method(traj2d, VoronoiBinner(10, boundary2d, traj2d))
@@ -61,6 +63,7 @@ end
 
     ur = ulam_method(traj2d, RectangleBinner(100, boundary2d))
     ur = ulam_method(traj2d, RectangleBinner(100, boundary2d, hardclip = false))
+    ur = ulam_method(traj2d, RectangleBinner(100, boundary2d), reinj_algo = UniformReinjection())
     ur = ulam_method(traj2d, RectangleBinner(100, boundary2d), reinj_algo = SourceReinjection(pts))
     ur = ulam_method(traj2d, RectangleBinner(100, boundary2d), reinj_algo = StationaryReinjection())
     ur = ulam_method(traj2d, VoronoiBinner(10, boundary2d, traj2d))
@@ -81,6 +84,7 @@ end
 
     ur = ulam_method(traj2d, RectangleBinner(100, boundary2d))
     ur = ulam_method(traj2d, RectangleBinner(100, boundary2d, hardclip = false))
+    ur = ulam_method(traj2d, RectangleBinner(100, boundary2d), reinj_algo = UniformReinjection())
     ur = ulam_method(traj2d, RectangleBinner(100, boundary2d), reinj_algo = SourceReinjection(pts))
     ur = ulam_method(traj2d, RectangleBinner(100, boundary2d), reinj_algo = StationaryReinjection())
     ur = ulam_method(traj2d, VoronoiBinner(10, boundary2d, traj2d))
@@ -102,6 +106,7 @@ end
 
 
     ur = ulam_method(traj3d, HyperRectangleBinner(1000, boundary3d))
+    ur = ulam_method(traj3d, HyperRectangleBinner(1000, boundary3d), reinj_algo = UniformReinjection())
     ur = ulam_method(traj3d, HyperRectangleBinner(1000, boundary3d), reinj_algo = SourceReinjection(pts))
     ur = ulam_method(traj3d, HyperRectangleBinner(1000, boundary3d), reinj_algo = StationaryReinjection()) 
 end
@@ -115,6 +120,7 @@ end
     pts = [(coords(pt).x.val, coords(pt).y.val, coords(pt).z.val) for pt in pts]
 
     ur = ulam_method(traj3d, HyperRectangleBinner(1000, boundary3d))
+    ur = ulam_method(traj3d, HyperRectangleBinner(1000, boundary3d), reinj_algo = UniformReinjection())
     ur = ulam_method(traj3d, HyperRectangleBinner(1000, boundary3d), reinj_algo = SourceReinjection(pts))
     ur = ulam_method(traj3d, HyperRectangleBinner(1000, boundary3d), reinj_algo = StationaryReinjection())  
 end

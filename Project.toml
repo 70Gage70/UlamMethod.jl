@@ -1,7 +1,7 @@
 name = "UlamMethod"
 uuid = "4cc20838-1966-48f0-823a-5def0ad5c24d"
 authors = ["Gage Bonner <gage.bonner@gmail.com>"]
-version = "0.7.4"
+version = "0.7.9"
 
 [deps]
 ArgCheck = "dce04be8-c92d-5529-be00-80e4d2c0e197"
@@ -27,7 +27,7 @@ ArgCheck = "2.3"
 Distributions = "0.25.109"
 Graphs = "1.10"
 Makie = "0.21"
-Meshes = "0.48"
+Meshes = "0.51.4"
 ParallelKMeans = "1.1"
 PolygonInbounds = "0.2"
 PrecompileTools = "1.2"

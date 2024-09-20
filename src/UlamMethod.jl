@@ -42,7 +42,7 @@ export HyperRectangle, HyperRectangleBinner
 
 include("reinjection.jl")
 export ReinjectionAlgorithm
-export DataReinjection, SourceReinjection, StationaryReinjection
+export DataReinjection, UniformReinjection, SourceReinjection, StationaryReinjection
 
 include("result.jl")
 export UlamResult
@@ -84,6 +84,7 @@ include("earth-polygons.jl") # EarthPolygons module
 
     ur = ulam_method(traj2d, RectangleBinner(100, boundary2d))
     ur = ulam_method(traj2d, RectangleBinner(100, boundary2d, hardclip = false))
+    ur = ulam_method(traj2d, RectangleBinner(100, boundary2d), reinj_algo = UniformReinjection())
     ur = ulam_method(traj2d, RectangleBinner(100, boundary2d), reinj_algo = SourceReinjection(pts))
     ur = ulam_method(traj2d, RectangleBinner(100, boundary2d), reinj_algo = StationaryReinjection())
     ur = ulam_method(traj2d, VoronoiBinner(10, boundary2d, traj2d))

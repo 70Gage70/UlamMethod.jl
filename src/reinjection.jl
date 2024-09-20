@@ -31,6 +31,23 @@ function reinject!(binner::BinningAlgorithm, Pij::Matrix{Float64}, reinj_algo::D
 end
 
 """
+    struct UniformReinjection
+
+Reinject the data uniformly across all available bins.
+
+### Constructor
+
+    UniformReinjection()
+"""
+struct UniformReinjection <: ReinjectionAlgorithm
+end
+
+function reinject!(binner::BinningAlgorithm, Pij::Matrix{Float64}, reinj_algo::UniformReinjection)
+    Pij[end,1:end-1] .= 1
+    return nothing
+end
+
+"""
     struct SourceReinjection{Dim}
 
 Reinject the data at particular locations. 

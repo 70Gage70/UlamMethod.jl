@@ -64,6 +64,7 @@ ReinjectionAlgorithm
 
 ```@docs; canonical=false
 DataReinjection
+UniformReinjection
 SourceReinjection
 StationaryReinjection
 ```

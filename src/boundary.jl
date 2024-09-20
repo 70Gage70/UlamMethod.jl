@@ -131,7 +131,7 @@ function AutoBoundary(
     end
 
     data = [traj.x0 ;; traj.xT]
-    n_points = [size(data, 2) .* fac .|> x -> ceil(Int64, x) for fac in nirvana]
+    n_points = [size(data, 2) .* fac .|> x -> max(1, ceil(Int64, x)) for fac in nirvana]
     
     sort_perms = [sortperm(data[d,:]) for d = 1:Dim]
     bounds = [(

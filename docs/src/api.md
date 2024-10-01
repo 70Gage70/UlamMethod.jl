@@ -19,12 +19,6 @@ Modules = [UlamMethod]
 Order = [:type]
 ``` 
 
-<!-- ## Constants
-```@autodocs
-Modules = [UlamMethod]
-Order = [:constant]
-```  -->
-
 ## Earth Polygons
 ```@autodocs
 Modules = [UlamMethod.EarthPolygons]

@@ -93,4 +93,4 @@ docs/.vitepress/dist
 docs/.DS_Store
 docs/package-lock.json
 
-/UlamMethodCompiled
+/app

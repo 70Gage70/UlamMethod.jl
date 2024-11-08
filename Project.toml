@@ -1,7 +1,7 @@
 name = "UlamMethod"
 uuid = "4cc20838-1966-48f0-823a-5def0ad5c24d"
 authors = ["Gage Bonner <gage.bonner@gmail.com>"]
-version = "0.7.10"
+version = "0.7.11"
 
 [deps]
 ArgCheck = "dce04be8-c92d-5529-be00-80e4d2c0e197"

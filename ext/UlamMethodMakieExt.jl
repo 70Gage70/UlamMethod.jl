@@ -164,15 +164,16 @@ function UlamMethod.viz(
     fig
 end
 
-@compile_workload begin
-    import Random
-    Random.seed!(1234)
+### extension loading issue on 1.11
+# @compile_workload begin
+#     import Random
+#     Random.seed!(1234)
 
-    traj = Trajectories(2, 1000)
-    ulam = ulam_method(traj, 200)
+#     traj = Trajectories(2, 1000)
+#     ulam = ulam_method(traj, 200)
 
-    viz(traj)
-    viz(ulam)
-end
+#     viz(traj)
+#     viz(ulam)
+# end
 
 end # module

@@ -9,7 +9,8 @@ makedocs(
     pages = [
         "Home" => "index.md",
         "Advanced Usage" => "advanced.md",
-        "API" => "api.md",
+        "Making an App" => "app.md",
+        "API" => "api.md"
     ],
     warnonly = true
 )

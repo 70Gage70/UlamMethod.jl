@@ -49,6 +49,12 @@ The final number of bins may be different (larger) than the number requested.
 ### Constructor
 
     HyperRectangleBinner(nbins, boundary)
+
+`nbins` can be:
+
+- An `Integer`, in which case a `HyperRectangleBinner` will be constructed attempting to distribute boxes proportionally \
+across dimensions such that the total number of boxes is as close as possible to `nbins`.
+- An `NTuple{Dim, Integer}`, in which case dimension `i` receives `nbins[i]` bins.
 """
 struct HyperRectangleBinner{Dim, M, CRS, R<:AbstractRange} <: BinningAlgorithm{Dim}
     boundary::Boundary{Dim, M, CRS}
@@ -57,14 +63,24 @@ struct HyperRectangleBinner{Dim, M, CRS, R<:AbstractRange} <: BinningAlgorithm{D
     ranges::Vector{R}
 end
 
-function HyperRectangleBinner(nbins::Int64, boundary::Boundary{Dim, M, CRS}) where {Dim, M, CRS}
+function HyperRectangleBinner(
+    nbins::Union{Integer, NTuple{Dim, Integer}}, 
+    boundary::Boundary{Dim, M, CRS}) where {Dim, M, CRS}
     @argcheck Dim >= 3 "In dimensions 1 and 2, LineBinner and RectangleBinner are preferred (respectively)."
 
     x_min = boundary.boundary.min
     x_max = boundary.boundary.max
-    side_lengths = x_max .- x_min
-    n_per_dim = [1 + ceil(Int64, side_length*(nbins/prod(side_lengths))^(1/Dim)) for side_length in side_lengths]
-    # add 1 to account for the fact that n gridpoints makes n - 1 boxes
+
+    if nbins isa Int64
+        @argcheck nbins > 0 "Need at least one bin."
+        side_lengths = x_max .- x_min
+        n_per_dim = [1 + ceil(Int64, side_length*(nbins/prod(side_lengths))^(1/Dim)) for side_length in side_lengths]
+        # add 1 to account for the fact that n gridpoints makes n - 1 boxes
+    else
+        @argcheck all((x -> x > 0).(nbins)) "Need at least one bin in each dimension."
+        n_per_dim = collect(nbins) .+ 1
+        # add 1 to account for the fact that n gridpoints makes n - 1 boxes
+    end
 
     # place vertices on grid 
     ranges = [range(x_min[i], x_max[i], length = n_per_dim[i]) for i = 1:Dim]

@@ -106,6 +106,7 @@ end
 
 
     ur = ulam_method(traj3d, HyperRectangleBinner(1000, boundary3d))
+    ur = ulam_method(traj3d, HyperRectangleBinner((10, 10, 10), boundary3d))
     ur = ulam_method(traj3d, HyperRectangleBinner(1000, boundary3d), reinj_algo = UniformReinjection())
     ur = ulam_method(traj3d, HyperRectangleBinner(1000, boundary3d), reinj_algo = SourceReinjection(pts))
     ur = ulam_method(traj3d, HyperRectangleBinner(1000, boundary3d), reinj_algo = StationaryReinjection()) 
@@ -120,6 +121,7 @@ end
     pts = [(coords(pt).x.val, coords(pt).y.val, coords(pt).z.val) for pt in pts]
 
     ur = ulam_method(traj3d, HyperRectangleBinner(1000, boundary3d))
+    ur = ulam_method(traj3d, HyperRectangleBinner((10, 10, 10), boundary3d))
     ur = ulam_method(traj3d, HyperRectangleBinner(1000, boundary3d), reinj_algo = UniformReinjection())
     ur = ulam_method(traj3d, HyperRectangleBinner(1000, boundary3d), reinj_algo = SourceReinjection(pts))
     ur = ulam_method(traj3d, HyperRectangleBinner(1000, boundary3d), reinj_algo = StationaryReinjection())  
@@ -131,4 +133,5 @@ end
     boundary4d = AutoBoundary(traj4d)
 
     ur = ulam_method(traj4d, HyperRectangleBinner(1000, boundary4d))
+    ur = ulam_method(traj4d, HyperRectangleBinner((6, 6, 6, 6), boundary4d))
 end

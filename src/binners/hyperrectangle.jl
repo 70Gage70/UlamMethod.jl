@@ -71,7 +71,7 @@ function HyperRectangleBinner(
     x_min = boundary.boundary.min
     x_max = boundary.boundary.max
 
-    if nbins isa Int64
+    if nbins isa Integer
         @argcheck nbins > 0 "Need at least one bin."
         side_lengths = x_max .- x_min
         n_per_dim = [1 + ceil(Int64, side_length*(nbins/prod(side_lengths))^(1/Dim)) for side_length in side_lengths]

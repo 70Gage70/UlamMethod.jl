@@ -15,6 +15,12 @@ may be slightly different than the number requested.
 ### Constructor 
 
     RectangleBinner(nbins, boundary; hardclip = true)
+
+`nbins` can be:
+
+- An `Integer`, in which case a `RectangleBinner` will be constructed attempting to distribute boxes proportionally \
+across `x` and y` such that the total number of boxes is as close as possible to `nbins`.
+- An `NTuple{2, Integer}`, in which case dimension `i` receives `nbins[i]` bins.
 """
 struct RectangleBinner{M, CRS} <: BinningAlgorithm{2}
     boundary::Boundary{2, M, CRS}
@@ -22,15 +28,21 @@ struct RectangleBinner{M, CRS} <: BinningAlgorithm{2}
     idx2pos::Vector{Union{Int64, Nothing}}
 end
 
-function RectangleBinner(nbins::Int64, boundary::Boundary{2, M, CRS}; hardclip::Bool = true) where {M, CRS}
+function RectangleBinner(
+    nbins::Union{Integer, NTuple{2, Integer}}, 
+    boundary::Boundary{2, M, CRS}; 
+    hardclip::Bool = true) where {M, CRS}
     bbox = Meshes.boundingbox(boundary.boundary)
     bbox_W = coords(bbox.max).x - coords(bbox.min).x
     bbox_L = coords(bbox.max).y - coords(bbox.min).y
 
-    nbins = hardclip ? ceil(Int64, nbins*area(bbox)/area(boundary.boundary)) : nbins
-    
-    n_x = sqrt(bbox_W*nbins/bbox_L) |> x -> round(Int64, x)
-    n_y = sqrt(bbox_L*nbins/bbox_W) |> x -> round(Int64, x)
+    if nbins isa Integer
+        nbins = hardclip ? ceil(Int64, nbins*area(bbox)/area(boundary.boundary)) : nbins
+        n_x = sqrt(bbox_W*nbins/bbox_L) |> x -> round(Int64, x)
+        n_y = sqrt(bbox_L*nbins/bbox_W) |> x -> round(Int64, x)
+    else
+        n_x, n_y = nbins
+    end
     
     grid = CartesianGrid(bbox.min, bbox.max, dims = (n_x, n_y))
     bins = Polytope{2, 𝔼{2}, CRS}[]

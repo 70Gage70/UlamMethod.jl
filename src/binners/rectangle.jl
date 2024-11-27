@@ -21,6 +21,7 @@ may be slightly different than the number requested.
 - An `Integer`, in which case a `RectangleBinner` will be constructed attempting to distribute boxes proportionally \
 across `x` and y` such that the total number of boxes is as close as possible to `nbins`.
 - An `NTuple{2, Integer}`, in which case dimension `i` receives `nbins[i]` bins.
+- An `NTuple{2, AbstractVector}`, in which case `nbins[i]` defines the edges of the bins in dimension `i`.
 """
 struct RectangleBinner{M, CRS} <: BinningAlgorithm{2}
     boundary::Boundary{2, M, CRS}
@@ -29,7 +30,7 @@ struct RectangleBinner{M, CRS} <: BinningAlgorithm{2}
 end
 
 function RectangleBinner(
-    nbins::Union{Integer, NTuple{2, Integer}}, 
+    nbins::Union{Integer, NTuple{2, Integer}, NTuple{2, AbstractVector}}, 
     boundary::Boundary{2, M, CRS}; 
     hardclip::Bool = true) where {M, CRS}
     bbox = Meshes.boundingbox(boundary.boundary)
@@ -40,11 +41,14 @@ function RectangleBinner(
         nbins = hardclip ? ceil(Int64, nbins*area(bbox)/area(boundary.boundary)) : nbins
         n_x = sqrt(bbox_W*nbins/bbox_L) |> x -> round(Int64, x)
         n_y = sqrt(bbox_L*nbins/bbox_W) |> x -> round(Int64, x)
-    else
-        n_x, n_y = nbins
+        grid = CartesianGrid(bbox.min, bbox.max, dims = (n_x, n_y))
+    elseif nbins isa NTuple{2, Integer}
+        grid = CartesianGrid(bbox.min, bbox.max, dims = nbins)
+    elseif nbins isa NTuple{2, AbstractVector}
+        @argcheck all(issorted.(nbins))
+        grid = RectilinearGrid(nbins[1], nbins[2])
     end
     
-    grid = CartesianGrid(bbox.min, bbox.max, dims = (n_x, n_y))
     bins = Polytope{2, 𝔼{2}, CRS}[]
 
     for bin_ in elements(grid)

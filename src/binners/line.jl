@@ -21,7 +21,7 @@ struct LineBinner{M, CRS} <: BinningAlgorithm{1}
 end
 
 function LineBinner(nbins::Int64, boundary::Boundary{1, M, CRS}; hardclip::Bool = true) where {M, CRS}
-    bbox = Meshes.boundingbox(boundary.boundary)
+    bbox = boundingbox(boundary.boundary)
     grid = CartesianGrid(bbox.min, bbox.max, dims = (nbins, ))
 
     bins = Polytope{1, 𝔼{1}, CRS}[]

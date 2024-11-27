@@ -23,7 +23,7 @@ struct HexagonBinner{M, CRS} <: BinningAlgorithm{2}
 end
 
 function HexagonBinner(nbins::Int64, boundary::Boundary{2, M, CRS}; hardclip::Bool = true) where {M, CRS}
-    bbox = Meshes.boundingbox(boundary.boundary)
+    bbox = boundingbox(boundary.boundary)
     xmin, xmax, ymin, ymax = coords(bbox.min).x.val, coords(bbox.max).x.val, coords(bbox.min).y.val, coords(bbox.max).y.val
     W = xmax - xmin
     L = ymax - ymin
@@ -59,7 +59,7 @@ function HexagonBinner(nbins::Int64, boundary::Boundary{2, M, CRS}; hardclip::Bo
     hexagons = Translate(c_box .- c_hex)(hexagons)
 
     # points near but not exactly equal to zero cause problems for Meshes.intersect, so round them to zero
-    near_zero_p(p) = ([coords(p).x.val, coords(p).y.val] .|> x -> (y -> abs(y) < 10^(-15) ? 0.0 : y).(x)) |> z -> Meshes.Point(z...)
+    near_zero_p(p) = ([coords(p).x.val, coords(p).y.val] .|> x -> (y -> abs(y) < 10^(-15) ? 0.0 : y).(x)) |> z -> Point(z...)
     hexagons = [Hexagon(near_zero_p.(vertices(tri))...) for tri in hexagons]
 
     bins = Polytope{2, 𝔼{2}, CRS}[]

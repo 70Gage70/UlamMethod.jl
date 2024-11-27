@@ -1,6 +1,11 @@
 module UlamMethod
 
-using Meshes
+import Meshes
+using Meshes: 𝔼
+using Meshes: Box, CartesianGrid, Hexagon, HomogeneousSampling, Ngon
+using Meshes: Point, PointSet, PolyArea, Polytope, Triangle, Segment, Scale
+using Meshes: RectilinearGrid, Translate, VoronoiTesselation
+using Meshes: area, boundingbox, centroid, convexhull, coords, elements, intersects, sample, tesselate, vertices
 using ArgCheck: @argcheck
 using PolygonInbounds: inpoly2
 using Graphs: SimpleDiGraph, strongly_connected_components

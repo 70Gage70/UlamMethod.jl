@@ -73,7 +73,7 @@ end
 function Boundary(x_start::Real, x_end::Real)
     @argcheck x_start < x_end
 
-    return Boundary(boundary = Segment(Meshes.Point(float(x_start)), Meshes.Point(float(x_end))))
+    return Boundary(boundary = Segment(Point(float(x_start)), Point(float(x_end))))
 end
 
 function points(boundary::Boundary{1, M, CRS}) where {M, CRS}

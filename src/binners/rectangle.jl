@@ -33,7 +33,7 @@ function RectangleBinner(
     nbins::Union{Integer, NTuple{2, Integer}, NTuple{2, AbstractVector}}, 
     boundary::Boundary{2, M, CRS}; 
     hardclip::Bool = true) where {M, CRS}
-    bbox = Meshes.boundingbox(boundary.boundary)
+    bbox = boundingbox(boundary.boundary)
     bbox_W = coords(bbox.max).x - coords(bbox.min).x
     bbox_L = coords(bbox.max).y - coords(bbox.min).y
 

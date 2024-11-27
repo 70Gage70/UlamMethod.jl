@@ -1,11 +1,11 @@
 module UlamMethod
 
 using Meshes
-using ArgCheck
-using PolygonInbounds
+using ArgCheck: @argcheck
+using PolygonInbounds: inpoly2
 using Graphs: SimpleDiGraph, strongly_connected_components
-using ParallelKMeans
-import Distributions
+using ParallelKMeans: kmeans, Yinyang
+using Distributions: Normal
 using StatsBase: countmap
 using LinearAlgebra: eigvecs
 using PrecompileTools: @compile_workload
@@ -15,7 +15,7 @@ export Trajectories
 
 include("bins.jl")
 export Bins, BinningAlgorithm
-
+ 
 include(joinpath(@__DIR__, "..", "src", "binners", "membership-1d.jl"))
 include(joinpath(@__DIR__, "..", "src", "binners", "membership-2d.jl"))
 
@@ -108,7 +108,7 @@ include("earth-polygons.jl") # EarthPolygons module
     ur = ulam_method(traj3d, HyperRectangleBinner(1000, boundary3d), reinj_algo = SourceReinjection([(1, 2, 3)]))
 end
 
-using MAT
+using MAT: matread, matwrite
 
 function _ulam(
         ARGS_file_in::String,

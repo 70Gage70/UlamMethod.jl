@@ -54,8 +54,8 @@ function Trajectories(
         @argcheck dim == length(mu_sigmaT)
     end
 
-    x0 = stack([rand(Distributions.Normal(mu_sigma0[i]...), n_traj) for i = 1:dim], dims = 1)
-    xT = x0 + stack([rand(Distributions.Normal(mu_sigmaT[i]...), n_traj) for i = 1:dim], dims = 1)
+    x0 = stack([rand(Normal(mu_sigma0[i]...), n_traj) for i = 1:dim], dims = 1)
+    xT = x0 + stack([rand(Normal(mu_sigmaT[i]...), n_traj) for i = 1:dim], dims = 1)
 
     return Trajectories(x0, xT)
 end
